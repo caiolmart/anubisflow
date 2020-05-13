@@ -37,3 +37,14 @@ Here is the list of the features of the 2-tuple flows we want to generate, and t
 | offset_m | Average Offset | ? |
 | qtd_t_icmp | Amount of ICMP Types | ? |
 | qtd_cdg_icmp | Amount of ICMP Codes | ? |
+
+
+## Testing
+
+The tests are written using pytest and are in the folder `tests`.
+
+To run the tests you may need to install `pytest-cov`:
+
+```Shell
+pytest --cov-report html --cov=src tests/
+```
