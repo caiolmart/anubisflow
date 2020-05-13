@@ -26,7 +26,7 @@ class Tuple2Node:
                     msg = f'TypeError: {key} is invalid argument'
                     raise TypeError(msg)
             except AssertionError as msg:
-                print(msg)
+                raise
 
 class AnubisFG:
 
@@ -45,5 +45,5 @@ class AnubisFG:
                     assert type(item[0][1]) == LayerFieldsContainer, msg
                     assert type(item[1]) == Tuple2Node, msg
             except AssertionError as msg:
-                print(msg)
+                raise
             self.memory = memory
