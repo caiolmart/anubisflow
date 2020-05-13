@@ -57,3 +57,9 @@ class AnubisFG:
             update(packet)
         """
         pass
+
+    def generate_features(self,
+                          flow: Tuple[LayerFieldsContainer, LayerFieldsContainer]):
+        """TODO
+        """
+        pass
