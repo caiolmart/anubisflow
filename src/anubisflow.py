@@ -2,7 +2,7 @@ from typing import Tuple, Dict
 from datetime import datetime
 
 from pyshark.packet.fields import LayerFieldsContainer
-
+from pyshark.packet.packet import Packet
 
 class Tuple2Node:
 
@@ -48,7 +48,7 @@ class AnubisFG:
                 raise
             self.memory = memory
 
-    def update(self, packet):
+    def update(self, packet: Packet):
         """TODO
         Usage
         -----
