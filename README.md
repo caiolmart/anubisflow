@@ -10,8 +10,8 @@ The goal is to store, and readily generate features of the flows.
 
 Here is the list of the features of the 2-tuple flows we want to generate, and the attribute that stores the information to generate them.
 
-| Name | Feature | Tuple2Node attribute |
-| ---- | ------- | -------------------- |
+| Feature | Description | Tuple2Node attribute(s) |
+| ------- | ----------- | --------------------- |
 | qtd_pkt_tcp | Amount of TCP Packets | pkt_protocol_counter |
 | qtd_pkt_udp | Amount of UDP Packets | pkt_protocol_counter |
 | qtd_pkt_icmp | Amount of ICMP Packets | pkt_protocol_counter |
@@ -28,6 +28,7 @@ Here is the list of the features of the 2-tuple flows we want to generate, and t
 | qtd_cwr_flag | Amount of CWR Flags | pkt_flag_counter |
 | header_len_m | Average Header Size | tot_header_len + pkt_protocol_counter |
 | packet_len_m | Average Packet Size | tot_packet_len + pkt_protocol_counter |
+| frq_packets | Frequency of packets | fst_timestamp + pkt_protocol_counter |
 | qtd_tos | Amount of IP Service Type | ? |
 | ttl_m | Average TTL | ? |
 | qtd_do_not_frag | Amount of “Do Not Frag” Flags | ? |
