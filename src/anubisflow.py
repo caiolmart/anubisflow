@@ -20,7 +20,7 @@ class Tuple2Node:
                 msg = f'AssertionError: {key} must be type {{type}}'
                 if key in self.__dict__:
                     _type = type(self.__dict__[key])
-                    assert type(value) == _type, msg.format(type=_type)
+                    assert isinstance(value, _type), msg.format(type=_type)
                     self.__dict__[key] = value
                 else:
                     msg = f'TypeError: {key} is invalid argument'
@@ -38,12 +38,12 @@ class AnubisFG:
         else:
             msg = 'AssertionError: memory must be of type Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer], Tuple2Node]'
             try:
-                assert type(memory) == dict, msg
+                assert isinstance(memory, dict), msg
                 for item in memory.items():
-                    assert type(item[0]) == tuple, msg
-                    assert type(item[0][0]) == LayerFieldsContainer, msg
-                    assert type(item[0][1]) == LayerFieldsContainer, msg
-                    assert type(item[1]) == Tuple2Node, msg
+                    assert isinstance(item[0], tuple), msg
+                    assert isinstance(item[0][0], LayerFieldsContainer), msg
+                    assert isinstance(item[0][1], LayerFieldsContainer), msg
+                    assert isinstance(item[1], Tuple2Node), msg
             except AssertionError as msg:
                 raise
             self.memory = memory
