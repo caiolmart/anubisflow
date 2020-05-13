@@ -47,3 +47,13 @@ class AnubisFG:
             except AssertionError as msg:
                 raise
             self.memory = memory
+
+    def update(self, packet):
+        """TODO
+        Usage
+        -----
+        capture = pyshark.FileCapture('tests/test_100_rows.pcap')
+        for packet in capture:
+            update(packet)
+        """
+        pass
