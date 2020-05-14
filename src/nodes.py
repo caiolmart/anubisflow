@@ -76,6 +76,15 @@ class TwoTupleBidirectionalNode:
         A set of all destination ports of forward packets of the flux.
     fwd_pkt_flag_counter: `dict`
         A counter of the number of flags on forward packets.
+        Position of flags in list:
+            FIN : 0
+            SYN : 1
+            RES : 2
+            PSH : 3
+            ACK : 4
+            URG : 5
+            ECN : 6
+            CWR : 7
     fwd_pkt_protocol_counter: `dict`
         A counter of the number of protocols of forward packets.
     fwd_tot_header_len: `int`
@@ -92,6 +101,15 @@ class TwoTupleBidirectionalNode:
         A set of all destination ports of backward packets of the flux.
     bck_pkt_flag_counter: `dict`
         A counter of the number of flags on backward packets.
+        Position of flags in list:
+            FIN : 0
+            SYN : 1
+            RES : 2
+            PSH : 3
+            ACK : 4
+            URG : 5
+            ECN : 6
+            CWR : 7
     bck_pkt_protocol_counter: `dict`
         A counter of the number of protocols of backward packets.
     bck_tot_header_len: `int`
@@ -124,4 +142,9 @@ class TwoTupleBidirectionalNode:
             msg2 = f'AssertionError: {key} must be type {{type}}'
             _type = type(self.__dict__[key])
             assert isinstance(value, _type), msg2.format(type=_type)
+            if key in ['fwd_pkt_flag_counter', 'bck_pkt_flag_counter']:
+                msg3 = f'AssertionError: {key} must be an 8 int list'
+                assert len(value) == 8, msg3
+                for c in value:
+                    assert isinstance(c, int), msg3
             self.__dict__[key] = value
