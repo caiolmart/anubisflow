@@ -94,7 +94,7 @@ class AnubisFG:
             dst_port = packet[packet.transport_layer].dstport
             protocol = packet.transport_layer
             length = packet.length
-            hdr_legth = packet.ip.hdr_length
+            hdr_length = packet.ip.hdr_length
         except:
             return
         # Only works for tcp packets
@@ -124,16 +124,28 @@ class AnubisFG:
             add_to_counter(self.memory_twotup[key].pkt_protocol_counter, 
                            protocol)
             self.memory_twotup[key].tot_packet_len += length
-            self.memory_twotup[key].tot_packet_len += hdr_legth
-            self.memory_twotup[key].pkt_flag_counter['ACK'] += ack
-            self.memory_twotup[key].pkt_flag_counter['CWR'] += cwr
-            self.memory_twotup[key].pkt_flag_counter['ECN'] += ecn
-            self.memory_twotup[key].pkt_flag_counter['FIN'] += fin
-            self.memory_twotup[key].pkt_flag_counter['RES'] += res
-            self.memory_twotup[key].pkt_flag_counter['SYN'] += syn
-            self.memory_twotup[key].pkt_flag_counter['URG'] += urg
-            self.memory_twotup[key].pkt_flag_counter['PSH'] += psh
-            
+            self.memory_twotup[key].tot_packet_len += hdr_length
+            self.memory_twotup[key].pkt_flag_counter[0] += fin
+            self.memory_twotup[key].pkt_flag_counter[1] += syn
+            self.memory_twotup[key].pkt_flag_counter[2] += res
+            self.memory_twotup[key].pkt_flag_counter[3] += psh
+            self.memory_twotup[key].pkt_flag_counter[4] += ack
+            self.memory_twotup[key].pkt_flag_counter[5] += urg
+            self.memory_twotup[key].pkt_flag_counter[6] += ecn
+            self.memory_twotup[key].pkt_flag_counter[7] += cwr
+        else:
+            d = {'fst_timestamp': timestamp,
+                 'lst_timestamp': timestamp,
+                 'set_src_ports': {src_port},
+                 'set_dst_ports': {dst_port},
+                 'pkt_flag_counter': [fin, syn, res, psh, ack, urg, ecn, cwr],
+                 'pkt_protocol_counter': {protocol : 1},
+                 'tot_header_len': hdr_length,
+                 'tot_packet_len': length}
+            node = TwoTupleUnidirectionalNode(**d)
+            self.memory_twotup[key] = node
+
+
     def generate_features(self,
                           flow: Tuple[LayerFieldsContainer,
                                       LayerFieldsContainer]):
