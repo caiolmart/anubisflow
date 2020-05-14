@@ -5,7 +5,7 @@ from pyshark.packet.fields import LayerFieldsContainer
 from pyshark.packet.packet import Packet
 
 
-class Tuple2Node:
+class TwoTupleNode:
     '''
     Class stores information of a flux.
     It is used internally by AnubisFG.
@@ -74,7 +74,7 @@ class AnubisFG:
     memory_twotup: `dict`
         The dictionary with the information of the flows. Has key (IP Source,
         IP Destination), a tuple with two
-        pyshark.packet.fields.LayerFieldsContainer's, and value Tuple2Node
+        pyshark.packet.fields.LayerFieldsContainer's, and value TwoTupleNode
         object.
 
     Examples
@@ -99,17 +99,17 @@ class AnubisFG:
     def __init__(self,
                  memory_twotup: Dict[Tuple[LayerFieldsContainer,
                                      LayerFieldsContainer],
-                                     Tuple2Node] = None):
+                                     TwoTupleNode] = None):
         if memory_twotup is None:
             self.memory_twotup = dict()
         else:
-            msg = 'AssertionError: memory_twotup must be of type Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer], Tuple2Node]'
+            msg = 'AssertionError: memory_twotup must be of type Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer], TwoTupleNode]'
             assert isinstance(memory_twotup, dict), msg
             for item in memory_twotup.items():
                 assert isinstance(item[0], tuple), msg
                 assert isinstance(item[0][0], LayerFieldsContainer), msg
                 assert isinstance(item[0][1], LayerFieldsContainer), msg
-                assert isinstance(item[1], Tuple2Node), msg
+                assert isinstance(item[1], TwoTupleNode), msg
             self.memory_twotup = memory_twotup
 
     def update(self, packet: Packet):
