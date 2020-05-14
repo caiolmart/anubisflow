@@ -98,12 +98,14 @@ class AnubisFG:
 
     def __init__(self,
                  memory_twotup: Dict[Tuple[LayerFieldsContainer,
-                                     LayerFieldsContainer],
+                                           LayerFieldsContainer],
                                      TwoTupleNode] = None):
         if memory_twotup is None:
             self.memory_twotup = dict()
         else:
-            msg = 'AssertionError: memory_twotup must be of type Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer], TwoTupleNode]'
+            msg = 'AssertionError: memory_twotup must be of type ' \
+                  'Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer], ' \
+                  'TwoTupleNode]'
             assert isinstance(memory_twotup, dict), msg
             for item in memory_twotup.items():
                 assert isinstance(item[0], tuple), msg
