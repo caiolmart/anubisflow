@@ -92,27 +92,32 @@ class AnubisFG:
             ip_src = packet.ip.src
             ip_dst = packet.ip.dst
             timestamp = packet.sniff_time
-            src_port = packet[packet.transport_layer].srcport
-            dst_port = packet[packet.transport_layer].dstport
+            src_port = int(packet[packet.transport_layer].srcport)
+            dst_port = int(packet[packet.transport_layer].dstport)
             protocol = packet.transport_layer
-            length = packet.length
-            hdr_length = packet.ip.hdr_length
-        except TypeError:
+            length = int(packet.length)
+        except AttributeError as err:
             if ignore_errors:
                 return
-            msg = 'Invalid packet'
-            raise msg
+            err.args = ('Attribute ip not in packet', )
+            raise
+
+        # Not all packets have IP headers
+        try:
+            hdr_length = int(packet.ip.hdr_length)
+        except:
+            hdr_length = 0
         # Only works for tcp packets
         try:
-            ack = packet.tcp.flags_ack
-            cwr = packet.tcp.flags_cwr
-            ecn = packet.tcp.flags_ecn
-            fin = packet.tcp.flags_fin
-            res = packet.tcp.flags_res
-            syn = packet.tcp.flags_syn
-            urg = packet.tcp.flags_urg
-            psh = packet.tcp.flags_push
-        except TypeError:
+            ack = int(packet.tcp.flags_ack)
+            cwr = int(packet.tcp.flags_cwr)
+            ecn = int(packet.tcp.flags_ecn)
+            fin = int(packet.tcp.flags_fin)
+            res = int(packet.tcp.flags_res)
+            syn = int(packet.tcp.flags_syn)
+            urg = int(packet.tcp.flags_urg)
+            psh = int(packet.tcp.flags_push)
+        except AttributeError:
             ack = 0
             cwr = 0
             ecn = 0
