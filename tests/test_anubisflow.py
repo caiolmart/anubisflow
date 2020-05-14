@@ -21,6 +21,7 @@ def test_twotuple_default():
 
 def test_twotuple_ud():
     k = {'fst_timestamp': datetime(1995, 12, 2),
+         'lst_timestamp': datetime(1995, 12, 2),
          'set_src_ports': {82, 8888, 42},
          'set_dst_ports': {82, 8888, 42},
          'pkt_flag_counter': {2: 5, 4: 1},
@@ -32,7 +33,8 @@ def test_twotuple_ud():
 
 
 def test_twotuple_raises():
-    k = {'fst_timestamp': 5,
+    k = {'fst_timestamp': 42,
+         'lst_timestamp': 42,
          'set_src_ports': datetime(1995, 12, 2),
          'set_dst_ports': datetime(1995, 12, 2),
          'pkt_flag_counter': datetime(1995, 12, 2),

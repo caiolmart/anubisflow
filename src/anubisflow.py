@@ -2,9 +2,13 @@ from typing import Tuple, Dict
 
 from pyshark.packet.fields import LayerFieldsContainer
 from pyshark.packet.packet import Packet
-from .nodes import TwoTupleNode
+from .nodes import TwoTupleUnidirectionalNode
 
-
+def add_to_counter(counter, key, val=1):
+    if key in counter:
+        counter[key] += val
+    else:
+        counter[key] = val
 
 class AnubisFG:
     '''
@@ -34,7 +38,7 @@ class AnubisFG:
     memory_twotup: `dict`
         The dictionary with the information of the flows. Has key (IP Source,
         IP Destination), a tuple with two
-        pyshark.packet.fields.LayerFieldsContainer's, and value TwoTupleNode
+        pyshark.packet.fields.LayerFieldsContainer's, and value TwoTupleUnidirectionalNode
         object.
 
     Examples
@@ -59,30 +63,37 @@ class AnubisFG:
     def __init__(self,
                  memory_twotup: Dict[Tuple[LayerFieldsContainer,
                                            LayerFieldsContainer],
-                                     TwoTupleNode] = None):
+                                     TwoTupleUnidirectionalNode] = None):
         if memory_twotup is None:
             self.memory_twotup = dict()
         else:
             msg = 'AssertionError: memory_twotup must be of type ' \
                   'Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer], ' \
-                  'TwoTupleNode]'
+                  'TwoTupleUnidirectionalNode]'
             assert isinstance(memory_twotup, dict), msg
             for item in memory_twotup.items():
                 assert isinstance(item[0], tuple), msg
                 assert isinstance(item[0][0], LayerFieldsContainer), msg
                 assert isinstance(item[0][1], LayerFieldsContainer), msg
-                assert isinstance(item[1], TwoTupleNode), msg
+                assert isinstance(item[1], TwoTupleUnidirectionalNode), msg
             self.memory_twotup = memory_twotup
 
-    def update(self, packet: Packet):
+    def update_twotuple(self, packet: Packet):
         """TODO
         Usage
         -----
-        capture = pyshark.FileCapture('tests/test_100_rows.pcap')
+        capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
         for packet in capture:
             update(packet)
         """
-        pass
+        ip_src = packet.ip.src
+        ip_dst = packet.ip.dst
+        timestamp = packet.sniff_time
+        src_port = packet[packet.transport_layer].srcport
+        dst_port = packet[packet.transport_layer].dstport
+        protocol = packet.transport_layer
+        if protocol == 'TCP':
+            packet.tcp.flags_ack
 
     def generate_features(self,
                           flow: Tuple[LayerFieldsContainer,
