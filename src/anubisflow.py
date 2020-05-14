@@ -1,5 +1,4 @@
 from typing import Tuple, Dict
-from datetime import datetime
 
 from pyshark.packet.fields import LayerFieldsContainer
 from pyshark.packet.packet import Packet

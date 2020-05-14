@@ -40,4 +40,3 @@ class TwoTupleNode:
             _type = type(self.__dict__[key])
             assert isinstance(value, _type), msg2.format(type=_type)
             self.__dict__[key] = value
-
