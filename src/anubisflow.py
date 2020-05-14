@@ -4,11 +4,13 @@ from pyshark.packet.fields import LayerFieldsContainer
 from pyshark.packet.packet import Packet
 from .nodes import TwoTupleUnidirectionalNode
 
+
 def add_to_counter(counter, key, val=1):
     if key in counter:
         counter[key] += val
     else:
         counter[key] = val
+
 
 class AnubisFG:
     '''
@@ -38,7 +40,7 @@ class AnubisFG:
     memory_twotup: `dict`
         The dictionary with the information of the flows. Has key (IP Source,
         IP Destination), a tuple with two
-        pyshark.packet.fields.LayerFieldsContainer's, and value 
+        pyshark.packet.fields.LayerFieldsContainer's, and value
         TwoTupleUnidirectionalNode object.
 
     Examples
@@ -78,7 +80,7 @@ class AnubisFG:
                 assert isinstance(item[1], TwoTupleUnidirectionalNode), msg
             self.memory_twotup = memory_twotup
 
-    def _update_twotupleuni(self, packet: Packet):
+    def _update_twotupleuni(self, packet: Packet, ignore_errors=True):
         """TODO
         Usage
         -----
@@ -95,8 +97,11 @@ class AnubisFG:
             protocol = packet.transport_layer
             length = packet.length
             hdr_length = packet.ip.hdr_length
-        except:
-            return
+        except TypeError:
+            if ignore_errors:
+                return
+            msg = 'Invalid packet'
+            raise msg
         # Only works for tcp packets
         try:
             ack = packet.tcp.flags_ack
@@ -107,7 +112,7 @@ class AnubisFG:
             syn = packet.tcp.flags_syn
             urg = packet.tcp.flags_urg
             psh = packet.tcp.flags_push
-        except:
+        except TypeError:
             ack = 0
             cwr = 0
             ecn = 0
@@ -121,7 +126,7 @@ class AnubisFG:
             self.memory_twotup[key].lst_timestamp = timestamp
             self.memory_twotup[key].set_src_ports.add(src_port)
             self.memory_twotup[key].set_dst_ports.add(dst_port)
-            add_to_counter(self.memory_twotup[key].pkt_protocol_counter, 
+            add_to_counter(self.memory_twotup[key].pkt_protocol_counter,
                            protocol)
             self.memory_twotup[key].tot_packet_len += length
             self.memory_twotup[key].tot_packet_len += hdr_length
@@ -134,17 +139,17 @@ class AnubisFG:
             self.memory_twotup[key].pkt_flag_counter[6] += ecn
             self.memory_twotup[key].pkt_flag_counter[7] += cwr
         else:
-            d = {'fst_timestamp': timestamp,
-                 'lst_timestamp': timestamp,
-                 'set_src_ports': {src_port},
-                 'set_dst_ports': {dst_port},
-                 'pkt_flag_counter': [fin, syn, res, psh, ack, urg, ecn, cwr],
-                 'pkt_protocol_counter': {protocol : 1},
-                 'tot_header_len': hdr_length,
-                 'tot_packet_len': length}
-            node = TwoTupleUnidirectionalNode(**d)
+            node_dict = {'fst_timestamp': timestamp,
+                         'lst_timestamp': timestamp,
+                         'set_src_ports': {src_port},
+                         'set_dst_ports': {dst_port},
+                         'pkt_flag_counter': [fin, syn, res, psh, ack, urg, ecn, 
+                                              cwr],
+                         'pkt_protocol_counter': {protocol: 1},
+                         'tot_header_len': hdr_length,
+                         'tot_packet_len': length}
+            node = TwoTupleUnidirectionalNode(**node_dict)
             self.memory_twotup[key] = node
-
 
     def generate_features(self,
                           flow: Tuple[LayerFieldsContainer,

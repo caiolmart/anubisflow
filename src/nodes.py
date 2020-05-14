@@ -58,6 +58,7 @@ class TwoTupleUnidirectionalNode:
                     assert isinstance(c, int), msg3
             self.__dict__[key] = value
 
+
 class TwoTupleBidirectionalNode:
     '''
     Class stores information of a flux.
