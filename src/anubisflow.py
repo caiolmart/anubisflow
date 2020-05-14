@@ -38,15 +38,12 @@ class Tuple2Node:
         self.tot_packet_len = 0
 
         for key, value in kwargs.items():
-            try:
-                msg1 = f'AssertionError: {key} is invalid argument'
-                assert key in self.__dict__, msg1
-                msg2 = f'AssertionError: {key} must be type {{type}}'
-                _type = type(self.__dict__[key])
-                assert isinstance(value, _type), msg2.format(type=_type)
-                self.__dict__[key] = value
-            except AssertionError as msg:
-                raise
+            msg1 = f'AssertionError: {key} is invalid argument'
+            assert key in self.__dict__, msg1
+            msg2 = f'AssertionError: {key} must be type {{type}}'
+            _type = type(self.__dict__[key])
+            assert isinstance(value, _type), msg2.format(type=_type)
+            self.__dict__[key] = value
 
 
 class AnubisFG:
@@ -107,15 +104,12 @@ class AnubisFG:
             self.memory = dict()
         else:
             msg = 'AssertionError: memory must be of type Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer], Tuple2Node]'
-            try:
-                assert isinstance(memory, dict), msg
-                for item in memory.items():
-                    assert isinstance(item[0], tuple), msg
-                    assert isinstance(item[0][0], LayerFieldsContainer), msg
-                    assert isinstance(item[0][1], LayerFieldsContainer), msg
-                    assert isinstance(item[1], Tuple2Node), msg
-            except AssertionError as msg:
-                raise
+            assert isinstance(memory, dict), msg
+            for item in memory.items():
+                assert isinstance(item[0], tuple), msg
+                assert isinstance(item[0][0], LayerFieldsContainer), msg
+                assert isinstance(item[0][1], LayerFieldsContainer), msg
+                assert isinstance(item[1], Tuple2Node), msg
             self.memory = memory
 
     def update(self, packet: Packet):
