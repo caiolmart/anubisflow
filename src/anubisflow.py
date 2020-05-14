@@ -71,7 +71,7 @@ class AnubisFG:
 
     Attributes
     ----------
-    memory_2tuple: `dict`
+    memory_twotup: `dict`
         The dictionary with the information of the flows. Has key (IP Source,
         IP Destination), a tuple with two
         pyshark.packet.fields.LayerFieldsContainer's, and value Tuple2Node
@@ -97,20 +97,20 @@ class AnubisFG:
     '''
 
     def __init__(self,
-                 memory: Dict[Tuple[LayerFieldsContainer,
-                                    LayerFieldsContainer],
-                              Tuple2Node] = None):
-        if memory is None:
-            self.memory = dict()
+                 memory_twotup: Dict[Tuple[LayerFieldsContainer,
+                                     LayerFieldsContainer],
+                                     Tuple2Node] = None):
+        if memory_twotup is None:
+            self.memory_twotup = dict()
         else:
-            msg = 'AssertionError: memory must be of type Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer], Tuple2Node]'
-            assert isinstance(memory, dict), msg
-            for item in memory.items():
+            msg = 'AssertionError: memory_twotup must be of type Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer], Tuple2Node]'
+            assert isinstance(memory_twotup, dict), msg
+            for item in memory_twotup.items():
                 assert isinstance(item[0], tuple), msg
                 assert isinstance(item[0][0], LayerFieldsContainer), msg
                 assert isinstance(item[0][1], LayerFieldsContainer), msg
                 assert isinstance(item[1], Tuple2Node), msg
-            self.memory = memory
+            self.memory_twotup = memory_twotup
 
     def update(self, packet: Packet):
         """TODO

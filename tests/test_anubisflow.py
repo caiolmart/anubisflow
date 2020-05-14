@@ -47,7 +47,7 @@ def test_tuple2_raises():
 
 def test_anubisfg_default():
     afg = af.AnubisFG()
-    assert afg.memory == dict()
+    assert afg.memory_twotup == dict()
 
 
 def test_anubisfg_ud():
@@ -57,15 +57,15 @@ def test_anubisfg_ud():
     t2_2 = af.Tuple2Node()
     ip_src_2 = LayerFieldsContainer('192.168.0.1')
     ip_dst_2 = LayerFieldsContainer('192.168.0.2')
-    memory_1 = {(ip_src_1, ip_dst_1): t2_1}
-    memory_2 = {(ip_src_1, ip_dst_1): t2_1,
+    memory_twotup_1 = {(ip_src_1, ip_dst_1): t2_1}
+    memory_twotup_2 = {(ip_src_1, ip_dst_1): t2_1,
                 (ip_src_2, ip_dst_2): t2_2}
 
-    afg_1 = af.AnubisFG(memory=memory_1)
-    afg_2 = af.AnubisFG(memory=memory_2)
+    afg_1 = af.AnubisFG(memory_twotup=memory_twotup_1)
+    afg_2 = af.AnubisFG(memory_twotup=memory_twotup_2)
 
-    assert memory_1 == afg_1.memory
-    assert memory_2 == afg_2.memory
+    assert memory_twotup_1 == afg_1.memory_twotup
+    assert memory_twotup_2 == afg_2.memory_twotup
 
 
 def test_anubisfg_raises():
@@ -82,6 +82,6 @@ def test_anubisfg_raises():
                 {(ip_src_1, ip_dst_2): t2_1},
                 {(ip_src_1, ip_dst_1): t2_2}]
 
-    for memory in memories:
+    for memory_twotup in memories:
         with pytest.raises(AssertionError):
-            _ = af.AnubisFG(memory=memory)
+            _ = af.AnubisFG(memory_twotup=memory_twotup)
