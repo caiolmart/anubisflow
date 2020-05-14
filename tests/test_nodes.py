@@ -13,7 +13,7 @@ def test_twotupleuni_default():
     assert 0 <= (datetime.now() - t2.fst_timestamp).seconds < 5
     assert t2.set_src_ports == set()
     assert t2.set_dst_ports == set()
-    assert t2.pkt_flag_counter == dict()
+    assert t2.pkt_flag_counter == [0] * 8
     assert t2.pkt_protocol_counter == dict()
     assert t2.tot_header_len == 0
     assert t2.tot_packet_len == 0
@@ -24,7 +24,7 @@ def test_twotupleuni_ud():
          'lst_timestamp': datetime(1995, 12, 2),
          'set_src_ports': {82, 8888, 42},
          'set_dst_ports': {82, 8888, 42},
-         'pkt_flag_counter': {2: 5, 4: 1},
+         'pkt_flag_counter': [10] * 8,
          'pkt_protocol_counter': {2: 5, 4: 1},
          'tot_header_len': 1048,
          'tot_packet_len': int(1e10)}
@@ -46,3 +46,5 @@ def test_twotupleuni_raises():
             _ = TwoTupleUnidirectionalNode(**{item[0]: item[1]})
     with pytest.raises(AssertionError):
         _ = TwoTupleUnidirectionalNode(**{'foo': 'bar'})
+    with pytest.raises(AssertionError):
+        _ = TwoTupleUnidirectionalNode(pkt_flag_counter=[2]* 6)

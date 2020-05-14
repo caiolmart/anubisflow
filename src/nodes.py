@@ -16,8 +16,17 @@ class TwoTupleUnidirectionalNode:
         A set of all source ports of packets of the flux.
     set_dst_ports: `set`
         A set of all destination ports of packets of the flux.
-    pkt_flag_counter: `dict`
+    pkt_flag_counter: `list`
         A counter of the number of flags on packets.
+        Position of flags in list:
+            FIN : 0
+            SYN : 1
+            RES : 2
+            PSH : 3
+            ACK : 4
+            URG : 5
+            ECN : 6
+            CWR : 7
     pkt_protocol_counter: `dict`
         A counter of the number of protocols of packets.
     tot_header_len: `int`
@@ -31,7 +40,7 @@ class TwoTupleUnidirectionalNode:
         self.lst_timestamp = self.fst_timestamp
         self.set_src_ports = set()
         self.set_dst_ports = set()
-        self.pkt_flag_counter = dict()
+        self.pkt_flag_counter = [0] * 8
         self.pkt_protocol_counter = dict()
         self.tot_header_len = 0
         self.tot_packet_len = 0
@@ -42,6 +51,11 @@ class TwoTupleUnidirectionalNode:
             msg2 = f'AssertionError: {key} must be type {{type}}'
             _type = type(self.__dict__[key])
             assert isinstance(value, _type), msg2.format(type=_type)
+            if key == 'pkt_flag_counter':
+                msg3 = 'AssertionError: pkt_flag_counter must be an 8 int list'
+                assert len(value) == 8, msg3
+                for c in value:
+                    assert isinstance(c, int), msg3
             self.__dict__[key] = value
 
 class TwoTupleBidirectionalNode:
@@ -90,7 +104,7 @@ class TwoTupleBidirectionalNode:
         self.fwd_lst_timestamp = self.fwd_fst_timestamp
         self.fwd_set_src_ports = set()
         self.fwd_set_dst_ports = set()
-        self.fwd_pkt_flag_counter = dict()
+        self.fwd_pkt_flag_counter = [0] * 8
         self.fwd_pkt_protocol_counter = dict()
         self.fwd_tot_header_len = 0
         self.fwd_tot_packet_len = 0
@@ -98,7 +112,7 @@ class TwoTupleBidirectionalNode:
         self.bck_lst_timestamp = self.bck_fst_timestamp
         self.bck_set_src_ports = set()
         self.bck_set_dst_ports = set()
-        self.bck_pkt_flag_counter = dict()
+        self.bck_pkt_flag_counter = [0] * 8
         self.bck_pkt_protocol_counter = dict()
         self.bck_tot_header_len = 0
         self.bck_tot_packet_len = 0
