@@ -54,8 +54,8 @@ class TwoTupleUnidirectionalNode:
             if key == 'pkt_flag_counter':
                 msg3 = 'AssertionError: pkt_flag_counter must be an 8 int list'
                 assert len(value) == 8, msg3
-                for c in value:
-                    assert isinstance(c, int), msg3
+                for c_value in value:
+                    assert isinstance(c_value, int), msg3
             self.__dict__[key] = value
 
 
@@ -145,6 +145,6 @@ class TwoTupleBidirectionalNode:
             if key in ['fwd_pkt_flag_counter', 'bck_pkt_flag_counter']:
                 msg3 = f'AssertionError: {key} must be an 8 int list'
                 assert len(value) == 8, msg3
-                for c in value:
-                    assert isinstance(c, int), msg3
+                for c_value in value:
+                    assert isinstance(c_value, int), msg3
             self.__dict__[key] = value

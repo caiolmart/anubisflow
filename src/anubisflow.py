@@ -105,7 +105,7 @@ class AnubisFG:
         # Not all packets have IP headers
         try:
             hdr_length = int(packet.ip.hdr_length)
-        except:
+        except AttributeError:
             hdr_length = 0
         # Only works for tcp packets
         try:
@@ -144,15 +144,24 @@ class AnubisFG:
             self.memory_twotup[key].pkt_flag_counter[6] += ecn
             self.memory_twotup[key].pkt_flag_counter[7] += cwr
         else:
-            node_dict = {'fst_timestamp': timestamp,
-                         'lst_timestamp': timestamp,
-                         'set_src_ports': {src_port},
-                         'set_dst_ports': {dst_port},
-                         'pkt_flag_counter': [fin, syn, res, psh, ack, urg, ecn, 
-                                              cwr],
-                         'pkt_protocol_counter': {protocol: 1},
-                         'tot_header_len': hdr_length,
-                         'tot_packet_len': length}
+            node_dict = {
+                'fst_timestamp': timestamp,
+                'lst_timestamp': timestamp,
+                'set_src_ports': {src_port},
+                'set_dst_ports': {dst_port},
+                'pkt_flag_counter': [
+                    fin,
+                    syn,
+                    res,
+                    psh,
+                    ack,
+                    urg,
+                    ecn,
+                    cwr],
+                'pkt_protocol_counter': {
+                    protocol: 1},
+                'tot_header_len': hdr_length,
+                'tot_packet_len': length}
             node = TwoTupleUnidirectionalNode(**node_dict)
             self.memory_twotup[key] = node
 

@@ -48,7 +48,7 @@ def test_twotupleuni_raises():
     with pytest.raises(AssertionError):
         _ = TwoTupleUnidirectionalNode(**{'foo': 'bar'})
     with pytest.raises(AssertionError):
-        _ = TwoTupleUnidirectionalNode(pkt_flag_counter=[2]* 6)
+        _ = TwoTupleUnidirectionalNode(pkt_flag_counter=[2] * 6)
 
 
 def test_twotuplebi_default():
@@ -87,7 +87,7 @@ def test_twotuplebi_ud():
          'bck_pkt_flag_counter': [10] * 8,
          'bck_pkt_protocol_counter': {2: 5, 4: 1},
          'bck_tot_header_len': 1048,
-         'bck_tot_packet_len': int(1e10),}
+         'bck_tot_packet_len': int(1e10), }
     t2 = TwoTupleBidirectionalNode(**k)
     assert t2.__dict__ == k
 
@@ -115,6 +115,6 @@ def test_twotuplebi_raises():
     with pytest.raises(AssertionError):
         _ = TwoTupleBidirectionalNode(**{'foo': 'bar'})
     with pytest.raises(AssertionError):
-        _ = TwoTupleBidirectionalNode(fwd_pkt_flag_counter=[2]* 6)
+        _ = TwoTupleBidirectionalNode(fwd_pkt_flag_counter=[2] * 6)
     with pytest.raises(AssertionError):
-        _ = TwoTupleBidirectionalNode(bck_pkt_flag_counter=[2]* 6)
+        _ = TwoTupleBidirectionalNode(bck_pkt_flag_counter=[2] * 6)

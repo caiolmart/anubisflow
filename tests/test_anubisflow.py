@@ -10,7 +10,7 @@ from src.nodes import TwoTupleUnidirectionalNode
 
 
 def test_add_to_counter():
-    counter = {1 : 3}
+    counter = {1: 3}
     add_to_counter(counter, 1)
     assert counter[1] == 4
     add_to_counter(counter, 2)
@@ -31,7 +31,7 @@ def test_anubisfg_ud():
     ip_dst_2 = LayerFieldsContainer('192.168.0.2')
     memory_twotup_1 = {(ip_src_1, ip_dst_1): t2_1}
     memory_twotup_2 = {(ip_src_1, ip_dst_1): t2_1,
-                (ip_src_2, ip_dst_2): t2_2}
+                       (ip_src_2, ip_dst_2): t2_2}
 
     afg_1 = AnubisFG(memory_twotup=memory_twotup_1)
     afg_2 = AnubisFG(memory_twotup=memory_twotup_2)
@@ -94,7 +94,7 @@ def test__update_twotupleuni_update():
                 'set_src_ports': {src_port},
                 'set_dst_ports': {dst_port},
                 'pkt_flag_counter': pkt_flag_counter,
-                'pkt_protocol_counter': {protocol : 1},
+                'pkt_protocol_counter': {protocol: 1},
                 'tot_header_len': 0,
                 'tot_packet_len': length}
     assert len(afg.memory_twotup) == 1
@@ -111,7 +111,7 @@ def test__update_twotupleuni_update():
                 'set_src_ports': {src_port},
                 'set_dst_ports': {dst_port},
                 'pkt_flag_counter': pkt_flag_counter,
-                'pkt_protocol_counter': {protocol : 2},
+                'pkt_protocol_counter': {protocol: 2},
                 'tot_header_len': 0,
                 'tot_packet_len': length * 2}
     assert len(afg.memory_twotup) == 1
