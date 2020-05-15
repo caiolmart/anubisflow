@@ -10,7 +10,7 @@ The goal is to store, and readily generate features of the flows.
 
 Here is the list of the features of the 2-tuple flows we want to generate, and the attribute that stores the information to generate them.
 
-| Feature | Description | Tuple2Node attribute(s) |
+| Feature | Description | TwoTupleNode attribute(s) |
 | ------- | ----------- | --------------------- |
 | qt_pkt | Amount of packets | pkt_protocol_counter |
 | qt_pkt_tcp | Amount of TCP Packets | pkt_protocol_counter |
