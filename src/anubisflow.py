@@ -12,6 +12,7 @@ def add_to_counter(counter, key, val=1):
     else:
         counter[key] = val
 
+
 def zero_if_not_exits(counter, key):
     if key in counter:
         return counter[key]
@@ -349,4 +350,3 @@ class AnubisFG:
             frq_pkt,
             duration_s,
         ]
-

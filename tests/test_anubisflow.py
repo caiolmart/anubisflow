@@ -262,26 +262,26 @@ def test__generate_features_twotupleuni():
     timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
     afg._update_twotupleuni(packet)
     expected = [
-        1, #qt_pkt
-        1, #qt_pkt_tcp
-        0, #qt_pkt_udp
-        0, #qt_pkt_icmp
-        0, #qt_pkt_ip
-        1, #qt_prtcl
-        1, #qt_src_prt
-        1, #qt_dst_prt
-        0, #qt_fin_fl
-        1, #qt_syn_fl
-        0, #qt_psh_fl
-        0, #qt_ack_fl
-        0, #qt_urg_fl
-        0, #qt_rst_fl
-        0, #qt_ece_fl
-        0, #qt_cwr_fl
-        0, #avg_hdr_len
-        74, #avg_pkt_len
-        1, #frq_pkt
-        0, #tm_dur
+        1,  # qt_pkt
+        1,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        1,  # qt_prtcl
+        1,  # qt_src_prt
+        1,  # qt_dst_prt
+        0,  # qt_fin_fl
+        1,  # qt_syn_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_rst_fl
+        0,  # qt_ece_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len
+        1,  # frq_pkt
+        0,  # tm_dur
     ]
     ftrs = afg._generate_features_twotupleuni(key)
     assert ftrs == expected
@@ -294,26 +294,26 @@ def test__generate_features_twotupleuni():
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
     dur = (new_timestamp - timestamp).total_seconds()
     expected = [
-        2, #qt_pkt
-        2, #qt_pkt_tcp
-        0, #qt_pkt_udp
-        0, #qt_pkt_icmp
-        0, #qt_pkt_ip
-        1, #qt_prtcl
-        1, #qt_src_prt
-        1, #qt_dst_prt
-        0, #qt_fin_fl
-        2, #qt_syn_fl
-        0, #qt_psh_fl
-        0, #qt_ack_fl
-        0, #qt_urg_fl
-        0, #qt_rst_fl
-        0, #qt_ece_fl
-        0, #qt_cwr_fl
-        0, #avg_hdr_len
-        74, #avg_pkt_len
-        2 / dur, #frq_pkt
-        dur, #tm_dur
+        2,  # qt_pkt
+        2,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        1,  # qt_prtcl
+        1,  # qt_src_prt
+        1,  # qt_dst_prt
+        0,  # qt_fin_fl
+        2,  # qt_syn_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_rst_fl
+        0,  # qt_ece_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len
+        2 / dur,  # frq_pkt
+        dur,  # tm_dur
     ]
     ftrs = afg._generate_features_twotupleuni(key)
     assert ftrs == expected
@@ -322,26 +322,26 @@ def test__generate_features_twotupleuni():
     new_timestamp = datetime.now()
     dur = (new_timestamp - timestamp).total_seconds()
     expected = [
-        2, #qt_pkt
-        2, #qt_pkt_tcp
-        0, #qt_pkt_udp
-        0, #qt_pkt_icmp
-        0, #qt_pkt_ip
-        1, #qt_prtcl
-        1, #qt_src_prt
-        1, #qt_dst_prt
-        0, #qt_fin_fl
-        2, #qt_syn_fl
-        0, #qt_psh_fl
-        0, #qt_ack_fl
-        0, #qt_urg_fl
-        0, #qt_rst_fl
-        0, #qt_ece_fl
-        0, #qt_cwr_fl
-        0, #avg_hdr_len
-        74, #avg_pkt_len
-        2 / dur, #frq_pkt
-        dur, #tm_dur
+        2,  # qt_pkt
+        2,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        1,  # qt_prtcl
+        1,  # qt_src_prt
+        1,  # qt_dst_prt
+        0,  # qt_fin_fl
+        2,  # qt_syn_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_rst_fl
+        0,  # qt_ece_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len
+        2 / dur,  # frq_pkt
+        dur,  # tm_dur
     ]
     ftrs = afg._generate_features_twotupleuni(key, now=True)
     assert np.isclose(ftrs, expected).all()
