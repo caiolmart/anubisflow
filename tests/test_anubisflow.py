@@ -85,6 +85,7 @@ def test__update_twotupleuni_update():
     protocol = 'TCP'
     length = 74
     pkt_flag_counter = [0] * 8
+    # SYN flag
     pkt_flag_counter[1] = 1
 
     # Creating
@@ -104,6 +105,7 @@ def test__update_twotupleuni_update():
     # Third package is another SYN TCP packet with same IPs and Ports
     packet = capture[2]
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+    # SYN flag
     pkt_flag_counter[1] += 1
     afg._update_twotupleuni(packet)
     expected = {'fst_timestamp': timestamp,
@@ -114,5 +116,105 @@ def test__update_twotupleuni_update():
                 'pkt_protocol_counter': {protocol: 2},
                 'tot_header_len': 0,
                 'tot_packet_len': length * 2}
+    assert len(afg.memory_twotup) == 1
+    assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
+
+
+def test__update_twotuplebi_noupdate():
+    afg = AnubisFG()
+    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    # First packet is a STP packet that should not be read.
+    packet = capture[0]
+
+    afg._update_twotuplebi(packet)
+    assert afg.memory_twotup == dict()
+    with pytest.raises(AttributeError, match='Attribute ip not in packet'):
+        afg._update_twotuplebi(packet, ignore_errors=False)
+
+
+def test__update_twotuplebi_update():
+    afg = AnubisFG()
+    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    # Second packet is a SYN TCP packet.
+    packet = capture[1]
+
+    ip_src = LayerFieldsContainer('172.16.0.5')
+    ip_dst = LayerFieldsContainer('192.168.50.1')
+    timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
+    src_port = 60675
+    dst_port = 80
+    protocol = 'TCP'
+    length = 74
+    fwd_pkt_flag_counter = [0] * 8
+    # SYN flag
+    fwd_pkt_flag_counter[1] = 1
+    bck_pkt_flag_counter = [0] * 8
+
+    # Creating
+    afg._update_twotuplebi(packet)
+    expected = {'fst_timestamp': timestamp,
+                'lst_timestamp': timestamp,
+                'fwd_set_src_ports': {src_port},
+                'fwd_set_dst_ports': {dst_port},
+                'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
+                'fwd_pkt_protocol_counter': {protocol: 1},
+                'fwd_tot_header_len': 0,
+                'fwd_tot_packet_len': length,
+                'bck_set_src_ports': set(),
+                'bck_set_dst_ports': set(),
+                'bck_pkt_flag_counter': bck_pkt_flag_counter,
+                'bck_pkt_protocol_counter': dict(),
+                'bck_tot_header_len': 0,
+                'bck_tot_packet_len': 0}
+    assert len(afg.memory_twotup) == 1
+    assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
+
+    # Updating Forward
+    # Third package is another SYN TCP packet with same IPs and Ports
+    packet = capture[2]
+    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+    # SYN flag
+    fwd_pkt_flag_counter[1] += 1
+    afg._update_twotuplebi(packet)
+    expected = {'fst_timestamp': timestamp,
+                'lst_timestamp': new_timestamp,
+                'fwd_set_src_ports': {src_port},
+                'fwd_set_dst_ports': {dst_port},
+                'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
+                'fwd_pkt_protocol_counter': {protocol: 2},
+                'fwd_tot_header_len': 0,
+                'fwd_tot_packet_len': length * 2,
+                'bck_set_src_ports': set(),
+                'bck_set_dst_ports': set(),
+                'bck_pkt_flag_counter': bck_pkt_flag_counter,
+                'bck_pkt_protocol_counter': dict(),
+                'bck_tot_header_len': 0,
+                'bck_tot_packet_len': 0}
+    assert len(afg.memory_twotup) == 1
+    assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
+
+    # Fourth package is a SYN ACK response TCP packet with inverted IPs and
+    # Ports
+    packet = capture[3]
+    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
+    # SYN flag
+    bck_pkt_flag_counter[1] += 1
+    # ACK flag
+    bck_pkt_flag_counter[4] += 1
+    afg._update_twotuplebi(packet)
+    expected = {'fst_timestamp': timestamp,
+                'lst_timestamp': new_timestamp,
+                'fwd_set_src_ports': {src_port},
+                'fwd_set_dst_ports': {dst_port},
+                'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
+                'fwd_pkt_protocol_counter': {protocol: 2},
+                'fwd_tot_header_len': 0,
+                'fwd_tot_packet_len': length * 2,
+                'bck_set_src_ports': {dst_port},
+                'bck_set_dst_ports': {src_port},
+                'bck_pkt_flag_counter': bck_pkt_flag_counter,
+                'bck_pkt_protocol_counter': {protocol: 1},
+                'bck_tot_header_len': 0,
+                'bck_tot_packet_len': length}
     assert len(afg.memory_twotup) == 1
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
