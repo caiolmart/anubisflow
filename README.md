@@ -12,31 +12,34 @@ Here is the list of the features of the 2-tuple flows we want to generate, and t
 
 | Feature | Description | Tuple2Node attribute(s) |
 | ------- | ----------- | --------------------- |
-| qtd_pkt_tcp | Amount of TCP Packets | pkt_protocol_counter |
-| qtd_pkt_udp | Amount of UDP Packets | pkt_protocol_counter |
-| qtd_pkt_icmp | Amount of ICMP Packets | pkt_protocol_counter |
-| qtd_pkt_ip | Amount of IP Packets | pkt_protocol_counter |
-| qtd_src_port | Amount of Source Ports | set_src_ports |
-| qtd_dst_port | Amount of Destination Ports | set_dst_ports |
-| qtd_fin_flag | Amount of FIN Flags | pkt_flag_counter |
-| qtd_syn_flag | Amount of SYN Flags | pkt_flag_counter |
-| qtd_psh_flag | Amount of PSH Flags | pkt_flag_counter |
-| qtd_ack_flag | Amount of ACK Flags | pkt_flag_counter |
-| qtd_urg_flag | Amount of URG Flags | pkt_flag_counter |
-| qtd_rst_flag | Amount of RST Flags | pkt_flag_counter |
-| qtd_ece_flag | Amount of ECE Flags | pkt_flag_counter |
-| qtd_cwr_flag | Amount of CWR Flags | pkt_flag_counter |
-| header_len_m | Average Header Size | tot_header_len + pkt_protocol_counter |
-| packet_len_m | Average Packet Size | tot_packet_len + pkt_protocol_counter |
-| frq_packets | Frequency of packets | fst_timestamp + pkt_protocol_counter |
-| qtd_tos | Amount of IP Service Type | ? |
-| ttl_m | Average TTL | ? |
-| qtd_do_not_frag | Amount of “Do Not Frag” Flags | ? |
-| qtd_more_frag | Amount of “More Frag” Flags | ? |
-| fragment_offset_m | Average Fragment Offset | ? |
-| offset_m | Average Offset | ? |
-| qtd_t_icmp | Amount of ICMP Types | ? |
-| qtd_cdg_icmp | Amount of ICMP Codes | ? |
+| qt_pkt | Amount of packets | pkt_protocol_counter |
+| qt_pkt_tcp | Amount of TCP Packets | pkt_protocol_counter |
+| qt_pkt_udp | Amount of UDP Packets | pkt_protocol_counter |
+| qt_pkt_icmp | Amount of ICMP Packets | pkt_protocol_counter |
+| qt_pkt_ip | Amount of IP Packets | pkt_protocol_counter |
+| qt_prtcl | Amount of protocols | pkt_protocol_counter |
+| qt_src_prt | Amount of Source Ports | set_src_ports |
+| qt_dst_prt | Amount of Destination Ports | set_dst_ports |
+| qt_fin_fl | Amount of FIN Flags | pkt_flag_counter |
+| qt_syn_fl | Amount of SYN Flags | pkt_flag_counter |
+| qt_psh_fl | Amount of PSH Flags | pkt_flag_counter |
+| qt_ack_fl | Amount of ACK Flags | pkt_flag_counter |
+| qt_urg_fl | Amount of URG Flags | pkt_flag_counter |
+| qt_rst_fl | Amount of RST Flags | pkt_flag_counter |
+| qt_ece_fl | Amount of ECE Flags | pkt_flag_counter |
+| qt_cwr_fl | Amount of CWR Flags | pkt_flag_counter |
+| avg_hdr_len | Average Header Size | tot_header_len + pkt_protocol_counter |
+| avg_pkt_len | Average Packet Size | tot_packet_len + pkt_protocol_counter |
+| frq_pkt | Frequency of packets | fst_timestamp (+ lst_timestamp) + pkt_protocol_counter |
+| tm_dur_s | Time duration of the flow (s) | fst_timestamp (+ lst_timestamp)|
+| qt_tos | Amount of IP Service Type | TODO |
+| ttl_m | Average TTL | TODO |
+| qt_do_not_frag | Amount of “Do Not Frag” Flags | TODO |
+| qt_more_frag | Amount of “More Frag” Flags | TODO |
+| fragment_offset_m | Average Fragment Offset | TODO |
+| offset_m | Average Offset | TODO |
+| qt_t_icmp | Amount of ICMP Types | TODO |
+| qt_cdg_icmp | Amount of ICMP Codes | TODO |
 
 
 ## Testing
