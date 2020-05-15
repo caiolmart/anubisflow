@@ -81,12 +81,18 @@ class AnubisFG:
             self.memory_twotup = memory_twotup
 
     def _update_twotupleuni(self, packet: Packet, ignore_errors=True):
-        """TODO
-        Usage
-        -----
-        capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
-        for packet in capture:
-            update(packet)
+        """ Method updates the two tuple unidirectional memory with a pyshark
+        packet.
+
+        Parameters
+        ----------
+        packet: `pyshark.packet.packet.Packet`
+            The packet to be inserted in memory.
+
+        ignore_errors: `bool`
+            Whether or not to ignore invalid packets (only packets with IP 
+            Source, IP Destination, Source Port and Destination Port are valid -
+            STP Packets are invalid for example). (default=True)
         """
         try:
             ip_src = packet.ip.src
