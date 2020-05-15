@@ -312,7 +312,7 @@ class AnubisFG:
             avg_hdr_len
             avg_pkt_len
             frq_pkt
-            tm_dur
+            tm_dur_s
         '''
         n_features = 20
         if flow_key not in self.memory_twotup:

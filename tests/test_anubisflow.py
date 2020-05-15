@@ -243,7 +243,7 @@ def test__generate_features_twotupleuni():
             avg_hdr_len
             avg_pkt_len
             frq_pkt
-            tm_dur
+            tm_dur_s
     '''
     n_features = 20
     ip_src = LayerFieldsContainer('172.16.0.5')
@@ -281,7 +281,7 @@ def test__generate_features_twotupleuni():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         1,  # frq_pkt
-        0,  # tm_dur
+        0,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotupleuni(key)
     assert ftrs == expected
@@ -313,7 +313,7 @@ def test__generate_features_twotupleuni():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
-        dur,  # tm_dur
+        dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotupleuni(key)
     assert ftrs == expected
@@ -341,7 +341,7 @@ def test__generate_features_twotupleuni():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
-        dur,  # tm_dur
+        dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotupleuni(key, now=True)
     assert np.isclose(ftrs, expected).all()
