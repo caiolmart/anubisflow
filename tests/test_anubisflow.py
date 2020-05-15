@@ -6,8 +6,8 @@ import pyshark
 import numpy as np
 
 from pyshark.packet.fields import LayerFieldsContainer
-from src.anubisflow import AnubisFG, add_to_counter
-from src.nodes import TwoTupleUnidirectionalNode
+from anubisflow.anubisflow import AnubisFG, add_to_counter
+from anubisflow.nodes import TwoTupleUnidirectionalNode
 
 
 def test_add_to_counter():

@@ -4,8 +4,8 @@ import os
 import pathlib
 
 from pyshark.packet.fields import LayerFieldsContainer
-from src.anubisflow import AnubisFG
-from src.nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode
+from anubisflow.anubisflow import AnubisFG
+from anubisflow.nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode
 
 
 def test_twotupleuni_default():
