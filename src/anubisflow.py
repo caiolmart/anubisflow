@@ -2,7 +2,7 @@ from typing import Tuple, Dict
 
 from pyshark.packet.fields import LayerFieldsContainer
 from pyshark.packet.packet import Packet
-from .nodes import TwoTupleUnidirectionalNode
+from .nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode
 
 
 def add_to_counter(counter, key, val=1):
@@ -90,7 +90,7 @@ class AnubisFG:
             The packet to be inserted in memory.
 
         ignore_errors: `bool`
-            Whether or not to ignore invalid packets (only packets with IP 
+            Whether or not to ignore invalid packets (only packets with IP
             Source, IP Destination, Source Port and Destination Port are valid -
             STP Packets are invalid for example). (default=True)
         """
@@ -170,6 +170,114 @@ class AnubisFG:
                 'tot_packet_len': length}
             node = TwoTupleUnidirectionalNode(**node_dict)
             self.memory_twotup[key] = node
+
+    def _update_twotuplebi(self, packet: Packet, ignore_errors=True):
+        """ Method updates the two tuple unidirectional memory with a pyshark
+        packet.
+
+        Parameters
+        ----------
+        packet: `pyshark.packet.packet.Packet`
+            The packet to be inserted in memory.
+
+        ignore_errors: `bool`
+            Whether or not to ignore invalid packets (only packets with IP
+            Source, IP Destination, Source Port and Destination Port are valid -
+            STP Packets are invalid for example). (default=True)
+        """
+        try:
+            ip_src = packet.ip.src
+            ip_dst = packet.ip.dst
+            timestamp = packet.sniff_time
+            src_port = int(packet[packet.transport_layer].srcport)
+            dst_port = int(packet[packet.transport_layer].dstport)
+            protocol = packet.transport_layer
+            length = int(packet.length)
+        except AttributeError as err:
+            if ignore_errors:
+                return
+            err.args = ('Attribute ip not in packet', )
+            raise
+
+        # Not all packets have IP headers
+        try:
+            hdr_length = int(packet.ip.hdr_length)
+        except AttributeError:
+            hdr_length = 0
+        # Only works for tcp packets
+        try:
+            ack = int(packet.tcp.flags_ack)
+            cwr = int(packet.tcp.flags_cwr)
+            ecn = int(packet.tcp.flags_ecn)
+            fin = int(packet.tcp.flags_fin)
+            res = int(packet.tcp.flags_res)
+            syn = int(packet.tcp.flags_syn)
+            urg = int(packet.tcp.flags_urg)
+            psh = int(packet.tcp.flags_push)
+        except AttributeError:
+            ack = 0
+            cwr = 0
+            ecn = 0
+            fin = 0
+            res = 0
+            syn = 0
+            urg = 0
+            psh = 0
+        if (ip_src, ip_dst) in self.memory_twotup:
+            prefix = 'fwd'
+            key = (ip_src, ip_dst)
+        elif (ip_dst, ip_src) in self.memory_twotup:
+            prefix = 'bck'
+            key = (ip_dst, ip_src)
+        else:
+            node_dict = {
+                'fst_timestamp': timestamp,
+                'lst_timestamp': timestamp,
+                'fwd_set_src_ports': {src_port},
+                'fwd_set_dst_ports': {dst_port},
+                'fwd_pkt_flag_counter': [
+                    fin,
+                    syn,
+                    res,
+                    psh,
+                    ack,
+                    urg,
+                    ecn,
+                    cwr],
+                'fwd_pkt_protocol_counter': {
+                    protocol: 1},
+                'fwd_tot_header_len': hdr_length,
+                'fwd_tot_packet_len': length}
+            node = TwoTupleBidirectionalNode(**node_dict)
+            self.memory_twotup[(ip_src, ip_dst)] = node
+            return
+
+        self.memory_twotup[key].__dict__[f'lst_timestamp'] = timestamp
+        self.memory_twotup[key].__dict__[
+            f'{prefix}_set_src_ports'].add(src_port)
+        self.memory_twotup[key].__dict__[
+            f'{prefix}_set_dst_ports'].add(dst_port)
+        add_to_counter(self.memory_twotup[key].__dict__[
+            f'{prefix}_pkt_protocol_counter'], protocol)
+        self.memory_twotup[key].__dict__[f'{prefix}_tot_packet_len'] += length
+        self.memory_twotup[key].__dict__[
+            f'{prefix}_tot_packet_len'] += hdr_length
+        self.memory_twotup[key].__dict__[
+            f'{prefix}_pkt_flag_counter'][0] += fin
+        self.memory_twotup[key].__dict__[
+            f'{prefix}_pkt_flag_counter'][1] += syn
+        self.memory_twotup[key].__dict__[
+            f'{prefix}_pkt_flag_counter'][2] += res
+        self.memory_twotup[key].__dict__[
+            f'{prefix}_pkt_flag_counter'][3] += psh
+        self.memory_twotup[key].__dict__[
+            f'{prefix}_pkt_flag_counter'][4] += ack
+        self.memory_twotup[key].__dict__[
+            f'{prefix}_pkt_flag_counter'][5] += urg
+        self.memory_twotup[key].__dict__[
+            f'{prefix}_pkt_flag_counter'][6] += ecn
+        self.memory_twotup[key].__dict__[
+            f'{prefix}_pkt_flag_counter'][7] += cwr
 
     def generate_features(self,
                           flow: Tuple[LayerFieldsContainer,
