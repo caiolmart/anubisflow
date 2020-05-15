@@ -1,4 +1,5 @@
-from typing import Tuple, Dict
+from typing import Dict, List, Tuple
+from datetime import datetime
 
 from pyshark.packet.fields import LayerFieldsContainer
 from pyshark.packet.packet import Packet
@@ -10,6 +11,11 @@ def add_to_counter(counter, key, val=1):
         counter[key] += val
     else:
         counter[key] = val
+
+def zero_if_not_exits(counter, key):
+    if key in counter:
+        return counter[key]
+    return 0
 
 
 class AnubisFG:
@@ -81,7 +87,7 @@ class AnubisFG:
             self.memory_twotup = memory_twotup
 
     def _update_twotupleuni(self, packet: Packet, ignore_errors=True):
-        """ Method updates the two tuple unidirectional memory with a pyshark
+        ''' Method updates the two tuple unidirectional memory with a pyshark
         packet.
 
         Parameters
@@ -93,7 +99,7 @@ class AnubisFG:
             Whether or not to ignore invalid packets (only packets with IP
             Source, IP Destination, Source Port and Destination Port are valid -
             STP Packets are invalid for example). (default=True)
-        """
+        '''
         try:
             ip_src = packet.ip.src
             ip_dst = packet.ip.dst
@@ -172,7 +178,7 @@ class AnubisFG:
             self.memory_twotup[key] = node
 
     def _update_twotuplebi(self, packet: Packet, ignore_errors=True):
-        """ Method updates the two tuple unidirectional memory with a pyshark
+        ''' Method updates the two tuple unidirectional memory with a pyshark
         packet.
 
         Parameters
@@ -184,7 +190,7 @@ class AnubisFG:
             Whether or not to ignore invalid packets (only packets with IP
             Source, IP Destination, Source Port and Destination Port are valid -
             STP Packets are invalid for example). (default=True)
-        """
+        '''
         try:
             ip_src = packet.ip.src
             ip_dst = packet.ip.dst
@@ -279,9 +285,68 @@ class AnubisFG:
         self.memory_twotup[key].__dict__[
             f'{prefix}_pkt_flag_counter'][7] += cwr
 
-    def generate_features(self,
-                          flow: Tuple[LayerFieldsContainer,
-                                      LayerFieldsContainer]):
-        """TODO
-        """
-        pass
+    def _generate_features_twotupleuni(self,
+                                       flow_key: Tuple[LayerFieldsContainer,
+                                                       LayerFieldsContainer],
+                                       now=False) -> List:
+        ''' Extract features of the flow from the memory_twotup.
+
+        Feature list:
+            qt_pkt
+            qt_pkt_tcp
+            qt_pkt_udp
+            qt_pkt_icmp
+            qt_pkt_ip
+            qt_prtcl
+            qt_src_prt
+            qt_dst_prt
+            qt_fin_fl
+            qt_syn_fl
+            qt_psh_fl
+            qt_ack_fl
+            qt_urg_fl
+            qt_rst_fl
+            qt_ece_fl
+            qt_cwr_fl
+            avg_hdr_len
+            avg_pkt_len
+            frq_pkt
+            tm_dur
+        '''
+        n_features = 20
+        if flow_key not in self.memory_twotup:
+            return [0] * n_features
+        mem = self.memory_twotup[flow_key]
+        if now:
+            lst_time = datetime.now()
+        else:
+            lst_time = mem.lst_timestamp
+        qt_pkt = sum(mem.pkt_protocol_counter.values())
+        duration_s = (lst_time - mem.fst_timestamp).total_seconds()
+        if duration_s == 0:
+            frq_pkt = qt_pkt
+        else:
+            frq_pkt = qt_pkt / duration_s
+        return [
+            qt_pkt,
+            zero_if_not_exits(mem.pkt_protocol_counter, 'TCP'),
+            zero_if_not_exits(mem.pkt_protocol_counter, 'UDP'),
+            zero_if_not_exits(mem.pkt_protocol_counter, 'ICMP'),
+            zero_if_not_exits(mem.pkt_protocol_counter, 'IP'),
+            len(mem.pkt_protocol_counter),
+            len(mem.set_src_ports),
+            len(mem.set_dst_ports),
+            mem.pkt_flag_counter[0],
+            mem.pkt_flag_counter[1],
+            mem.pkt_flag_counter[2],
+            mem.pkt_flag_counter[3],
+            mem.pkt_flag_counter[4],
+            mem.pkt_flag_counter[5],
+            mem.pkt_flag_counter[6],
+            mem.pkt_flag_counter[7],
+            mem.tot_header_len / qt_pkt,
+            mem.tot_packet_len / qt_pkt,
+            frq_pkt,
+            duration_s,
+        ]
+
