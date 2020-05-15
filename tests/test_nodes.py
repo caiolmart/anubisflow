@@ -53,16 +53,14 @@ def test_twotupleuni_raises():
 
 def test_twotuplebi_default():
     t2 = TwoTupleBidirectionalNode()
-    assert 0 <= (datetime.now() - t2.fwd_fst_timestamp).seconds < 5
-    assert 0 <= (datetime.now() - t2.bck_fst_timestamp).seconds < 5
+    assert 0 <= (datetime.now() - t2.fst_timestamp).seconds < 5
+    assert 0 <= (datetime.now() - t2.lst_timestamp).seconds < 5
     assert t2.fwd_set_src_ports == set()
     assert t2.fwd_set_dst_ports == set()
     assert t2.fwd_pkt_flag_counter == [0] * 8
     assert t2.fwd_pkt_protocol_counter == dict()
     assert t2.fwd_tot_header_len == 0
     assert t2.fwd_tot_packet_len == 0
-    assert 0 <= (datetime.now() - t2.bck_fst_timestamp).seconds < 5
-    assert 0 <= (datetime.now() - t2.bck_lst_timestamp).seconds < 5
     assert t2.bck_set_src_ports == set()
     assert t2.bck_set_dst_ports == set()
     assert t2.bck_pkt_flag_counter == [0] * 8
@@ -72,16 +70,14 @@ def test_twotuplebi_default():
 
 
 def test_twotuplebi_ud():
-    k = {'fwd_fst_timestamp': datetime(1995, 12, 2),
-         'fwd_lst_timestamp': datetime(1995, 12, 2),
+    k = {'fst_timestamp': datetime(1995, 12, 2),
+         'lst_timestamp': datetime(1995, 12, 2),
          'fwd_set_src_ports': {82, 8888, 42},
          'fwd_set_dst_ports': {82, 8888, 42},
          'fwd_pkt_flag_counter': [10] * 8,
          'fwd_pkt_protocol_counter': {2: 5, 4: 1},
          'fwd_tot_header_len': 1048,
          'fwd_tot_packet_len': int(1e10),
-         'bck_fst_timestamp': datetime(1995, 12, 2),
-         'bck_lst_timestamp': datetime(1995, 12, 2),
          'bck_set_src_ports': {82, 8888, 42},
          'bck_set_dst_ports': {82, 8888, 42},
          'bck_pkt_flag_counter': [10] * 8,
@@ -93,16 +89,14 @@ def test_twotuplebi_ud():
 
 
 def test_twotuplebi_raises():
-    k = {'fwd_fst_timestamp': 42,
-         'fwd_lst_timestamp': 42,
+    k = {'fst_timestamp': 42,
+         'lst_timestamp': 42,
          'fwd_set_src_ports': datetime(1995, 12, 2),
          'fwd_set_dst_ports': datetime(1995, 12, 2),
          'fwd_pkt_flag_counter': datetime(1995, 12, 2),
          'fwd_pkt_protocol_counter': datetime(1995, 12, 2),
          'fwd_tot_header_len': datetime(1995, 12, 2),
          'fwd_tot_packet_len': datetime(1995, 12, 2),
-         'bck_fst_timestamp': 42,
-         'bck_lst_timestamp': 42,
          'bck_set_src_ports': datetime(1995, 12, 2),
          'bck_set_dst_ports': datetime(1995, 12, 2),
          'bck_pkt_flag_counter': datetime(1995, 12, 2),

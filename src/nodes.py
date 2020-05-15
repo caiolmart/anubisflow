@@ -66,10 +66,10 @@ class TwoTupleBidirectionalNode:
 
     Attributes
     ----------
-    fwd_fst_timestamp: `datetime`
-        Timestamp of the first forward packet of the flux.
-    fwd_lst_timestamp: `datetime`
-        Timestamp of the last forward packet of the flux.
+    fst_timestamp: `datetime`
+        Timestamp of the first packet of the flux.
+    lst_timestamp: `datetime`
+        Timestamp of the last packet of the flux.
     fwd_set_src_ports: `set`
         A set of all source ports of forward packets of the flux.
     fwd_set_dst_ports: `set`
@@ -91,10 +91,6 @@ class TwoTupleBidirectionalNode:
         The sum of all the header lengths of forward packets of the flux.
     fwd_tot_packet_len: `int`
         The sum of all the packet lengths of forward packets of the flux.
-    bck_fst_timestamp: `datetime`
-        Timestamp of the first backward packet of the flux.
-    bck_lst_timestamp: `datetime`
-        Timestamp of the last backward packet of the flux.
     bck_set_src_ports: `set`
         A set of all source ports of backward packets of the flux.
     bck_set_dst_ports: `set`
@@ -119,16 +115,14 @@ class TwoTupleBidirectionalNode:
     '''
 
     def __init__(self, **kwargs):
-        self.fwd_fst_timestamp = datetime.now()
-        self.fwd_lst_timestamp = self.fwd_fst_timestamp
+        self.fst_timestamp = datetime.now()
+        self.lst_timestamp = self.fst_timestamp
         self.fwd_set_src_ports = set()
         self.fwd_set_dst_ports = set()
         self.fwd_pkt_flag_counter = [0] * 8
         self.fwd_pkt_protocol_counter = dict()
         self.fwd_tot_header_len = 0
         self.fwd_tot_packet_len = 0
-        self.bck_fst_timestamp = datetime.now()
-        self.bck_lst_timestamp = self.bck_fst_timestamp
         self.bck_set_src_ports = set()
         self.bck_set_dst_ports = set()
         self.bck_pkt_flag_counter = [0] * 8
