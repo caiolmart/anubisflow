@@ -49,5 +49,5 @@ The tests are written using pytest and are in the folder `tests`.
 To run the tests you may need to install `pytest-cov`:
 
 ```Shell
-pytest --cov-report html --cov=src tests/
+pytest --cov-report html --cov=anubisflow -v tests/
 ```
