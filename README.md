@@ -6,7 +6,7 @@ We begin by creating  a class that stores information about the flows, this clas
 
 The class can store two dictionaries. One for the 2-tuple flow (a sequence of packets with the same values for _IP Source_, _IP Destination_) and one for the 5-tuple flow (a sequence of packets with same values for _IP Source_, _Port Source_, _IP Destination_, _Port Destination_, _Protocol_).
 
-The goal is to generate and store features of the flows that may useful in attempting to identify and block flows originated from a DDoS attack.
+The goal is to generate and store features of the flows that may useful for identifying and blocking flows originated from a DDoS attack.
 
 Here is the list of features of the 2-tuple flows we want to generate, and the attribute that stores the information to generate them.
 
