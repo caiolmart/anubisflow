@@ -1,0 +1,7 @@
+DateTime==4.3
+lxml==4.5.0
+py==1.8.1
+pyshark==0.4.2.9
+pytz==2020.1
+typing==3.7.4.1
+zope.interface==5.1.0

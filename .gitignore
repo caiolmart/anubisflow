@@ -3,3 +3,4 @@ htmlcov
 *.pcap
 .coverage
 assets
+.venv*
