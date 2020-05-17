@@ -4,7 +4,7 @@ This is a tool designed to generate features to identify DDoS flows from `.pcap`
 
 We begin by creating  a class that stores information about the flows, this class is continuously updated whenever a new packet passes through the network interface.
 
-![alt text](https://github.com/caiolmart/anubisflow/blob/master/update_ilustration.png "Ilustration of dictionaries update")
+![alt text](https://github.com/caiolmart/anubisflow/blob/master/figures/update_ilustration.png "Ilustration of dictionaries update")
 
 
 The class can store two dictionaries. One for the 2-tuple flow (a sequence of packets with the same values for _IP Source_, _IP Destination_) and one for the 5-tuple flow (a sequence of packets with same values for _IP Source_, _Port Source_, _IP Destination_, _Port Destination_, _Protocol_).
