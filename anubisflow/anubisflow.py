@@ -47,16 +47,18 @@ class AnubisFG:
     memory_twotup: `dict`
         The dictionary with the information of the flows. Has key (IP Source,
         IP Destination), a tuple with two
-        pyshark.packet.fields.LayerFieldsContainer's, and value
-        TwoTupleUnidirectionalNode object. 
+        pyshark.packet.fields.LayerFieldsContainer's, and value a
+        TwoTupleUnidirectionalNode of TwoTupleBidirectionalNode object, 
+        depeding on the choice of the bidirectional parameter.
     memory_fivetup: `dict`
         The dictionary with the information of the flows. Has key (IP Source,
-        Source Port, IP Destination, Destination Port, Protocol), a tuple with 
-        five elements (pyshark.packet.fields.LayerFieldsContainer, 
-        pyshark.packet.fields.LayerFieldsContainer, 
-        pyshark.packet.fields.LayerFieldsContainer, 
+        Source Port, IP Destination, Destination Port, Protocol), a tuple with
+        five elements (pyshark.packet.fields.LayerFieldsContainer,
+        pyshark.packet.fields.LayerFieldsContainer,
+        pyshark.packet.fields.LayerFieldsContainer,
         pyshark.packet.fields.LayerFieldsContainer, str), and value a
-        FiveTupleUnidirectionalNode or FiveTupleBidirectionalNode object.
+        FiveTupleUnidirectionalNode or FiveTupleBidirectionalNode object, 
+        depeding on the choice of the bidirectional parameter.
 
     Examples
     --------
@@ -78,20 +80,27 @@ class AnubisFG:
     '''
 
     def __init__(self,
+                 bidirectional=True,
+                 only_twotuple=False,
+                 only_fivetuple=False,
                  memory_twotup: Dict[Tuple[LayerFieldsContainer,
                                            LayerFieldsContainer],
                                      Union[TwoTupleUnidirectionalNode,
                                            TwoTupleBidirectionalNode]] = None,
                  memory_fivetup: Dict[Tuple[LayerFieldsContainer,
-                                           LayerFieldsContainer,
-                                           LayerFieldsContainer,
-                                           LayerFieldsContainer,
-                                           str],
-                                     Union[FiveTupleUnidirectionalNode,
-                                           FiveTupleUnidirectionalNode]] = None):
-        if memory_twotup is None:
+                                            LayerFieldsContainer,
+                                            LayerFieldsContainer,
+                                            LayerFieldsContainer,
+                                            str],
+                                      Union[FiveTupleUnidirectionalNode,
+                                            FiveTupleUnidirectionalNode]] = None):
+        msg = "Parameters only_twotuple and only_fivetuple can't be mutually " \
+              "True"
+        assert not (only_twotuple and only_fivetuple), msg
+
+        if memory_twotup is None and not only_fivetuple:
             self.memory_twotup = dict()
-        else:
+        elif not only_fivetuple:
             msg = 'AssertionError: memory_twotup must be of type ' \
                   'Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer], ' \
                   'TwoTupleUnidirectionalNode]'
@@ -100,13 +109,17 @@ class AnubisFG:
                 assert isinstance(item[0], tuple), msg
                 assert isinstance(item[0][0], LayerFieldsContainer), msg
                 assert isinstance(item[0][1], LayerFieldsContainer), msg
-                assert isinstance(item[1], (TwoTupleUnidirectionalNode, 
-                                            TwoTupleBidirectionalNode)), msg
+                if bidirectional:
+                    assert isinstance(item[1], TwoTupleBidirectionalNode), msg
+                else:
+                    assert isinstance(item[1], TwoTupleUnidirectionalNode), msg
             self.memory_twotup = memory_twotup
-        
-        if memory_fivetup is None:
-            self.memory_fivetup = dict()
         else:
+            self.memory_twotup = None
+
+        if memory_fivetup is None and not only_twotuple:
+            self.memory_fivetup = dict()
+        elif not only_twotuple:
             msg = 'AssertionError: memory_fivetup must be of type ' \
                   'Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer, ' \
                   'LayerFieldsContainer, LayerFieldsContainer, str], ' \
@@ -120,9 +133,13 @@ class AnubisFG:
                 assert isinstance(item[0][2], LayerFieldsContainer), msg
                 assert isinstance(item[0][3], LayerFieldsContainer), msg
                 assert isinstance(item[0][4], str), msg
-                assert isinstance(item[1], (FiveTupleUnidirectionalNode, 
-                                            FiveTupleBidirectionalNode)), msg
+                if bidirectional:
+                    assert isinstance(item[1], FiveTupleBidirectionalNode), msg
+                else:
+                    assert isinstance(item[1], FiveTupleUnidirectionalNode), msg
             self.memory_fivetup = memory_fivetup
+        else:
+            self.memory_fivetup = None
 
     def _update_twotupleuni(self, packet: Packet, ignore_errors=True):
         ''' Method updates the two tuple unidirectional memory with a pyshark
