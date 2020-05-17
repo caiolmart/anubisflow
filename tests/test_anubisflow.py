@@ -107,6 +107,9 @@ def test_anubisfg_raises():
     for memory_fivetup in memories:
         with pytest.raises(AssertionError):
             _ = AnubisFG(memory_fivetup=memory_fivetup)
+    
+    with pytest.raises(AssertionError):
+        _ = AnubisFG(only_twotuple=True, only_fivetuple=True)
 
 
 def test_anubisfg_uni_raises():
