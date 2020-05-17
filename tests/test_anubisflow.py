@@ -7,7 +7,7 @@ import numpy as np
 
 from pyshark.packet.fields import LayerFieldsContainer
 from anubisflow.anubisflow import AnubisFG, add_to_counter
-from anubisflow.nodes import TwoTupleUnidirectionalNode, FiveTupleUnidirectionalNode
+from anubisflow.nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode, FiveTupleUnidirectionalNode, FiveTupleBidirectionalNode
 
 
 def test_add_to_counter():
@@ -24,11 +24,22 @@ def test_anubisfg_default():
     assert afg.memory_fivetup == dict()
 
 
+def test_anubisfg_onlytwo():
+    afg = AnubisFG(only_twotuple=True)
+    assert afg.memory_twotup == dict()
+    assert afg.memory_fivetup == None
+
+
+def test_anubisfg_onlyfive():
+    afg = AnubisFG(only_fivetuple=True)
+    assert afg.memory_twotup == None
+    assert afg.memory_fivetup == dict()
+
 def test_anubisfg_ud():
-    t2_1 = TwoTupleUnidirectionalNode()
+    t2_1 = TwoTupleBidirectionalNode()
     ip_src_1 = LayerFieldsContainer('192.168.0.1')
     ip_dst_1 = LayerFieldsContainer('192.168.0.2')
-    t2_2 = TwoTupleUnidirectionalNode()
+    t2_2 = TwoTupleBidirectionalNode()
     ip_src_2 = LayerFieldsContainer('192.168.0.1')
     ip_dst_2 = LayerFieldsContainer('192.168.0.2')
     memory_twotup_1 = {(ip_src_1, ip_dst_1): t2_1}
@@ -39,7 +50,7 @@ def test_anubisfg_ud():
     assert memory_twotup_1 == afg_1.memory_twotup
     assert memory_twotup_2 == afg_2.memory_twotup
 
-    t5_1 = FiveTupleUnidirectionalNode()
+    t5_1 = FiveTupleBidirectionalNode()
     ip_src_1 = LayerFieldsContainer('192.168.0.1')
     ip_dst_1 = LayerFieldsContainer('192.168.0.2')
     src_port_1 = LayerFieldsContainer('80')
@@ -59,7 +70,7 @@ def test_anubisfg_ud():
 
 
 def test_anubisfg_raises():
-    t2_1 = TwoTupleUnidirectionalNode()
+    t2_1 = TwoTupleBidirectionalNode()
     ip_src_1 = LayerFieldsContainer('192.168.0.1')
     ip_dst_1 = LayerFieldsContainer('192.168.0.2')
     t2_2 = dict()
@@ -75,6 +86,46 @@ def test_anubisfg_raises():
     for memory_twotup in memories:
         with pytest.raises(AssertionError):
             _ = AnubisFG(memory_twotup=memory_twotup)
+
+    t5_1 = FiveTupleBidirectionalNode()
+    src_port_1 = LayerFieldsContainer('80')
+    dst_port_1 = LayerFieldsContainer('80')
+    protocol_1 = 'TCP'
+    src_port_2 = '80'
+    dst_port_2 = '80'
+    protocol_2 = 1
+    t5_2 = dict()
+
+    memories = [[[ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1], t5_1],
+                {ip_src_1: t5_1},
+                {(ip_src_2, src_port_1, ip_dst_1, dst_port_1, protocol_1) : t5_1},
+                {(ip_src_1, src_port_2, ip_dst_1, dst_port_1, protocol_1) : t5_1},
+                {(ip_src_1, src_port_1, ip_dst_2, dst_port_1, protocol_1) : t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_2, protocol_1) : t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_2) : t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1) : t5_2}]
+    for memory_fivetup in memories:
+        with pytest.raises(AssertionError):
+            _ = AnubisFG(memory_fivetup=memory_fivetup)
+
+
+def test_anubisfg_uni_raises():
+    t2_1 = TwoTupleUnidirectionalNode()
+    ip_src_1 = LayerFieldsContainer('192.168.0.1')
+    ip_dst_1 = LayerFieldsContainer('192.168.0.2')
+    t2_2 = dict()
+    ip_src_2 = '192.168.0.1'
+    ip_dst_2 = '192.168.0.1'
+
+    memories = [[[ip_src_1, ip_dst_1], t2_1],
+                {ip_src_1: t2_1},
+                {(ip_src_2, ip_dst_1): t2_1},
+                {(ip_src_1, ip_dst_2): t2_1},
+                {(ip_src_1, ip_dst_1): t2_2}]
+
+    for memory_twotup in memories:
+        with pytest.raises(AssertionError):
+            _ = AnubisFG(bidirectional=False, memory_twotup=memory_twotup)
 
     t5_1 = FiveTupleUnidirectionalNode()
     src_port_1 = LayerFieldsContainer('80')
@@ -95,7 +146,7 @@ def test_anubisfg_raises():
                 {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1) : t5_2}]
     for memory_fivetup in memories:
         with pytest.raises(AssertionError):
-            _ = AnubisFG(memory_fivetup=memory_fivetup)
+            _ = AnubisFG(bidirectional=False, memory_fivetup=memory_fivetup)
 
 
 def test__update_twotupleuni_noupdate():
