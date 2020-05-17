@@ -197,9 +197,4 @@ class FiveTupleUnidirectionalNode:
             msg2 = f'AssertionError: {key} must be type {{type}}'
             _type = type(self.__dict__[key])
             assert isinstance(value, _type), msg2.format(type=_type)
-            if key == 'pkt_flag_counter':
-                msg3 = 'AssertionError: pkt_flag_counter must be an 8 int list'
-                assert len(value) == 8, msg3
-                for c_value in value:
-                    assert isinstance(c_value, int), msg3
             self.__dict__[key] = value
