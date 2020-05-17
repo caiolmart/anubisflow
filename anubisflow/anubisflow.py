@@ -1,9 +1,9 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 from datetime import datetime
 
 from pyshark.packet.fields import LayerFieldsContainer
 from pyshark.packet.packet import Packet
-from .nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode
+from .nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode, FiveTupleUnidirectionalNode, FiveTupleBidirectionalNode
 
 
 def add_to_counter(counter, key, val=1):
@@ -48,7 +48,15 @@ class AnubisFG:
         The dictionary with the information of the flows. Has key (IP Source,
         IP Destination), a tuple with two
         pyshark.packet.fields.LayerFieldsContainer's, and value
-        TwoTupleUnidirectionalNode object.
+        TwoTupleUnidirectionalNode object. 
+    memory_fivetup: `dict`
+        The dictionary with the information of the flows. Has key (IP Source,
+        Source Port, IP Destination, Destination Port, Protocol), a tuple with 
+        five elements (pyshark.packet.fields.LayerFieldsContainer, 
+        pyshark.packet.fields.LayerFieldsContainer, 
+        pyshark.packet.fields.LayerFieldsContainer, 
+        pyshark.packet.fields.LayerFieldsContainer, str), and value a
+        FiveTupleUnidirectionalNode or FiveTupleBidirectionalNode object.
 
     Examples
     --------
@@ -72,7 +80,15 @@ class AnubisFG:
     def __init__(self,
                  memory_twotup: Dict[Tuple[LayerFieldsContainer,
                                            LayerFieldsContainer],
-                                     TwoTupleUnidirectionalNode] = None):
+                                     Union[TwoTupleUnidirectionalNode,
+                                           TwoTupleBidirectionalNode]] = None,
+                 memory_fivetup: Dict[Tuple[LayerFieldsContainer,
+                                           LayerFieldsContainer,
+                                           LayerFieldsContainer,
+                                           LayerFieldsContainer,
+                                           str],
+                                     Union[FiveTupleUnidirectionalNode,
+                                           FiveTupleUnidirectionalNode]] = None):
         if memory_twotup is None:
             self.memory_twotup = dict()
         else:
@@ -84,8 +100,29 @@ class AnubisFG:
                 assert isinstance(item[0], tuple), msg
                 assert isinstance(item[0][0], LayerFieldsContainer), msg
                 assert isinstance(item[0][1], LayerFieldsContainer), msg
-                assert isinstance(item[1], TwoTupleUnidirectionalNode), msg
+                assert isinstance(item[1], (TwoTupleUnidirectionalNode, 
+                                            TwoTupleBidirectionalNode)), msg
             self.memory_twotup = memory_twotup
+        
+        if memory_fivetup is None:
+            self.memory_fivetup = dict()
+        else:
+            msg = 'AssertionError: memory_fivetup must be of type ' \
+                  'Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer, ' \
+                  'LayerFieldsContainer, LayerFieldsContainer, str], ' \
+                  'Union[FiveTupleUnidirectionalNode, ' \
+                  'FiveTupleBidirectionalNode]]'
+            assert isinstance(memory_fivetup, dict), msg
+            for item in memory_fivetup.items():
+                assert isinstance(item[0], tuple), msg
+                assert isinstance(item[0][0], LayerFieldsContainer), msg
+                assert isinstance(item[0][1], LayerFieldsContainer), msg
+                assert isinstance(item[0][2], LayerFieldsContainer), msg
+                assert isinstance(item[0][3], LayerFieldsContainer), msg
+                assert isinstance(item[0][4], str), msg
+                assert isinstance(item[1], (FiveTupleUnidirectionalNode, 
+                                            FiveTupleBidirectionalNode)), msg
+            self.memory_fivetup = memory_fivetup
 
     def _update_twotupleuni(self, packet: Packet, ignore_errors=True):
         ''' Method updates the two tuple unidirectional memory with a pyshark
