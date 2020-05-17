@@ -133,9 +133,9 @@ def test_fivetupleuni_ud():
          'tot_pkt': 10,
          'tot_header_len': 1048,
          'tot_packet_len': int(1e10),
-         'max_pkt_len' : 120,
-         'min_pkt_len' : 100,
-         'tot_ttl' : 20}
+         'max_pkt_len': 120,
+         'min_pkt_len': 100,
+         'tot_ttl': 20}
     t5 = FiveTupleUnidirectionalNode(**k)
     assert t5.__dict__ == k
 
@@ -146,9 +146,9 @@ def test_fivetupleuni_raises():
          'tot_pkt': datetime(1995, 12, 2),
          'tot_header_len': datetime(1995, 12, 2),
          'tot_packet_len': datetime(1995, 12, 2),
-         'max_pkt_len' : datetime(1995, 12, 2),
-         'min_pkt_len' : datetime(1995, 12, 2),
-         'tot_ttl' : datetime(1995, 12, 2)}
+         'max_pkt_len': datetime(1995, 12, 2),
+         'min_pkt_len': datetime(1995, 12, 2),
+         'tot_ttl': datetime(1995, 12, 2)}
     for item in k.items():
         with pytest.raises(AssertionError):
             _ = FiveTupleUnidirectionalNode(**{item[0]: item[1]})
