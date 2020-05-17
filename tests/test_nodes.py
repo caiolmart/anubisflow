@@ -5,7 +5,7 @@ import pathlib
 
 from pyshark.packet.fields import LayerFieldsContainer
 from anubisflow.anubisflow import AnubisFG
-from anubisflow.nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode
+from anubisflow.nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode, FiveTupleUnidirectionalNode
 
 
 def test_twotupleuni_default():
@@ -112,3 +112,45 @@ def test_twotuplebi_raises():
         _ = TwoTupleBidirectionalNode(fwd_pkt_flag_counter=[2] * 6)
     with pytest.raises(AssertionError):
         _ = TwoTupleBidirectionalNode(bck_pkt_flag_counter=[2] * 6)
+
+
+def test_fivetupleuni_default():
+    t5 = FiveTupleUnidirectionalNode()
+    assert 0 <= (datetime.now() - t5.fst_timestamp).seconds < 5
+    assert 0 <= (datetime.now() - t5.lst_timestamp).seconds < 5
+    assert t5.tot_pkt == 0
+    assert t5.tot_header_len == 0
+    assert t5.tot_packet_len == 0
+    assert t5.max_pkt_len == 0
+    assert t5.min_pkt_len == 0
+    assert t5.tot_ttl == 0
+
+
+def test_fivetupleuni_ud():
+    k = {'fst_timestamp': datetime(1995, 12, 2),
+         'lst_timestamp': datetime(1995, 12, 2),
+         'pkt_flag_counter': [10] * 8,
+         'tot_pkt': 10,
+         'tot_header_len': 1048,
+         'tot_packet_len': int(1e10),
+         'max_pkt_len' : 120,
+         'min_pkt_len' : 100,
+         'tot_ttl' : 20}
+    t5 = FiveTupleUnidirectionalNode(**k)
+    assert t5.__dict__ == k
+
+
+def test_fivetupleuni_raises():
+    k = {'fst_timestamp': 42,
+         'lst_timestamp': 42,
+         'tot_pkt': datetime(1995, 12, 2),
+         'tot_header_len': datetime(1995, 12, 2),
+         'tot_packet_len': datetime(1995, 12, 2),
+         'max_pkt_len' : datetime(1995, 12, 2),
+         'min_pkt_len' : datetime(1995, 12, 2),
+         'tot_ttl' : datetime(1995, 12, 2)}
+    for item in k.items():
+        with pytest.raises(AssertionError):
+            _ = FiveTupleUnidirectionalNode(**{item[0]: item[1]})
+    with pytest.raises(AssertionError):
+        _ = FiveTupleUnidirectionalNode(**{'foo': 'bar'})
