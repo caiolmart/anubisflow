@@ -21,6 +21,7 @@ def test_add_to_counter():
 def test_anubisfg_default():
     afg = AnubisFG()
     assert afg.memory_twotup == dict()
+    assert afg.memory_fivetup == dict()
 
 
 def test_anubisfg_ud():
