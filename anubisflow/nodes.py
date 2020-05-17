@@ -198,3 +198,89 @@ class FiveTupleUnidirectionalNode:
             _type = type(self.__dict__[key])
             assert isinstance(value, _type), msg2.format(type=_type)
             self.__dict__[key] = value
+
+
+class FiveTupleBidirectionalNode:
+    '''
+    Class stores information of a unidirectional flow.
+    It is used internally by AnubisFG.
+
+    Attributes
+    ----------
+    fst_timestamp: `datetime`
+        Timestamp of the first packet of the flow.
+    lst_timestamp: `datetime`
+        Timestamp of the last packet of the flow.
+    fwd_pkt_flag_counter: `list`
+        A counter of the number of flags on forward packets.
+        Position of flags in list:
+            FIN : 0
+            SYN : 1
+            RES : 2
+            PSH : 3
+            ACK : 4
+            URG : 5
+            ECN : 6
+            CWR : 7
+    fwd_tot_pkt: `int`
+        The number of forward packets of the flow.
+    fwd_tot_header_len: `int`
+        The sum of all the header lengths of forward packets of the flow.
+    fwd_tot_packet_len: `int`
+        The sum of all the packet lengths of forward packets of the flow.
+    fwd_max_pkt_len: `int`
+        The maximum length of a forward packet of the flow.
+    fwd_min_pkt_len: `int`
+        The minimum length of a forward packet of the flow.
+    fwd_tot_ttl: `int`
+        The sum of the TTL of all forward packets.
+    bck_pkt_flag_counter: `list`
+        A counter of the number of flags on backward packets.
+        Position of flags in list:
+            FIN : 0
+            SYN : 1
+            RES : 2
+            PSH : 3
+            ACK : 4
+            URG : 5
+            ECN : 6
+            CWR : 7
+    bck_tot_pkt: `int`
+        The number of backward packets of the flow.
+    bck_tot_header_len: `int`
+        The sum of all the header lengths of backward packets of the flow.
+    bck_tot_packet_len: `int`
+        The sum of all the packet lengths of backward packets of the flow.
+    bck_max_pkt_len: `int`
+        The maximum length of a bacward packet of the flow.
+    bck_min_pkt_len: `int`
+        The minimum length of a bacward packet of the flow.
+    bck_tot_ttl: `int`
+        The sum of the TTL of all backward packets.
+    '''
+
+    def __init__(self, **kwargs):
+        self.fst_timestamp = datetime.now()
+        self.lst_timestamp = self.fst_timestamp
+        self.fwd_pkt_flag_counter = [0] * 8
+        self.fwd_tot_pkt = 0
+        self.fwd_tot_header_len = 0
+        self.fwd_tot_packet_len = 0
+        self.fwd_max_pkt_len = 0
+        self.fwd_min_pkt_len = 0
+        self.fwd_tot_ttl = 0
+        self.bck_pkt_flag_counter = [0] * 8
+        self.bck_tot_pkt = 0
+        self.bck_tot_header_len = 0
+        self.bck_tot_packet_len = 0
+        self.bck_max_pkt_len = 0
+        self.bck_min_pkt_len = 0
+        self.bck_tot_ttl = 0
+
+        for key, value in kwargs.items():
+            msg1 = f'AssertionError: {key} is invalid argument'
+            assert key in self.__dict__, msg1
+            msg2 = f'AssertionError: {key} must be type {{type}}'
+            _type = type(self.__dict__[key])
+            assert isinstance(value, _type), msg2.format(type=_type)
+            self.__dict__[key] = value
