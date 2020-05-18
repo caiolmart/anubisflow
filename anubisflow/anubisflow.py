@@ -102,7 +102,7 @@ class AnubisFG:
                 self._update = self._update_bi_2_5
                 self._generate_features_twotuple = self._generate_features_twotuplebi
                 self._generate_features_fivetuple = self._generate_features_fivetuplebi
-    
+                self._generate_features = self._generate_features_bi_2_5
             elif only_twotuple ==True and only_fivetuple ==False:
                 self._update = self._update_bi_2
                 self._generate_features_twotuple = self._generate_features_twotuplebi
@@ -117,6 +117,7 @@ class AnubisFG:
                 self._update = self._update_uni_2_5
                 self._generate_features_twotuple = self._generate_features_twotupleuni
                 self._generate_features_fivetuple = self._generate_features_fivetupleuni
+                self._generate_features = self._generate_features_uni_2_5
             elif only_twotuple ==True and only_fivetuple ==False:
                 self._update = self._update_uni_2
                 self._generate_features_twotuple = self._generate_features_twotupleuni
@@ -176,6 +177,34 @@ class AnubisFG:
             self.memory_fivetup = memory_fivetup
         else:
             self.memory_fivetup = None
+
+    def _generate_features_bi_2_5(self, flow_key: Tuple[LayerFieldsContainer,
+                                                        LayerFieldsContainer,
+                                                        LayerFieldsContainer,
+                                                        LayerFieldsContainer,
+                                                        str],
+                                        now=False) -> List:
+        ''' Extract features from both flows with one single function. Bidirectional case
+
+        '''
+        features_2 = self._generate_features_twotuplebi(Tuple(flow_key[0], flow_key[2]), now)
+        features_5 = self._generate_features_fivetuplebi(flow_key, now)
+        return features_2 , features_5
+    
+    def _generate_features_uni_2_5(self, flow_key: Tuple[LayerFieldsContainer,
+                                                        LayerFieldsContainer,
+                                                        LayerFieldsContainer,
+                                                        LayerFieldsContainer,
+                                                        str],
+                                        now=False) -> List:
+        ''' Extract features from both flows with one single function. Unidirectional case
+
+        '''
+        features_2 = self._generate_features_twotupleuni(Tuple(flow_key[0], flow_key[2]), now)
+        features_5 = self._generate_features_fivetupleuni(flow_key, now)
+        return features_2 , features_5
+
+
 
     def _update_bi_2_5(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
