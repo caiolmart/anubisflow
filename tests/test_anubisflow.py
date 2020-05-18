@@ -502,3 +502,116 @@ def test__generate_features_twotupleuni():
     ]
     ftrs = afg._generate_features_twotupleuni(key, now=True)
     assert np.isclose(ftrs, expected).all()
+
+
+def test__generate_features_fivetupleuni():
+    '''
+        Feature list:
+            qt_pkt
+            qt_fin_fl
+            qt_syn_fl
+            qt_psh_fl
+            qt_ack_fl
+            qt_urg_fl
+            qt_rst_fl
+            qt_ece_fl
+            qt_cwr_fl
+            avg_hdr_len
+            avg_pkt_len
+            max_pkt_len
+            min_pkt_len
+            frq_pkt
+            tm_dur_s
+            avg_ttl
+    '''
+    n_features = 16
+    ip_src = LayerFieldsContainer('172.16.0.5')
+    ip_dst = LayerFieldsContainer('192.168.50.1')
+    src_port = LayerFieldsContainer('60675')
+    dst_port = LayerFieldsContainer('80')
+    protocol = 'TCP'
+    key = (ip_src, src_port, ip_dst, dst_port, protocol)
+    afg = AnubisFG()
+
+    # Tuple that is not on the memory.
+    empty = afg._generate_features_fivetupleuni(key)
+    assert empty == [0] * n_features
+
+    # Duration 0
+    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    # Second packet is a SYN TCP packet.
+    packet = capture[1]
+    timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
+    afg._update_fivetupleuni(packet)
+    expected = [
+        1,  # qt_pkt
+        0,  # qt_fin_fl
+        1,  # qt_syn_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_rst_fl
+        0,  # qt_ece_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len
+        74,  # max_pkt_len
+        74,  # min_pkt_len
+        1,  # frq_pkt
+        0,  # tm_dur_s
+        63, # avg_ttl
+    ]
+    ftrs = afg._generate_features_fivetupleuni(key)
+    assert ftrs == expected
+
+    # Duration > 0
+    # Updating
+    # Third package is another SYN TCP packet with same IPs and Ports
+    packet = capture[2]
+    afg._update_fivetupleuni(packet)
+    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+    dur = (new_timestamp - timestamp).total_seconds()
+    expected = [
+        2,  # qt_pkt
+        0,  # qt_fin_fl
+        2,  # qt_syn_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_rst_fl
+        0,  # qt_ece_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len
+        74,  # max_pkt_len
+        74,  # min_pkt_len
+        2 / dur,  # frq_pkt
+        dur,  # tm_dur_s
+        63, # avg_ttl
+    ]
+    ftrs = afg._generate_features_fivetupleuni(key)
+    assert ftrs == expected
+
+    # Using now datetime.
+    new_timestamp = datetime.now()
+    dur = (new_timestamp - timestamp).total_seconds()
+    expected = [
+        2,  # qt_pkt
+        0,  # qt_fin_fl
+        2,  # qt_syn_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_rst_fl
+        0,  # qt_ece_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len
+        74,  # max_pkt_len
+        74,  # min_pkt_len
+        2 / dur,  # frq_pkt
+        dur,  # tm_dur_s
+        63, # avg_ttl
+    ]
+    ftrs = afg._generate_features_fivetupleuni(key, now=True)
+    assert np.isclose(ftrs, expected).all()
