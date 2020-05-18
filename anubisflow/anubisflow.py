@@ -578,11 +578,11 @@ class AnubisFG:
             qt_dst_prt
             qt_fin_fl
             qt_syn_fl
+            qt_res_fl
             qt_psh_fl
             qt_ack_fl
             qt_urg_fl
-            qt_rst_fl
-            qt_ece_fl
+            qt_ecn_fl
             qt_cwr_fl
             avg_hdr_len
             avg_pkt_len
@@ -644,11 +644,11 @@ class AnubisFG:
             qt_dst_prt
             qt_fin_fl
             qt_syn_fl
+            qt_res_fl
             qt_psh_fl
             qt_ack_fl
             qt_urg_fl
-            qt_rst_fl
-            qt_ece_fl
+            qt_ecn_fl
             qt_cwr_fl
             avg_hdr_len
             avg_pkt_len
@@ -665,11 +665,11 @@ class AnubisFG:
             qt_dst_prt
             qt_fin_fl
             qt_syn_fl
+            qt_res_fl
             qt_psh_fl
             qt_ack_fl
             qt_urg_fl
-            qt_rst_fl
-            qt_ece_fl
+            qt_ecn_fl
             qt_cwr_fl
             avg_hdr_len
             avg_pkt_len

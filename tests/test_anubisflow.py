@@ -499,11 +499,11 @@ def test__generate_features_twotupleuni():
             qt_dst_prt
             qt_fin_fl
             qt_syn_fl
+            qt_res_fl
             qt_psh_fl
             qt_ack_fl
             qt_urg_fl
-            qt_rst_fl
-            qt_ece_fl
+            qt_ecn_fl
             qt_cwr_fl
             avg_hdr_len
             avg_pkt_len
@@ -537,11 +537,11 @@ def test__generate_features_twotupleuni():
         1,  # qt_dst_prt
         0,  # qt_fin_fl
         1,  # qt_syn_fl
+        0,  # qt_res_fl
         0,  # qt_psh_fl
         0,  # qt_ack_fl
         0,  # qt_urg_fl
-        0,  # qt_rst_fl
-        0,  # qt_ece_fl
+        0,  # qt_ecn_fl
         0,  # qt_cwr_fl
         0,  # avg_hdr_len
         74,  # avg_pkt_len
@@ -569,11 +569,11 @@ def test__generate_features_twotupleuni():
         1,  # qt_dst_prt
         0,  # qt_fin_fl
         2,  # qt_syn_fl
+        0,  # qt_res_fl
         0,  # qt_psh_fl
         0,  # qt_ack_fl
         0,  # qt_urg_fl
-        0,  # qt_rst_fl
-        0,  # qt_ece_fl
+        0,  # qt_ecn_fl
         0,  # qt_cwr_fl
         0,  # avg_hdr_len
         74,  # avg_pkt_len
@@ -597,11 +597,11 @@ def test__generate_features_twotupleuni():
         1,  # qt_dst_prt
         0,  # qt_fin_fl
         2,  # qt_syn_fl
+        0,  # qt_res_fl
         0,  # qt_psh_fl
         0,  # qt_ack_fl
         0,  # qt_urg_fl
-        0,  # qt_rst_fl
-        0,  # qt_ece_fl
+        0,  # qt_ecn_fl
         0,  # qt_cwr_fl
         0,  # avg_hdr_len
         74,  # avg_pkt_len
@@ -618,11 +618,11 @@ def test__generate_features_fivetupleuni():
             qt_pkt
             qt_fin_fl
             qt_syn_fl
+            qt_res_fl
             qt_psh_fl
             qt_ack_fl
             qt_urg_fl
-            qt_rst_fl
-            qt_ece_fl
+            qt_ecn_fl
             qt_cwr_fl
             avg_hdr_len
             avg_pkt_len
@@ -655,11 +655,11 @@ def test__generate_features_fivetupleuni():
         1,  # qt_pkt
         0,  # qt_fin_fl
         1,  # qt_syn_fl
+        0,  # qt_res_fl
         0,  # qt_psh_fl
         0,  # qt_ack_fl
         0,  # qt_urg_fl
-        0,  # qt_rst_fl
-        0,  # qt_ece_fl
+        0,  # qt_ecn_fl
         0,  # qt_cwr_fl
         0,  # avg_hdr_len
         74,  # avg_pkt_len
@@ -683,11 +683,11 @@ def test__generate_features_fivetupleuni():
         2,  # qt_pkt
         0,  # qt_fin_fl
         2,  # qt_syn_fl
+        0,  # qt_res_fl
         0,  # qt_psh_fl
         0,  # qt_ack_fl
         0,  # qt_urg_fl
-        0,  # qt_rst_fl
-        0,  # qt_ece_fl
+        0,  # qt_ecn_fl
         0,  # qt_cwr_fl
         0,  # avg_hdr_len
         74,  # avg_pkt_len
@@ -707,11 +707,11 @@ def test__generate_features_fivetupleuni():
         2,  # qt_pkt
         0,  # qt_fin_fl
         2,  # qt_syn_fl
+        0,  # qt_res_fl
         0,  # qt_psh_fl
         0,  # qt_ack_fl
         0,  # qt_urg_fl
-        0,  # qt_rst_fl
-        0,  # qt_ece_fl
+        0,  # qt_ecn_fl
         0,  # qt_cwr_fl
         0,  # avg_hdr_len
         74,  # avg_pkt_len
