@@ -95,6 +95,40 @@ class AnubisFG:
                                             str],
                                       Union[FiveTupleUnidirectionalNode,
                                             FiveTupleUnidirectionalNode]] = None):
+
+
+        if bidirectional ==True:
+            if only_twotuple ==True and only_fivetuple == True:
+                self._update = _update_bi_2_5
+                self._generate_features_twotuple = _generate_features_twotuplebi
+                self._generate_features_fivetuple = _generate_features_fivetuplebi
+    
+            elif only_twotuple ==True and only_fivetuple ==False:
+                self._update = _update_bi_2
+                self._generate_features_twotuple = _generate_features_twotuplebi
+
+            elif only_twotuple == False and only_fivetuple == True:
+                self._update = _update_bi_5
+                self._generate_features_fivetuple = _generate_features_fivetuplebi
+          #  else: Da pra puxar o assert la embaixo aqui pra dentro pra n checar 2 vezes essa condicao
+
+        else:
+            if only_twotuple ==True and only_fivetuple == True:
+                self._update = _update_uni_2_5
+                self._generate_features_twotuple = _generate_features_twotupleuni
+                self._generate_features_fivetuple = _generate_features_fivetupleuni
+            elif only_twotuple ==True and only_fivetuple ==False:
+                self._update = _update_uni_2
+                self._generate_features_twotuple = _generate_features_twotupleuni
+
+            elif only_twotuple == False and only_fivetuple == True:
+                self._update = _update_uni_5
+                self._generate_features_fivetuple = _generate_features_fivetupleuni
+          #  else: Da pra puxar o assert la embaixo aqui pra dentro pra n checar 2 vezes essa condicao
+
+
+
+
         msg = "Parameters only_twotuple and only_fivetuple can't be mutually " \
               "True"
         assert not (only_twotuple and only_fivetuple), msg
@@ -143,7 +177,7 @@ class AnubisFG:
         else:
             self.memory_fivetup = None
 
-    def update(self, packet: Packet, ignore_errors=True):
+    def _update_bi_2_5(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -157,37 +191,94 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_twotup is not None:
-            if isinstance(memory_twotup, TwoTupleBidirectionalNode):
                 _update_twotuplebi(self, packet: Packet, ignore_errors=ignore_errors)
-            else: 
+
+        if self.memory_fivetup is not None:
+                _update_fivetuplebi(self, packet: Packet, ignore_errors=ignore_errors)
+
+    def _update_bi_2(self, packet: Packet, ignore_errors=True):
+        ''' Method updates all flows with their respective functions
+
+        Parameters
+        ----------
+        packet: `pyshark.packet.packet.Packet`
+            The packet to be inserted in memory.
+
+        ignore_errors: `bool`
+            Whether or not to ignore invalid packets (only packets with IP
+            Source, IP Destination, Source Port and Destination Port are valid -
+            STP Packets are invalid for example). (default=True)
+        '''
+        if self.memory_twotup is not None:
+                _update_twotuplebi(self, packet: Packet, ignore_errors=ignore_errors)
+
+    def _update_bi_5(self, packet: Packet, ignore_errors=True):
+        ''' Method updates all flows with their respective functions
+
+        Parameters
+        ----------
+        packet: `pyshark.packet.packet.Packet`
+            The packet to be inserted in memory.
+
+        ignore_errors: `bool`
+            Whether or not to ignore invalid packets (only packets with IP
+            Source, IP Destination, Source Port and Destination Port are valid -
+            STP Packets are invalid for example). (default=True)
+        '''
+        if self.memory_fivetup is not None:
+                _update_fivetuplebi(self, packet: Packet, ignore_errors=ignore_errors)
+
+    def _update_uni_2_5(self, packet: Packet, ignore_errors=True):
+        ''' Method updates all flows with their respective functions
+
+        Parameters
+        ----------
+        packet: `pyshark.packet.packet.Packet`
+            The packet to be inserted in memory.
+
+        ignore_errors: `bool`
+            Whether or not to ignore invalid packets (only packets with IP
+            Source, IP Destination, Source Port and Destination Port are valid -
+            STP Packets are invalid for example). (default=True)
+        '''
+        if self.memory_twotup is not None:              
                 _update_twotupleuni(self, packet: Packet, ignore_errors=ignore_errors)
 
         if self.memory_fivetup is not None:
-            if isinstance(memory_fivetup, FiveTupleBidirectionalNode):
-                _update_fivetuplebi(self, packet: Packet, ignore_errors=ignore_errors)
-            else: 
                 _update_fivetupleuni(self, packet: Packet, ignore_errors=ignore_errors)
 
-    def generate_features(self , flow_key: Tuple[LayerFieldsContainer,
-                                                       LayerFieldsContainer,
-                                                       LayerFieldsContainer,
-                                                       LayerFieldsContainer,
-                                                       str],
-                                       now=False) -> List:
-         ''' Extract features from all flows with their respective functions.
-         '''
-        if self.memory_twotup is not None:
-            if isinstance(memory_twotup, TwoTupleBidirectionalNode):
-                _generate_features_twotuplebi(self, flow_key: flow_key, now=now)
-            else: 
-                _generate_features_twotupleuni(self, flow_key: flow_key, now=now)
+    def _update_uni_2(self, packet: Packet, ignore_errors=True):
+        ''' Method updates all flows with their respective functions
 
+        Parameters
+        ----------
+        packet: `pyshark.packet.packet.Packet`
+            The packet to be inserted in memory.
+
+        ignore_errors: `bool`
+            Whether or not to ignore invalid packets (only packets with IP
+            Source, IP Destination, Source Port and Destination Port are valid -
+            STP Packets are invalid for example). (default=True)
+        '''
+        if self.memory_twotup is not None:              
+                _update_twotupleuni(self, packet: Packet, ignore_errors=ignore_errors)
+
+    def _update_uni_5(self, packet: Packet, ignore_errors=True):
+        ''' Method updates all flows with their respective functions
+
+        Parameters
+        ----------
+        packet: `pyshark.packet.packet.Packet`
+            The packet to be inserted in memory.
+
+        ignore_errors: `bool`
+            Whether or not to ignore invalid packets (only packets with IP
+            Source, IP Destination, Source Port and Destination Port are valid -
+            STP Packets are invalid for example). (default=True)
+        '''
         if self.memory_fivetup is not None:
-            if isinstance(memory_fivetup, FiveTupleBidirectionalNode):
-                _generate_features_fivetuplebi(self, flow_key: flow_key, now=now)
-            else: 
-                _generate_features_fivetupleuni(self, flow_key: flow_key, now=now)   
-    
+                _update_fivetupleuni(self, packet: Packet, ignore_errors=ignore_errors)
+
 
 
     def _update_twotupleuni(self, packet: Packet, ignore_errors=True):
