@@ -143,6 +143,53 @@ class AnubisFG:
         else:
             self.memory_fivetup = None
 
+    def update(self, packet: Packet, ignore_errors=True):
+        ''' Method updates all flows with their respective functions
+
+        Parameters
+        ----------
+        packet: `pyshark.packet.packet.Packet`
+            The packet to be inserted in memory.
+
+        ignore_errors: `bool`
+            Whether or not to ignore invalid packets (only packets with IP
+            Source, IP Destination, Source Port and Destination Port are valid -
+            STP Packets are invalid for example). (default=True)
+        '''
+        if self.memory_twotup is not None:
+            if isinstance(memory_twotup, TwoTupleBidirectionalNode):
+                _update_twotuplebi(self, packet: Packet, ignore_errors=ignore_errors)
+            else: 
+                _update_twotupleuni(self, packet: Packet, ignore_errors=ignore_errors)
+
+        if self.memory_fivetup is not None:
+            if isinstance(memory_fivetup, FiveTupleBidirectionalNode):
+                _update_fivetuplebi(self, packet: Packet, ignore_errors=ignore_errors)
+            else: 
+                _update_fivetupleuni(self, packet: Packet, ignore_errors=ignore_errors)
+
+    def generate_features(self , flow_key: Tuple[LayerFieldsContainer,
+                                                       LayerFieldsContainer,
+                                                       LayerFieldsContainer,
+                                                       LayerFieldsContainer,
+                                                       str],
+                                       now=False) -> List:
+         ''' Extract features from all flows with their respective functions.
+         '''
+        if self.memory_twotup is not None:
+            if isinstance(memory_twotup, TwoTupleBidirectionalNode):
+                _generate_features_twotuplebi(self, flow_key: flow_key, now=now)
+            else: 
+                _generate_features_twotupleuni(self, flow_key: flow_key, now=now)
+
+        if self.memory_fivetup is not None:
+            if isinstance(memory_fivetup, FiveTupleBidirectionalNode):
+                _generate_features_fivetuplebi(self, flow_key: flow_key, now=now)
+            else: 
+                _generate_features_fivetupleuni(self, flow_key: flow_key, now=now)   
+    
+
+
     def _update_twotupleuni(self, packet: Packet, ignore_errors=True):
         ''' Method updates the two tuple unidirectional memory with a pyshark
         packet.
