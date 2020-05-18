@@ -3,7 +3,8 @@ from datetime import datetime
 
 from pyshark.packet.fields import LayerFieldsContainer
 from pyshark.packet.packet import Packet
-from .nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode, FiveTupleUnidirectionalNode, FiveTupleBidirectionalNode
+from .nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode, \
+    FiveTupleUnidirectionalNode, FiveTupleBidirectionalNode
 
 
 def add_to_counter(counter, key, val=1):
@@ -528,7 +529,7 @@ class AnubisFG:
                               f'{prefix}_max_pkt_len'])
         if self.memory_fivetup[key].__dict__[f'{prefix}_min_pkt_len'] > 0:
             min_pkt_len = min(length, self.memory_fivetup[key].__dict__[
-                              f'{prefix}_min_pkt_len'])
+                f'{prefix}_min_pkt_len'])
         else:
             min_pkt_len = length
         self.memory_fivetup[key].__dict__['lst_timestamp'] = timestamp
