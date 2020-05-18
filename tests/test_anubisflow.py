@@ -723,3 +723,221 @@ def test__generate_features_fivetupleuni():
     ]
     ftrs = afg._generate_features_fivetupleuni(key, now=True)
     assert np.isclose(ftrs, expected).all()
+
+def test__generate_features_fivetuplebi():
+    '''
+        Feature list:
+        Forward
+            fwd_qt_pkt
+            fwd_qt_fin_fl
+            fwd_qt_syn_fl
+            fwd_qt_res_fl
+            fwd_qt_psh_fl
+            fwd_qt_ack_fl
+            fwd_qt_urg_fl
+            fwd_qt_ecn_fl
+            fwd_qt_cwr_fl
+            fwd_avg_hdr_len
+            fwd_avg_pkt_len
+            fwd_max_pkt_len
+            fwd_min_pkt_len
+            fwd_frq_pkt
+            fwd_avg_ttl
+        Backward
+            bck_qt_pkt
+            bck_qt_fin_fl
+            bck_qt_syn_fl
+            bck_qt_res_fl
+            bck_qt_psh_fl
+            bck_qt_ack_fl
+            bck_qt_urg_fl
+            bck_qt_ecn_fl
+            bck_qt_cwr_fl
+            bck_avg_hdr_len
+            bck_avg_pkt_len
+            bck_max_pkt_len
+            bck_min_pkt_len
+            bck_frq_pkt
+            bck_avg_ttl
+        Non-directional
+            tm_dur_s
+    '''
+    n_features = 31
+    ip_src = LayerFieldsContainer('172.16.0.5')
+    ip_dst = LayerFieldsContainer('192.168.50.1')
+    src_port = LayerFieldsContainer('60675')
+    dst_port = LayerFieldsContainer('80')
+    protocol = 'TCP'
+    key = (ip_src, src_port, ip_dst, dst_port, protocol)
+    afg = AnubisFG()
+
+    # Tuple that is not on the memory.
+    empty = afg._generate_features_fivetuplebi(key)
+    assert empty == [0] * n_features
+
+    # Duration 0
+    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    # Second packet is a SYN TCP packet.
+    packet = capture[1]
+    timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
+    afg._update_fivetuplebi(packet)
+    expected = [
+        1, # fwd_qt_pkt
+        0, # fwd_qt_fin_fl
+        1, # fwd_qt_syn_fl
+        0, # fwd_qt_res_fl
+        0, # fwd_qt_psh_fl
+        0, # fwd_qt_ack_fl
+        0, # fwd_qt_urg_fl
+        0, # fwd_qt_ecn_fl
+        0, # fwd_qt_cwr_fl
+        0, # fwd_avg_hdr_len
+        74, # fwd_avg_pkt_len
+        74, # fwd_max_pkt_len
+        74, # fwd_min_pkt_len
+        1, # fwd_frq_pkt
+        63, # fwd_avg_ttl
+        0, # bck_qt_pkt
+        0, # bck_qt_fin_fl
+        0, # bck_qt_syn_fl
+        0, # bck_qt_res_fl
+        0, # bck_qt_psh_fl
+        0, # bck_qt_ack_fl
+        0, # bck_qt_urg_fl
+        0, # bck_qt_ecn_fl
+        0, # bck_qt_cwr_fl
+        0, # bck_avg_hdr_len
+        0, # bck_avg_pkt_len
+        0, # bck_max_pkt_len
+        0, # bck_min_pkt_len
+        0, # bck_frq_pkt
+        0, # bck_avg_ttl
+        0, # tm_dur_s
+    ]
+    ftrs = afg._generate_features_fivetuplebi(key)
+    assert ftrs == expected
+
+    # Duration > 0
+    # Updating
+    # Third package is another SYN TCP packet with same IPs and Ports
+    packet = capture[2]
+    afg._update_fivetuplebi(packet)
+    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+    dur = (new_timestamp - timestamp).total_seconds()
+    expected = [
+        2, # fwd_qt_pkt
+        0, # fwd_qt_fin_fl
+        2, # fwd_qt_syn_fl
+        0, # fwd_qt_res_fl
+        0, # fwd_qt_psh_fl
+        0, # fwd_qt_ack_fl
+        0, # fwd_qt_urg_fl
+        0, # fwd_qt_ecn_fl
+        0, # fwd_qt_cwr_fl
+        0, # fwd_avg_hdr_len
+        74, # fwd_avg_pkt_len
+        74, # fwd_max_pkt_len
+        74, # fwd_min_pkt_len
+        2 / dur, # fwd_frq_pkt
+        63, # fwd_avg_ttl
+        0, # bck_qt_pkt
+        0, # bck_qt_fin_fl
+        0, # bck_qt_syn_fl
+        0, # bck_qt_res_fl
+        0, # bck_qt_psh_fl
+        0, # bck_qt_ack_fl
+        0, # bck_qt_urg_fl
+        0, # bck_qt_ecn_fl
+        0, # bck_qt_cwr_fl
+        0, # bck_avg_hdr_len
+        0, # bck_avg_pkt_len
+        0, # bck_max_pkt_len
+        0, # bck_min_pkt_len
+        0 / dur, # bck_frq_pkt
+        0, # bck_avg_ttl
+        dur, # tm_dur_s
+    ]
+    ftrs = afg._generate_features_fivetuplebi(key)
+    assert ftrs == expected
+
+    # Using now datetime.
+    new_timestamp = datetime.now()
+    dur = (new_timestamp - timestamp).total_seconds()
+    expected = [
+        2, # fwd_qt_pkt
+        0, # fwd_qt_fin_fl
+        2, # fwd_qt_syn_fl
+        0, # fwd_qt_res_fl
+        0, # fwd_qt_psh_fl
+        0, # fwd_qt_ack_fl
+        0, # fwd_qt_urg_fl
+        0, # fwd_qt_ecn_fl
+        0, # fwd_qt_cwr_fl
+        0, # fwd_avg_hdr_len
+        74, # fwd_avg_pkt_len
+        74, # fwd_max_pkt_len
+        74, # fwd_min_pkt_len
+        2 / dur, # fwd_frq_pkt
+        63, # fwd_avg_ttl
+        0, # bck_qt_pkt
+        0, # bck_qt_fin_fl
+        0, # bck_qt_syn_fl
+        0, # bck_qt_res_fl
+        0, # bck_qt_psh_fl
+        0, # bck_qt_ack_fl
+        0, # bck_qt_urg_fl
+        0, # bck_qt_ecn_fl
+        0, # bck_qt_cwr_fl
+        0, # bck_avg_hdr_len
+        0, # bck_avg_pkt_len
+        0, # bck_max_pkt_len
+        0, # bck_min_pkt_len
+        0 / dur, # bck_frq_pkt
+        0, # bck_avg_ttl
+        dur, # tm_dur_s
+    ]
+    ftrs = afg._generate_features_fivetuplebi(key, now=True)
+    assert np.isclose(ftrs, expected).all()
+
+    # Backward features
+    # Updating
+    # Fourth package is a SYN ACK response TCP packet with inverted IPs and
+    packet = capture[3]
+    afg._update_fivetuplebi(packet)
+    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
+    dur = (new_timestamp - timestamp).total_seconds()
+    expected = [
+        2, # fwd_qt_pkt
+        0, # fwd_qt_fin_fl
+        2, # fwd_qt_syn_fl
+        0, # fwd_qt_res_fl
+        0, # fwd_qt_psh_fl
+        0, # fwd_qt_ack_fl
+        0, # fwd_qt_urg_fl
+        0, # fwd_qt_ecn_fl
+        0, # fwd_qt_cwr_fl
+        0, # fwd_avg_hdr_len
+        74, # fwd_avg_pkt_len
+        74, # fwd_max_pkt_len
+        74, # fwd_min_pkt_len
+        2 / dur, # fwd_frq_pkt
+        63, # fwd_avg_ttl
+        1, # bck_qt_pkt
+        0, # bck_qt_fin_fl
+        1, # bck_qt_syn_fl
+        0, # bck_qt_res_fl
+        0, # bck_qt_psh_fl
+        1, # bck_qt_ack_fl
+        0, # bck_qt_urg_fl
+        0, # bck_qt_ecn_fl
+        0, # bck_qt_cwr_fl
+        0, # bck_avg_hdr_len
+        74, # bck_avg_pkt_len
+        74, # bck_max_pkt_len
+        74, # bck_min_pkt_len
+        1 / dur, # bck_frq_pkt
+        64, # bck_avg_ttl
+        dur, # tm_dur_s
+    ]
+    ftrs = afg._generate_features_fivetuplebi(key)
+    assert np.isclose(ftrs, expected).all()
