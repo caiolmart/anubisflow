@@ -621,7 +621,10 @@ class AnubisFG:
 
     def _generate_features_fivetupleuni(self,
                                         flow_key: Tuple[LayerFieldsContainer,
-                                                        LayerFieldsContainer],
+                                                        LayerFieldsContainer,
+                                                        LayerFieldsContainer,
+                                                        LayerFieldsContainer,
+                                                        str],
                                         now=False) -> List:
         ''' Extract features of the flow from the memory_fivetup.
 
