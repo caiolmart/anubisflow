@@ -499,7 +499,7 @@ class AnubisFG:
             mem.fwd_pkt_flag_counter[7],
             mem.fwd_tot_header_len / fwd_qt_pkt,
             mem.fwd_tot_packet_len / fwd_qt_pkt,
-            fwd_frq_pkt
+            fwd_frq_pkt,
             #bck
             bck_qt_pkt,
             zero_if_not_exits(mem.bck_pkt_protocol_counter, 'TCP'),
