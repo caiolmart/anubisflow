@@ -846,9 +846,18 @@ def test__generate_features_twotuplei():
     ]
     
     ftrs = afg._generate_features_twotuplebi(key)
-    breakpoint()
+    #breakpoint()
     assert np.isclose(ftrs, expected).all()
 
+    # Zero forward packets on existing flow
+    ip_src_1 = LayerFieldsContainer('192.168.0.1')
+    ip_dst_1 = LayerFieldsContainer('192.168.0.2')
+    key_1 = (ip_src_1, ip_dst_1)
+    t2_1 = TwoTupleBidirectionalNode()
+    memory_twotup_1 = {key_1: t2_1}
+    afg_1 = AnubisFG(memory_twotup=memory_twotup_1)
+    ftrs = afg_1._generate_features_twotuplebi(key_1)
+    assert ftrs == [0] * n_features
 
 
 def test__generate_features_fivetupleuni():
