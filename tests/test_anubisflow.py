@@ -195,7 +195,7 @@ def test__update_twotupleuni_update():
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
 
     # Updating
-    # Third package is another SYN TCP packet with same IPs and Ports
+    # Third packet is another SYN TCP packet with same IPs and Ports
     packet = capture[2]
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
     # SYN flag
@@ -263,7 +263,7 @@ def test__update_twotuplebi_update():
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
 
     # Updating Forward
-    # Third package is another SYN TCP packet with same IPs and Ports
+    # Third packet is another SYN TCP packet with same IPs and Ports
     packet = capture[2]
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
     # SYN flag
@@ -286,7 +286,7 @@ def test__update_twotuplebi_update():
     assert len(afg.memory_twotup) == 1
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
 
-    # Fourth package is a SYN ACK response TCP packet with inverted IPs and
+    # Fourth packet is a SYN ACK response TCP packet with inverted IPs and
     # Ports
     packet = capture[3]
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
@@ -359,7 +359,7 @@ def test__update_fivetupleuni_update():
     assert afg.memory_fivetup[key].__dict__ == expected
 
     # Updating
-    # Third package is another SYN TCP packet with same IPs and Ports
+    # Third packet is another SYN TCP packet with same IPs and Ports
     packet = capture[2]
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
     # SYN flag
@@ -432,7 +432,7 @@ def test__update_fivetuplebi_update():
     assert afg.memory_fivetup[key].__dict__ == expected
 
     # Updating Forward
-    # Third package is another SYN TCP packet with same IPs and Ports
+    # Third packet is another SYN TCP packet with same IPs and Ports
     packet = capture[2]
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
     # SYN flag
@@ -457,7 +457,7 @@ def test__update_fivetuplebi_update():
     assert len(afg.memory_fivetup) == 1
     assert afg.memory_fivetup[key].__dict__ == expected
 
-    # Fourth package is a SYN ACK response TCP packet with inverted IPs and
+    # Fourth packet is a SYN ACK response TCP packet with inverted IPs and
     # Ports
     packet = capture[3]
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
@@ -553,7 +553,7 @@ def test__generate_features_twotupleuni():
 
     # Duration > 0
     # Updating
-    # Third package is another SYN TCP packet with same IPs and Ports
+    # Third packet is another SYN TCP packet with same IPs and Ports
     packet = capture[2]
     afg._update_twotupleuni(packet)
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
@@ -611,7 +611,7 @@ def test__generate_features_twotupleuni():
     ftrs = afg._generate_features_twotupleuni(key, now=True)
     assert np.isclose(ftrs, expected).all()
 
-    # Zero forward packages on existing flow
+    # Zero forward packets on existing flow
     ip_src_1 = LayerFieldsContainer('192.168.0.1')
     ip_dst_1 = LayerFieldsContainer('192.168.0.2')
     key_1 = (ip_src_1, ip_dst_1)
@@ -624,7 +624,7 @@ def test__generate_features_twotupleuni():
 
 
 
-def test__generate_features_twotuplei():
+def test__generate_features_twotuplebi():
     '''
      
     '''
@@ -694,7 +694,7 @@ def test__generate_features_twotuplei():
 
     # Duration > 0
     # Updating
-    # Third package is another SYN TCP packet with same IPs and Ports
+    # Third packet is another SYN TCP packet with same IPs and Ports
     packet = capture[2]
     afg._update_twotuplebi(packet)
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
@@ -796,7 +796,7 @@ def test__generate_features_twotuplei():
 
     # Backward features
     # Updating
-    # Fourth package is a SYN ACK response TCP packet with inverted IPs and
+    # Fourth packet is a SYN ACK response TCP packet with inverted IPs and
     packet = capture[3]
     afg._update_twotuplebi(packet)
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
@@ -922,7 +922,7 @@ def test__generate_features_fivetupleuni():
 
     # Duration > 0
     # Updating
-    # Third package is another SYN TCP packet with same IPs and Ports
+    # Third packet is another SYN TCP packet with same IPs and Ports
     packet = capture[2]
     afg._update_fivetupleuni(packet)
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
@@ -972,7 +972,7 @@ def test__generate_features_fivetupleuni():
     ftrs = afg._generate_features_fivetupleuni(key, now=True)
     assert np.isclose(ftrs, expected).all()
 
-    # Zero forward packages on existing flow
+    # Zero forward packets on existing flow
     ip_src_1 = LayerFieldsContainer('192.168.0.1')
     ip_dst_1 = LayerFieldsContainer('192.168.0.2')
     src_port_1 = LayerFieldsContainer('80')
@@ -1080,7 +1080,7 @@ def test__generate_features_fivetuplebi():
 
     # Duration > 0
     # Updating
-    # Third package is another SYN TCP packet with same IPs and Ports
+    # Third packet is another SYN TCP packet with same IPs and Ports
     packet = capture[2]
     afg._update_fivetuplebi(packet)
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
@@ -1162,7 +1162,7 @@ def test__generate_features_fivetuplebi():
 
     # Backward features
     # Updating
-    # Fourth package is a SYN ACK response TCP packet with inverted IPs and
+    # Fourth packet is a SYN ACK response TCP packet with inverted IPs and
     packet = capture[3]
     afg._update_fivetuplebi(packet)
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
@@ -1203,7 +1203,7 @@ def test__generate_features_fivetuplebi():
     ftrs = afg._generate_features_fivetuplebi(key)
     assert np.isclose(ftrs, expected).all()
 
-    # Zero forward packages on existing flow
+    # Zero forward packets on existing flow
     ip_src_1 = LayerFieldsContainer('192.168.0.1')
     ip_dst_1 = LayerFieldsContainer('192.168.0.2')
     src_port_1 = LayerFieldsContainer('80')
