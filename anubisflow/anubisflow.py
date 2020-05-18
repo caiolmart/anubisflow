@@ -99,31 +99,31 @@ class AnubisFG:
 
         if bidirectional ==True:
             if only_twotuple ==True and only_fivetuple == True:
-                self._update = _update_bi_2_5
-                self._generate_features_twotuple = _generate_features_twotuplebi
-                self._generate_features_fivetuple = _generate_features_fivetuplebi
+                self._update = self._update_bi_2_5
+                self._generate_features_twotuple = self._generate_features_twotuplebi
+                self._generate_features_fivetuple = self._generate_features_fivetuplebi
     
             elif only_twotuple ==True and only_fivetuple ==False:
-                self._update = _update_bi_2
-                self._generate_features_twotuple = _generate_features_twotuplebi
+                self._update = self._update_bi_2
+                self._generate_features_twotuple = self._generate_features_twotuplebi
 
             elif only_twotuple == False and only_fivetuple == True:
-                self._update = _update_bi_5
-                self._generate_features_fivetuple = _generate_features_fivetuplebi
+                self._update = self._update_bi_5
+                self._generate_features_fivetuple = self._generate_features_fivetuplebi
           #  else: Da pra puxar o assert la embaixo aqui pra dentro pra n checar 2 vezes essa condicao
 
         else:
             if only_twotuple ==True and only_fivetuple == True:
-                self._update = _update_uni_2_5
-                self._generate_features_twotuple = _generate_features_twotupleuni
-                self._generate_features_fivetuple = _generate_features_fivetupleuni
+                self._update = self._update_uni_2_5
+                self._generate_features_twotuple = self._generate_features_twotupleuni
+                self._generate_features_fivetuple = self._generate_features_fivetupleuni
             elif only_twotuple ==True and only_fivetuple ==False:
-                self._update = _update_uni_2
-                self._generate_features_twotuple = _generate_features_twotupleuni
+                self._update = self._update_uni_2
+                self._generate_features_twotuple = self._generate_features_twotupleuni
 
             elif only_twotuple == False and only_fivetuple == True:
-                self._update = _update_uni_5
-                self._generate_features_fivetuple = _generate_features_fivetupleuni
+                self._update = self._update_uni_5
+                self._generate_features_fivetuple = self._generate_features_fivetupleuni
           #  else: Da pra puxar o assert la embaixo aqui pra dentro pra n checar 2 vezes essa condicao
 
 
@@ -191,10 +191,10 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_twotup is not None:
-                _update_twotuplebi(self, packet, ignore_errors=ignore_errors)
+                self._update_twotuplebi(packet, ignore_errors)
 
         if self.memory_fivetup is not None:
-                _update_fivetuplebi(self, packet, ignore_errors=ignore_errors)
+                self._update_fivetuplebi(packet, ignore_errors)
 
     def _update_bi_2(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
@@ -210,7 +210,7 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_twotup is not None:
-                _update_twotuplebi(self, packet, ignore_errors=ignore_errors)
+                self._update_twotuplebi(packet, ignore_errors)
 
     def _update_bi_5(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
@@ -226,7 +226,7 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_fivetup is not None:
-                _update_fivetuplebi(self, packet, ignore_errors=ignore_errors)
+                self._update_fivetuplebi(packet, ignore_errors)
 
     def _update_uni_2_5(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
@@ -242,10 +242,10 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_twotup is not None:              
-                _update_twotupleuni(self, packet, ignore_errors=ignore_errors)
+                self._update_twotupleuni(packet, ignore_errors)
 
         if self.memory_fivetup is not None:
-                _update_fivetupleuni(self, packet, ignore_errors=ignore_errors)
+                self._update_fivetupleuni(packet, ignore_errors)
 
     def _update_uni_2(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
@@ -261,7 +261,7 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_twotup is not None:              
-                _update_twotupleuni(self, packet, ignore_errors=ignore_errors)
+                self._update_twotupleuni(packet, ignore_errors)
 
     def _update_uni_5(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
@@ -277,7 +277,7 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_fivetup is not None:
-                _update_fivetupleuni(self, packet, ignore_errors=ignore_errors)
+                self._update_fivetupleuni(packet, ignore_errors)
 
 
 
