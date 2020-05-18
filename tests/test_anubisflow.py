@@ -611,6 +611,16 @@ def test__generate_features_twotupleuni():
     ftrs = afg._generate_features_twotupleuni(key, now=True)
     assert np.isclose(ftrs, expected).all()
 
+    # Zero forward packages on existing flow
+    ip_src_1 = LayerFieldsContainer('192.168.0.1')
+    ip_dst_1 = LayerFieldsContainer('192.168.0.2')
+    key_1 = (ip_src_1, ip_dst_1)
+    t2_1 = TwoTupleUnidirectionalNode()
+    memory_twotup_1 = {key_1: t2_1}
+    afg_1 = AnubisFG(memory_twotup=memory_twotup_1, bidirectional=False)
+    ftrs = afg_1._generate_features_twotupleuni(key_1)
+    assert ftrs == [0] * n_features
+
 
 def test__generate_features_fivetupleuni():
     '''
@@ -723,6 +733,19 @@ def test__generate_features_fivetupleuni():
     ]
     ftrs = afg._generate_features_fivetupleuni(key, now=True)
     assert np.isclose(ftrs, expected).all()
+
+    # Zero forward packages on existing flow
+    ip_src_1 = LayerFieldsContainer('192.168.0.1')
+    ip_dst_1 = LayerFieldsContainer('192.168.0.2')
+    src_port_1 = LayerFieldsContainer('80')
+    dst_port_1 = LayerFieldsContainer('80')
+    protocol_1 = 'TCP'
+    key_1 = (ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1)
+    t5_1 = FiveTupleUnidirectionalNode()
+    memory_fivetup_1 = {key_1: t5_1}
+    afg_1 = AnubisFG(memory_fivetup=memory_fivetup_1, bidirectional=False)
+    ftrs = afg_1._generate_features_fivetupleuni(key_1)
+    assert ftrs == [0] * n_features
 
 def test__generate_features_fivetuplebi():
     '''
@@ -941,3 +964,16 @@ def test__generate_features_fivetuplebi():
     ]
     ftrs = afg._generate_features_fivetuplebi(key)
     assert np.isclose(ftrs, expected).all()
+
+    # Zero forward packages on existing flow
+    ip_src_1 = LayerFieldsContainer('192.168.0.1')
+    ip_dst_1 = LayerFieldsContainer('192.168.0.2')
+    src_port_1 = LayerFieldsContainer('80')
+    dst_port_1 = LayerFieldsContainer('80')
+    protocol_1 = 'TCP'
+    key_1 = (ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1)
+    t5_1 = FiveTupleBidirectionalNode()
+    memory_fivetup_1 = {key_1: t5_1}
+    afg_1 = AnubisFG(memory_fivetup=memory_fivetup_1)
+    ftrs = afg_1._generate_features_fivetuplebi(key_1)
+    assert ftrs == [0] * n_features
