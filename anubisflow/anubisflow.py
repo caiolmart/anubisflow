@@ -48,7 +48,7 @@ class AnubisFG:
         The dictionary with the information of the flows. Has key (IP Source,
         IP Destination), a tuple with two
         pyshark.packet.fields.LayerFieldsContainer's, and value a
-        TwoTupleUnidirectionalNode of TwoTupleBidirectionalNode object, 
+        TwoTupleUnidirectionalNode of TwoTupleBidirectionalNode object,
         depeding on the choice of the bidirectional parameter.
     memory_fivetup: `dict`
         The dictionary with the information of the flows. Has key (IP Source,
@@ -57,7 +57,7 @@ class AnubisFG:
         pyshark.packet.fields.LayerFieldsContainer,
         pyshark.packet.fields.LayerFieldsContainer,
         pyshark.packet.fields.LayerFieldsContainer, str), and value a
-        FiveTupleUnidirectionalNode or FiveTupleBidirectionalNode object, 
+        FiveTupleUnidirectionalNode or FiveTupleBidirectionalNode object,
         depeding on the choice of the bidirectional parameter.
 
     Examples
@@ -136,7 +136,8 @@ class AnubisFG:
                 if bidirectional:
                     assert isinstance(item[1], FiveTupleBidirectionalNode), msg
                 else:
-                    assert isinstance(item[1], FiveTupleUnidirectionalNode), msg
+                    assert isinstance(
+                        item[1], FiveTupleUnidirectionalNode), msg
             self.memory_fivetup = memory_fivetup
         else:
             self.memory_fivetup = None
@@ -395,12 +396,15 @@ class AnubisFG:
             psh = 0
         key = (ip_src, src_port, ip_dst, dst_port, protocol)
         if key in self.memory_fivetup:
+            max_pkt_len = max(length, self.memory_fivetup[key].max_pkt_len)
+            min_pkt_len = min(length, self.memory_fivetup[key].min_pkt_len)
+
             self.memory_fivetup[key].lst_timestamp = timestamp
             self.memory_fivetup[key].tot_pkt += 1
             self.memory_fivetup[key].tot_packet_len += length
             self.memory_fivetup[key].tot_packet_len += hdr_length
-            self.max_pkt_len = max(length, self.memory_fivetup[key].max_pkt_len)
-            self.min_pkt_len = min(length, self.memory_fivetup[key].min_pkt_len)
+            self.memory_fivetup[key].max_pkt_len = max_pkt_len
+            self.memory_fivetup[key].min_pkt_len = min_pkt_len
             self.memory_fivetup[key].tot_ttl += ttl
             self.memory_fivetup[key].pkt_flag_counter[0] += fin
             self.memory_fivetup[key].pkt_flag_counter[1] += syn
@@ -498,9 +502,9 @@ class AnubisFG:
         ]
 
     def _generate_features_twotuplebi(self,
-                                       flow_key: Tuple[LayerFieldsContainer,
-                                                       LayerFieldsContainer],
-                                       now=False) -> List:
+                                      flow_key: Tuple[LayerFieldsContainer,
+                                                      LayerFieldsContainer],
+                                      now=False) -> List:
         ''' Extract features of the flow from the memory_twotup.
 
         Feature list:
@@ -545,9 +549,9 @@ class AnubisFG:
             avg_hdr_len
             avg_pkt_len
             frq_pkt
-        Non-directional:       
+        Non-directional:
             tm_dur_s
-         
+
         '''
 
         n_features = 39
@@ -558,7 +562,7 @@ class AnubisFG:
         if now:
             lst_time = datetime.now()
         else:
-            lst_time = mem.lst_timestamp 
+            lst_time = mem.lst_timestamp
 
         fwd_qt_pkt = sum(mem.fwd_pkt_protocol_counter.values())
         bck_qt_pkt = sum(mem.bck_pkt_protocol_counter.values())
@@ -571,7 +575,7 @@ class AnubisFG:
             fwd_frq_pkt = fwd_qt_pkt / duration_s
             bck_frq_pkt = bck_qt_pkt / duration_s
 
-        return [#fwd
+        return [  # fwd
             fwd_qt_pkt,
             zero_if_not_exists(mem.fwd_pkt_protocol_counter, 'TCP'),
             zero_if_not_exists(mem.fwd_pkt_protocol_counter, 'UDP'),
@@ -591,7 +595,7 @@ class AnubisFG:
             mem.fwd_tot_header_len / fwd_qt_pkt,
             mem.fwd_tot_packet_len / fwd_qt_pkt,
             fwd_frq_pkt,
-            #bck
+            # bck
             bck_qt_pkt,
             zero_if_not_exists(mem.bck_pkt_protocol_counter, 'TCP'),
             zero_if_not_exists(mem.bck_pkt_protocol_counter, 'UDP'),
@@ -611,7 +615,7 @@ class AnubisFG:
             mem.bck_tot_header_len / bck_qt_pkt,
             mem.bck_tot_packet_len / bck_qt_pkt,
             bck_frq_pkt,
-            #non-directional
+            # non-directional
             duration_s,
         ]
 
