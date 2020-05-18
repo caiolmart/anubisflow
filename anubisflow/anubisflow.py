@@ -432,7 +432,7 @@ class AnubisFG:
             qt_cwr_fl
             avg_hdr_len
             avg_pkt_len
-
+            frq_pkt
 
         Backward:
             qt_pkt
@@ -453,14 +453,13 @@ class AnubisFG:
             qt_cwr_fl
             avg_hdr_len
             avg_pkt_len
-            
-        Non-directional:
             frq_pkt
+        Non-directional:       
             tm_dur_s
          
         '''
 
-        n_features = 38
+        n_features = 39
 
         if flow_key not in self.memory_twotup:
             return [0] * n_features
@@ -500,6 +499,7 @@ class AnubisFG:
             mem.fwd_pkt_flag_counter[7],
             mem.fwd_tot_header_len / fwd_qt_pkt,
             mem.fwd_tot_packet_len / fwd_qt_pkt,
+            fwd_frq_pkt
             #bck
             bck_qt_pkt,
             zero_if_not_exits(mem.bck_pkt_protocol_counter, 'TCP'),
@@ -519,8 +519,8 @@ class AnubisFG:
             mem.bck_pkt_flag_counter[7],
             mem.bck_tot_header_len / bck_qt_pkt,
             mem.bck_tot_packet_len / bck_qt_pkt,
+            bck_frq_pkt,
             #non-directional
-            frq_pkt,
             duration_s,
         ]
 
