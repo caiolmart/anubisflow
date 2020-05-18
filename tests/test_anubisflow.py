@@ -622,6 +622,235 @@ def test__generate_features_twotupleuni():
     assert ftrs == [0] * n_features
 
 
+
+
+def test__generate_features_twotuplei():
+    '''
+     
+    '''
+    n_features = 39
+    ip_src = LayerFieldsContainer('172.16.0.5')
+    ip_dst = LayerFieldsContainer('192.168.50.1')
+    key = (ip_src, ip_dst)
+    afg = AnubisFG()
+
+    # Tuple that is not on the memory.
+    empty = afg._generate_features_twotuplebi(key)
+    assert empty == [0] * n_features
+
+    # Duration 0
+    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    # Second packet is a SYN TCP packet.
+    packet = capture[1]
+    timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
+  
+    afg._update_twotuplebi(packet)
+    expected = [
+        #fwd
+        1,  # qt_pkt
+        1,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        1,  # qt_prtcl
+        1,  # qt_src_prt
+        1,  # qt_dst_prt
+        0,  # qt_fin_fl
+        1,  # qt_syn_fl
+        0,  # qt_res_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_ecn_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len
+        1,  # frq_pkt
+        #bck
+        0,  # qt_pkt
+        0,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        0,  # qt_prtcl
+        0,  # qt_src_prt
+        0,  # qt_dst_prt
+        0,  # qt_fin_fl
+        0,  # qt_syn_fl
+        0,  # qt_res_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_ecn_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        0,  # avg_pkt_len
+        0,  # frq_pkt
+        #non-directional
+        0,  # tm_dur_s
+    ]
+    ftrs = afg._generate_features_twotuplebi(key)
+    assert ftrs == expected
+
+    # Duration > 0
+    # Updating
+    # Third package is another SYN TCP packet with same IPs and Ports
+    packet = capture[2]
+    afg._update_twotuplebi(packet)
+    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+    dur = (new_timestamp - timestamp).total_seconds()
+    expected = [
+        2,  # qt_pkt
+        2,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        1,  # qt_prtcl
+        1,  # qt_src_prt
+        1,  # qt_dst_prt
+        0,  # qt_fin_fl
+        2,  # qt_syn_fl
+        0,  # qt_res_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_ecn_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len
+        2 / dur,  # frq_pkt
+        #bck
+        0,  # qt_pkt
+        0,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        0,  # qt_prtcl
+        0,  # qt_src_prt
+        0,  # qt_dst_prt
+        0,  # qt_fin_fl
+        0,  # qt_syn_fl
+        0,  # qt_res_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_ecn_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        0,  # avg_pkt_len
+        0,  # frq_pkt
+        #non-directional
+        dur,  # tm_dur_s
+    ]
+    ftrs = afg._generate_features_twotuplebi(key)
+    assert ftrs == expected
+
+    # Using now datetime.
+    new_timestamp = datetime.now()
+    dur = (new_timestamp - timestamp).total_seconds()
+    expected = [
+        2,  # qt_pkt
+        2,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        1,  # qt_prtcl
+        1,  # qt_src_prt
+        1,  # qt_dst_prt
+        0,  # qt_fin_fl
+        2,  # qt_syn_fl
+        0,  # qt_res_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_ecn_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len
+        2 / dur,  # frq_pkt
+        #bck
+        0,  # qt_pkt
+        0,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        0,  # qt_prtcl
+        0,  # qt_src_prt
+        0,  # qt_dst_prt
+        0,  # qt_fin_fl
+        0,  # qt_syn_fl
+        0,  # qt_res_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_ecn_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        0,  # avg_pkt_len
+        0,  # frq_pkt
+        #non-directional
+        dur,  # tm_dur_s
+    ]
+    ftrs = afg._generate_features_twotuplebi(key, now=True)
+    assert np.isclose(ftrs, expected).all()
+
+    # Backward features
+    # Updating
+    # Fourth package is a SYN ACK response TCP packet with inverted IPs and
+    packet = capture[3]
+    afg._update_twotuplebi(packet)
+    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
+    dur = (new_timestamp - timestamp).total_seconds()
+    expected = [
+        2,  # qt_pkt
+        2,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        1,  # qt_prtcl
+        1,  # qt_src_prt
+        1,  # qt_dst_prt
+        0,  # qt_fin_fl
+        2,  # qt_syn_fl
+        0,  # qt_res_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_ecn_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len
+        2 / dur,  # frq_pkt
+        #bck
+        1,  # qt_pkt
+        1,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        1,  # qt_prtcl
+        1,  # qt_src_prt
+        1,  # qt_dst_prt
+        0,  # qt_fin_fl
+        1,  # qt_syn_fl
+        0,  # qt_res_fl
+        0,  # qt_psh_fl
+        1,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_ecn_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len  
+        1 / dur,  # frq_pkt
+        #non-directional
+        dur,  # tm_dur_s
+    ]
+    
+    ftrs = afg._generate_features_twotuplebi(key)
+    breakpoint()
+    assert np.isclose(ftrs, expected).all()
+
+
+
 def test__generate_features_fivetupleuni():
     '''
         Feature list:

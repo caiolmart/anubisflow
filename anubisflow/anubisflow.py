@@ -660,7 +660,6 @@ class AnubisFG:
             avg_hdr_len
             avg_pkt_len
             frq_pkt
-
         Backward:
             qt_pkt
             qt_pkt_tcp
@@ -713,12 +712,12 @@ class AnubisFG:
         else:
             avg_fwd_header = mem.fwd_tot_header_len / fwd_qt_pkt
             avg_fwd_packet = mem.fwd_tot_packet_len / fwd_qt_pkt
-        if bck_frq_pkt == 0:
+        if bck_qt_pkt == 0:
             avg_bck_header = 0
             avg_bck_packet = 0
         else:
-            avg_bck_header = mem.bck_tot_header_len / bck_frq_pkt
-            avg_bck_packet = mem.bck_tot_packet_len / bck_frq_pkt
+            avg_bck_header = mem.bck_tot_header_len / bck_qt_pkt
+            avg_bck_packet = mem.bck_tot_packet_len / bck_qt_pkt
 
         return [  # fwd
             fwd_qt_pkt,
