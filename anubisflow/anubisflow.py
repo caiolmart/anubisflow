@@ -603,6 +603,12 @@ class AnubisFG:
             frq_pkt = qt_pkt
         else:
             frq_pkt = qt_pkt / duration_s
+        if qt_pkt == 0:
+            avg_header = 0
+            avg_packet = 0
+        else:
+            avg_header = mem.tot_header_len / qt_pkt
+            avg_packet = mem.tot_packet_len / qt_pkt
         return [
             qt_pkt,
             zero_if_not_exists(mem.pkt_protocol_counter, 'TCP'),
@@ -620,8 +626,8 @@ class AnubisFG:
             mem.pkt_flag_counter[5],
             mem.pkt_flag_counter[6],
             mem.pkt_flag_counter[7],
-            mem.tot_header_len / qt_pkt,
-            mem.tot_packet_len / qt_pkt,
+            avg_header,
+            avg_packet,
             frq_pkt,
             duration_s,
         ]
@@ -700,6 +706,19 @@ class AnubisFG:
             fwd_frq_pkt = fwd_qt_pkt / duration_s
             bck_frq_pkt = bck_qt_pkt / duration_s
 
+        if fwd_qt_pkt == 0:
+            avg_fwd_header = 0
+            avg_fwd_packet = 0
+        else:
+            avg_fwd_header = mem.fwd_tot_header_len / fwd_qt_pkt
+            avg_fwd_packet = mem.fwd_tot_packet_len / fwd_qt_pkt
+        if bck_frq_pkt == 0:
+            avg_bck_header = 0
+            avg_bck_packet = 0
+        else:
+            avg_bck_header = mem.bck_tot_header_len / bck_frq_pkt
+            avg_bck_packet = mem.bck_tot_packet_len / bck_frq_pkt
+
         return [  # fwd
             fwd_qt_pkt,
             zero_if_not_exists(mem.fwd_pkt_protocol_counter, 'TCP'),
@@ -717,8 +736,8 @@ class AnubisFG:
             mem.fwd_pkt_flag_counter[5],
             mem.fwd_pkt_flag_counter[6],
             mem.fwd_pkt_flag_counter[7],
-            mem.fwd_tot_header_len / fwd_qt_pkt,
-            mem.fwd_tot_packet_len / fwd_qt_pkt,
+            avg_fwd_header,
+            avg_fwd_packet,
             fwd_frq_pkt,
             # bck
             bck_qt_pkt,
@@ -737,8 +756,8 @@ class AnubisFG:
             mem.bck_pkt_flag_counter[5],
             mem.bck_pkt_flag_counter[6],
             mem.bck_pkt_flag_counter[7],
-            mem.bck_tot_header_len / bck_qt_pkt,
-            mem.bck_tot_packet_len / bck_qt_pkt,
+            avg_bck_header,
+            avg_bck_packet,
             bck_frq_pkt,
             # non-directional
             duration_s,
@@ -784,6 +803,14 @@ class AnubisFG:
             frq_pkt = mem.tot_pkt
         else:
             frq_pkt = mem.tot_pkt / duration_s
+        if mem.tot_pkt == 0:
+            avg_header = 0
+            avg_packet = 0
+            avg_ttl = 0
+        else:
+            avg_header = mem.tot_header_len / mem.tot_pkt
+            avg_packet = mem.tot_packet_len / mem.tot_pkt
+            avg_ttl = mem.tot_ttl / mem.tot_pkt
         return [
             mem.tot_pkt,
             mem.pkt_flag_counter[0],
@@ -794,13 +821,13 @@ class AnubisFG:
             mem.pkt_flag_counter[5],
             mem.pkt_flag_counter[6],
             mem.pkt_flag_counter[7],
-            mem.tot_header_len / mem.tot_pkt,
-            mem.tot_packet_len / mem.tot_pkt,
+            avg_header,
+            avg_packet,
             mem.max_pkt_len,
             mem.min_pkt_len,
             frq_pkt,
             duration_s,
-            mem.tot_ttl / mem.tot_pkt
+            avg_ttl
         ]
 
     def _generate_features_fivetuplebi(self,
