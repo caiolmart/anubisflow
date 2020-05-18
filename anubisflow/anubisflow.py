@@ -202,7 +202,7 @@ class AnubisFG:
             add_to_counter(self.memory_twotup[key].pkt_protocol_counter,
                            protocol)
             self.memory_twotup[key].tot_packet_len += length
-            self.memory_twotup[key].tot_packet_len += hdr_length
+            self.memory_twotup[key].tot_header_len += hdr_length
             self.memory_twotup[key].pkt_flag_counter[0] += fin
             self.memory_twotup[key].pkt_flag_counter[1] += syn
             self.memory_twotup[key].pkt_flag_counter[2] += res
@@ -323,7 +323,7 @@ class AnubisFG:
             f'{prefix}_pkt_protocol_counter'], protocol)
         self.memory_twotup[key].__dict__[f'{prefix}_tot_packet_len'] += length
         self.memory_twotup[key].__dict__[
-            f'{prefix}_tot_packet_len'] += hdr_length
+            f'{prefix}_tot_header_len'] += hdr_length
         self.memory_twotup[key].__dict__[
             f'{prefix}_pkt_flag_counter'][0] += fin
         self.memory_twotup[key].__dict__[
@@ -402,7 +402,7 @@ class AnubisFG:
             self.memory_fivetup[key].lst_timestamp = timestamp
             self.memory_fivetup[key].tot_pkt += 1
             self.memory_fivetup[key].tot_packet_len += length
-            self.memory_fivetup[key].tot_packet_len += hdr_length
+            self.memory_fivetup[key].tot_header_len += hdr_length
             self.memory_fivetup[key].max_pkt_len = max_pkt_len
             self.memory_fivetup[key].min_pkt_len = min_pkt_len
             self.memory_fivetup[key].tot_ttl += ttl
