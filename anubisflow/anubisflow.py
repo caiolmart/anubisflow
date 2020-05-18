@@ -802,3 +802,117 @@ class AnubisFG:
             duration_s,
             mem.tot_ttl / mem.tot_pkt
         ]
+
+    def _generate_features_fivetuplebi(self,
+                                       flow_key: Tuple[LayerFieldsContainer,
+                                                       LayerFieldsContainer,
+                                                       LayerFieldsContainer,
+                                                       LayerFieldsContainer,
+                                                       str],
+                                       now=False) -> List:
+        ''' Extract features of the flow from the memory_fivetup.
+
+        Feature list:
+        Forward
+            fwd_qt_pkt
+            fwd_qt_fin_fl
+            fwd_qt_syn_fl
+            fwd_qt_res_fl
+            fwd_qt_psh_fl
+            fwd_qt_ack_fl
+            fwd_qt_urg_fl
+            fwd_qt_ecn_fl
+            fwd_qt_cwr_fl
+            fwd_avg_hdr_len
+            fwd_avg_pkt_len
+            fwd_max_pkt_len
+            fwd_min_pkt_len
+            fwd_frq_pkt
+            fwd_avg_ttl
+        Backward
+            bck_qt_pkt
+            bck_qt_fin_fl
+            bck_qt_syn_fl
+            bck_qt_res_fl
+            bck_qt_psh_fl
+            bck_qt_ack_fl
+            bck_qt_urg_fl
+            bck_qt_ecn_fl
+            bck_qt_cwr_fl
+            bck_avg_hdr_len
+            bck_avg_pkt_len
+            bck_max_pkt_len
+            bck_min_pkt_len
+            bck_frq_pkt
+            bck_avg_ttl
+        Non-directional
+            tm_dur_s
+        '''
+        n_features = 31
+        if flow_key not in self.memory_fivetup:
+            return [0] * n_features
+        mem = self.memory_fivetup[flow_key]
+        if now:
+            lst_time = datetime.now()
+        else:
+            lst_time = mem.lst_timestamp
+        duration_s = (lst_time - mem.fst_timestamp).total_seconds()
+        if duration_s == 0:
+            fwd_frq_pkt = mem.fwd_tot_pkt
+            bck_frq_pkt = mem.bck_tot_pkt
+        else:
+            fwd_frq_pkt = mem.fwd_tot_pkt / duration_s
+            bck_frq_pkt = mem.bck_tot_pkt / duration_s
+        if mem.fwd_tot_pkt == 0:
+            avg_fwd_header = 0
+            avg_fwd_packet = 0
+            avg_fwd_ttl = 0
+        else:
+            avg_fwd_header = mem.fwd_tot_header_len / mem.fwd_tot_pkt
+            avg_fwd_packet = mem.fwd_tot_packet_len / mem.fwd_tot_pkt
+            avg_fwd_ttl = mem.fwd_tot_ttl / mem.fwd_tot_pkt
+        if mem.bck_tot_pkt == 0:
+            avg_bck_header = 0
+            avg_bck_packet = 0
+            avg_bck_ttl = 0
+        else:
+            avg_bck_header = mem.bck_tot_header_len / mem.bck_tot_pkt
+            avg_bck_packet = mem.bck_tot_packet_len / mem.bck_tot_pkt
+            avg_bck_ttl = mem.bck_tot_ttl / mem.bck_tot_pkt
+
+        return [
+            # fwd
+            mem.fwd_tot_pkt,
+            mem.fwd_pkt_flag_counter[0],
+            mem.fwd_pkt_flag_counter[1],
+            mem.fwd_pkt_flag_counter[2],
+            mem.fwd_pkt_flag_counter[3],
+            mem.fwd_pkt_flag_counter[4],
+            mem.fwd_pkt_flag_counter[5],
+            mem.fwd_pkt_flag_counter[6],
+            mem.fwd_pkt_flag_counter[7],
+            avg_fwd_header,
+            avg_fwd_packet,
+            mem.fwd_max_pkt_len,
+            mem.fwd_min_pkt_len,
+            fwd_frq_pkt,
+            avg_fwd_ttl,
+            # bck
+            mem.bck_tot_pkt,
+            mem.bck_pkt_flag_counter[0],
+            mem.bck_pkt_flag_counter[1],
+            mem.bck_pkt_flag_counter[2],
+            mem.bck_pkt_flag_counter[3],
+            mem.bck_pkt_flag_counter[4],
+            mem.bck_pkt_flag_counter[5],
+            mem.bck_pkt_flag_counter[6],
+            mem.bck_pkt_flag_counter[7],
+            avg_bck_header,
+            avg_bck_packet,
+            mem.bck_max_pkt_len,
+            mem.bck_min_pkt_len,
+            bck_frq_pkt,
+            avg_bck_ttl,
+            # non-directional
+            duration_s,
+        ]
