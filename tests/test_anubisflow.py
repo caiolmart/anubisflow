@@ -649,7 +649,7 @@ def test__generate_features_fivetupleuni():
     dst_port = LayerFieldsContainer('80')
     protocol = 'TCP'
     key = (ip_src, src_port, ip_dst, dst_port, protocol)
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=False)
 
     # Tuple that is not on the memory.
     empty = afg._generate_features_fivetupleuni(key)
