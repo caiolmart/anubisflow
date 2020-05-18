@@ -404,3 +404,124 @@ class AnubisFG:
             frq_pkt,
             duration_s,
         ]
+
+
+    def _generate_features_twotuplebi(self,
+                                       flow_key: Tuple[LayerFieldsContainer,
+                                                       LayerFieldsContainer],
+                                       now=False) -> List:
+        ''' Extract features of the flow from the memory_twotup.
+
+        Feature list:
+        Forward:
+            qt_pkt
+            qt_pkt_tcp
+            qt_pkt_udp
+            qt_pkt_icmp
+            qt_pkt_ip
+            qt_prtcl
+            qt_src_prt
+            qt_dst_prt
+            qt_fin_fl
+            qt_syn_fl
+            qt_psh_fl
+            qt_ack_fl
+            qt_urg_fl
+            qt_rst_fl
+            qt_ece_fl
+            qt_cwr_fl
+            avg_hdr_len
+            avg_pkt_len
+
+
+        Backward:
+            qt_pkt
+            qt_pkt_tcp
+            qt_pkt_udp
+            qt_pkt_icmp
+            qt_pkt_ip
+            qt_prtcl
+            qt_src_prt
+            qt_dst_prt
+            qt_fin_fl
+            qt_syn_fl
+            qt_psh_fl
+            qt_ack_fl
+            qt_urg_fl
+            qt_rst_fl
+            qt_ece_fl
+            qt_cwr_fl
+            avg_hdr_len
+            avg_pkt_len
+            
+        Non-directional:
+            frq_pkt
+            tm_dur_s
+         
+        '''
+
+        n_features = 38
+
+        if flow_key not in self.memory_twotup:
+            return [0] * n_features
+        mem = self.memory_twotup[flow_key]
+        if now:
+            lst_time = datetime.now()
+        else:
+            lst_time = mem.lst_timestamp 
+
+        fwd_qt_pkt = sum(mem.fwd_pkt_protocol_counter.values())
+        bck_qt_pkt = sum(mem.bck_pkt_protocol_counter.values())
+
+        duration_s = (lst_time - mem.fst_timestamp).total_seconds()
+        if duration_s == 0:
+            fwd_frq_pkt = fwd_qt_pkt
+            bck_frq_pkt = bck_qt_pkt
+        else:
+            fwd_frq_pkt = fwd_qt_pkt / duration_s
+            bck_frq_pkt = bck_qt_pkt / duration_s
+
+        return [#fwd
+            fwd_qt_pkt,
+            zero_if_not_exits(mem.fwd_pkt_protocol_counter, 'TCP'),
+            zero_if_not_exits(mem.fwd_pkt_protocol_counter, 'UDP'),
+            zero_if_not_exits(mem.fwd_pkt_protocol_counter, 'ICMP'),
+            zero_if_not_exits(mem.fwd_pkt_protocol_counter, 'IP'),
+            len(mem.fwd_pkt_protocol_counter),
+            len(mem.fwd_set_src_ports),
+            len(mem.fwd_set_dst_ports),
+            mem.fwd_pkt_flag_counter[0],
+            mem.fwd_pkt_flag_counter[1],
+            mem.fwd_pkt_flag_counter[2],
+            mem.fwd_pkt_flag_counter[3],
+            mem.fwd_pkt_flag_counter[4],
+            mem.fwd_pkt_flag_counter[5],
+            mem.fwd_pkt_flag_counter[6],
+            mem.fwd_pkt_flag_counter[7],
+            mem.fwd_tot_header_len / fwd_qt_pkt,
+            mem.fwd_tot_packet_len / fwd_qt_pkt,
+            #bck
+            bck_qt_pkt,
+            zero_if_not_exits(mem.bck_pkt_protocol_counter, 'TCP'),
+            zero_if_not_exits(mem.bck_pkt_protocol_counter, 'UDP'),
+            zero_if_not_exits(mem.bck_pkt_protocol_counter, 'ICMP'),
+            zero_if_not_exits(mem.bck_pkt_protocol_counter, 'IP'),
+            len(mem.bck_pkt_protocol_counter),
+            len(mem.bck_set_src_ports),
+            len(mem.bck_set_dst_ports),
+            mem.bck_pkt_flag_counter[0],
+            mem.bck_pkt_flag_counter[1],
+            mem.bck_pkt_flag_counter[2],
+            mem.bck_pkt_flag_counter[3],
+            mem.bck_pkt_flag_counter[4],
+            mem.bck_pkt_flag_counter[5],
+            mem.bck_pkt_flag_counter[6],
+            mem.bck_pkt_flag_counter[7],
+            mem.bck_tot_header_len / bck_qt_pkt,
+            mem.bck_tot_packet_len / bck_qt_pkt,
+            #non-directional
+            frq_pkt,
+            duration_s,
+        ]
+
+
