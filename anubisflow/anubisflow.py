@@ -497,7 +497,6 @@ class AnubisFG:
             duration_s,
         ]
 
-
     def _generate_features_twotuplebi(self,
                                        flow_key: Tuple[LayerFieldsContainer,
                                                        LayerFieldsContainer],
@@ -616,4 +615,58 @@ class AnubisFG:
             duration_s,
         ]
 
+    def _generate_features_fivetupleuni(self,
+                                        flow_key: Tuple[LayerFieldsContainer,
+                                                        LayerFieldsContainer],
+                                        now=False) -> List:
+        ''' Extract features of the flow from the memory_fivetup.
 
+        Feature list:
+            qt_pkt
+            qt_fin_fl
+            qt_syn_fl
+            qt_psh_fl
+            qt_ack_fl
+            qt_urg_fl
+            qt_rst_fl
+            qt_ece_fl
+            qt_cwr_fl
+            avg_hdr_len
+            avg_pkt_len
+            max_pkt_len
+            min_pkt_len
+            frq_pkt
+            tm_dur_s
+            avg_ttl
+        '''
+        n_features = 16
+        if flow_key not in self.memory_fivetup:
+            return [0] * n_features
+        mem = self.memory_fivetup[flow_key]
+        if now:
+            lst_time = datetime.now()
+        else:
+            lst_time = mem.lst_timestamp
+        duration_s = (lst_time - mem.fst_timestamp).total_seconds()
+        if duration_s == 0:
+            frq_pkt = mem.tot_pkt
+        else:
+            frq_pkt = mem.tot_pkt / duration_s
+        return [
+            mem.tot_pkt,
+            mem.pkt_flag_counter[0],
+            mem.pkt_flag_counter[1],
+            mem.pkt_flag_counter[2],
+            mem.pkt_flag_counter[3],
+            mem.pkt_flag_counter[4],
+            mem.pkt_flag_counter[5],
+            mem.pkt_flag_counter[6],
+            mem.pkt_flag_counter[7],
+            mem.tot_header_len / mem.tot_pkt,
+            mem.tot_packet_len / mem.tot_pkt,
+            mem.max_pkt_len,
+            mem.min_pkt_len,
+            frq_pkt,
+            duration_s,
+            mem.tot_ttl / mem.tot_pkt
+        ]
