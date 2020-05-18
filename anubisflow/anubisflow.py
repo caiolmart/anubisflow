@@ -13,7 +13,7 @@ def add_to_counter(counter, key, val=1):
         counter[key] = val
 
 
-def zero_if_not_exits(counter, key):
+def zero_if_not_exists(counter, key):
     if key in counter:
         return counter[key]
     return 0
@@ -384,10 +384,10 @@ class AnubisFG:
             frq_pkt = qt_pkt / duration_s
         return [
             qt_pkt,
-            zero_if_not_exits(mem.pkt_protocol_counter, 'TCP'),
-            zero_if_not_exits(mem.pkt_protocol_counter, 'UDP'),
-            zero_if_not_exits(mem.pkt_protocol_counter, 'ICMP'),
-            zero_if_not_exits(mem.pkt_protocol_counter, 'IP'),
+            zero_if_not_exists(mem.pkt_protocol_counter, 'TCP'),
+            zero_if_not_exists(mem.pkt_protocol_counter, 'UDP'),
+            zero_if_not_exists(mem.pkt_protocol_counter, 'ICMP'),
+            zero_if_not_exists(mem.pkt_protocol_counter, 'IP'),
             len(mem.pkt_protocol_counter),
             len(mem.set_src_ports),
             len(mem.set_dst_ports),
@@ -482,10 +482,10 @@ class AnubisFG:
 
         return [#fwd
             fwd_qt_pkt,
-            zero_if_not_exits(mem.fwd_pkt_protocol_counter, 'TCP'),
-            zero_if_not_exits(mem.fwd_pkt_protocol_counter, 'UDP'),
-            zero_if_not_exits(mem.fwd_pkt_protocol_counter, 'ICMP'),
-            zero_if_not_exits(mem.fwd_pkt_protocol_counter, 'IP'),
+            zero_if_not_exists(mem.fwd_pkt_protocol_counter, 'TCP'),
+            zero_if_not_exists(mem.fwd_pkt_protocol_counter, 'UDP'),
+            zero_if_not_exists(mem.fwd_pkt_protocol_counter, 'ICMP'),
+            zero_if_not_exists(mem.fwd_pkt_protocol_counter, 'IP'),
             len(mem.fwd_pkt_protocol_counter),
             len(mem.fwd_set_src_ports),
             len(mem.fwd_set_dst_ports),
@@ -502,10 +502,10 @@ class AnubisFG:
             fwd_frq_pkt,
             #bck
             bck_qt_pkt,
-            zero_if_not_exits(mem.bck_pkt_protocol_counter, 'TCP'),
-            zero_if_not_exits(mem.bck_pkt_protocol_counter, 'UDP'),
-            zero_if_not_exits(mem.bck_pkt_protocol_counter, 'ICMP'),
-            zero_if_not_exits(mem.bck_pkt_protocol_counter, 'IP'),
+            zero_if_not_exists(mem.bck_pkt_protocol_counter, 'TCP'),
+            zero_if_not_exists(mem.bck_pkt_protocol_counter, 'UDP'),
+            zero_if_not_exists(mem.bck_pkt_protocol_counter, 'ICMP'),
+            zero_if_not_exists(mem.bck_pkt_protocol_counter, 'IP'),
             len(mem.bck_pkt_protocol_counter),
             len(mem.bck_set_src_ports),
             len(mem.bck_set_dst_ports),
