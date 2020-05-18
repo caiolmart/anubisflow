@@ -340,6 +340,98 @@ class AnubisFG:
         self.memory_twotup[key].__dict__[
             f'{prefix}_pkt_flag_counter'][7] += cwr
 
+    def _update_fivetupleuni(self, packet: Packet, ignore_errors=True):
+        ''' Method updates the two tuple unidirectional memory with a pyshark
+        packet.
+
+        Parameters
+        ----------
+        packet: `pyshark.packet.packet.Packet`
+            The packet to be inserted in memory.
+
+        ignore_errors: `bool`
+            Whether or not to ignore invalid packets (only packets with IP
+            Source, IP Destination, Source Port and Destination Port are valid -
+            STP Packets are invalid for example). (default=True)
+        '''
+        try:
+            ip_src = packet.ip.src
+            ip_dst = packet.ip.dst
+            timestamp = packet.sniff_time
+            src_port = packet[packet.transport_layer].srcport
+            dst_port = packet[packet.transport_layer].dstport
+            protocol = packet.transport_layer
+            length = int(packet.length)
+            ttl = int(packet.ip.ttl)
+        except AttributeError as err:
+            if ignore_errors:
+                return
+            err.args = ('Attribute ip not in packet', )
+            raise
+
+        # Not all packets have IP headers
+        try:
+            hdr_length = int(packet.ip.hdr_length)
+        except AttributeError:
+            hdr_length = 0
+        # Only works for tcp packets
+        try:
+            ack = int(packet.tcp.flags_ack)
+            cwr = int(packet.tcp.flags_cwr)
+            ecn = int(packet.tcp.flags_ecn)
+            fin = int(packet.tcp.flags_fin)
+            res = int(packet.tcp.flags_res)
+            syn = int(packet.tcp.flags_syn)
+            urg = int(packet.tcp.flags_urg)
+            psh = int(packet.tcp.flags_push)
+        except AttributeError:
+            ack = 0
+            cwr = 0
+            ecn = 0
+            fin = 0
+            res = 0
+            syn = 0
+            urg = 0
+            psh = 0
+        key = (ip_src, src_port, ip_dst, dst_port, protocol)
+        if key in self.memory_fivetup:
+            self.memory_fivetup[key].lst_timestamp = timestamp
+            self.memory_fivetup[key].tot_pkt += 1
+            self.memory_fivetup[key].tot_packet_len += length
+            self.memory_fivetup[key].tot_packet_len += hdr_length
+            self.max_pkt_len = max(length, self.memory_fivetup[key].max_pkt_len)
+            self.min_pkt_len = min(length, self.memory_fivetup[key].min_pkt_len)
+            self.memory_fivetup[key].tot_ttl += ttl
+            self.memory_fivetup[key].pkt_flag_counter[0] += fin
+            self.memory_fivetup[key].pkt_flag_counter[1] += syn
+            self.memory_fivetup[key].pkt_flag_counter[2] += res
+            self.memory_fivetup[key].pkt_flag_counter[3] += psh
+            self.memory_fivetup[key].pkt_flag_counter[4] += ack
+            self.memory_fivetup[key].pkt_flag_counter[5] += urg
+            self.memory_fivetup[key].pkt_flag_counter[6] += ecn
+            self.memory_fivetup[key].pkt_flag_counter[7] += cwr
+        else:
+            node_dict = {
+                'fst_timestamp': timestamp,
+                'lst_timestamp': timestamp,
+                'pkt_flag_counter': [
+                    fin,
+                    syn,
+                    res,
+                    psh,
+                    ack,
+                    urg,
+                    ecn,
+                    cwr],
+                'tot_pkt': 1,
+                'tot_header_len': hdr_length,
+                'tot_packet_len': length,
+                'max_pkt_len': length,
+                'min_pkt_len': length,
+                'tot_ttl': ttl}
+            node = FiveTupleUnidirectionalNode(**node_dict)
+            self.memory_fivetup[key] = node
+
     def _generate_features_twotupleuni(self,
                                        flow_key: Tuple[LayerFieldsContainer,
                                                        LayerFieldsContainer],
