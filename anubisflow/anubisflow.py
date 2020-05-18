@@ -191,10 +191,10 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_twotup is not None:
-                _update_twotuplebi(self, packet: Packet, ignore_errors=ignore_errors)
+                _update_twotuplebi(self, packet, ignore_errors=ignore_errors)
 
         if self.memory_fivetup is not None:
-                _update_fivetuplebi(self, packet: Packet, ignore_errors=ignore_errors)
+                _update_fivetuplebi(self, packet, ignore_errors=ignore_errors)
 
     def _update_bi_2(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
@@ -210,7 +210,7 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_twotup is not None:
-                _update_twotuplebi(self, packet: Packet, ignore_errors=ignore_errors)
+                _update_twotuplebi(self, packet, ignore_errors=ignore_errors)
 
     def _update_bi_5(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
@@ -226,7 +226,7 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_fivetup is not None:
-                _update_fivetuplebi(self, packet: Packet, ignore_errors=ignore_errors)
+                _update_fivetuplebi(self, packet, ignore_errors=ignore_errors)
 
     def _update_uni_2_5(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
@@ -242,10 +242,10 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_twotup is not None:              
-                _update_twotupleuni(self, packet: Packet, ignore_errors=ignore_errors)
+                _update_twotupleuni(self, packet, ignore_errors=ignore_errors)
 
         if self.memory_fivetup is not None:
-                _update_fivetupleuni(self, packet: Packet, ignore_errors=ignore_errors)
+                _update_fivetupleuni(self, packet, ignore_errors=ignore_errors)
 
     def _update_uni_2(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
@@ -261,7 +261,7 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_twotup is not None:              
-                _update_twotupleuni(self, packet: Packet, ignore_errors=ignore_errors)
+                _update_twotupleuni(self, packet, ignore_errors=ignore_errors)
 
     def _update_uni_5(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
@@ -277,7 +277,7 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         if self.memory_fivetup is not None:
-                _update_fivetupleuni(self, packet: Packet, ignore_errors=ignore_errors)
+                _update_fivetupleuni(self, packet, ignore_errors=ignore_errors)
 
 
 
