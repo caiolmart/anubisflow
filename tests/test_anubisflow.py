@@ -490,11 +490,14 @@ def test__update_fivetuplebi_update():
 
 def test_update():
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    # Will be tested considering all possible sets of attributes.
     for bidir in [True, False]:
         for onlytwo in [True, False]:
             for onlyfive in set([not onlytwo, False]):
+                # This will be updated by the method update.
                 afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
                                  only_fivetuple=onlyfive)
+                # This will be updated by the specific method(s) tested above.
                 afg_2 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
                                  only_fivetuple=onlyfive)
                 for i in range(1, 4):
@@ -1265,17 +1268,20 @@ def test__generate_features_fivetuplebi():
 
 def test_generate_features():
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    # Flow to be tested.
     packet = capture[1]
     ip_src = packet.ip.src
     ip_dst = packet.ip.dst
     src_port = int(packet[packet.transport_layer].srcport)
     dst_port = int(packet[packet.transport_layer].dstport)
     protocol = packet.transport_layer
+    # Will be tested considering all possible sets of attributes.
     for bidir in [True, False]:
         for onlytwo in [True, False]:
             for onlyfive in set([not onlytwo, False]):
                 afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
                                  only_fivetuple=onlyfive)
+                # Will be tested along 3 updates.
                 for i in range(1, 4):
                     packet = capture[i]
                     afg_1.update(packet)
