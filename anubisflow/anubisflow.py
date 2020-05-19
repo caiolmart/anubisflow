@@ -178,10 +178,33 @@ class AnubisFG:
             self.memory_fivetup = None
         self.lst_timestamp = None
     
-    def generate_features(self, flow_key):
+    def generate_features(self, flow_key: Tuple):
+        '''Method generates features of a flow.
+
+        Parameters
+        ----------
+        flow_key: `tuple`
+            The identifier of the flow. If the only_twotuple attribute is True,
+            it must be a tuple with two LayerFieldsContainer's (IP Source, IP
+            Destination) else must be a tuple with five elements: four 
+            LayerFieldsContainer's and a string (IP Source, Source Port, 
+            IP Destination, Destination Port, Protocol).
+
+        Returns
+        -------
+        features: `list`
+            A list of the features of the flow. The length and positions depends
+            on the attributes bidirectional, only_twotuple and only_fivetuple of
+            the class.
+        '''
         return self._generate_features(flow_key)
 
     def update(self, packet: Packet):
+        '''Method updates memories of AnubisFG with a pyshark.packet.Packet.
+
+        Updates memory_twotup if only_fivetuple is False.
+        Updates memory_fivetup if only_twotuple is False.
+        '''
         self._update(packet)
         self.lst_timestamp = packet.sniff_time
 
