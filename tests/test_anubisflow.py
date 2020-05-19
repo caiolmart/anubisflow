@@ -22,19 +22,20 @@ def test_anubisfg_default():
     afg = AnubisFG()
     assert afg.memory_twotup == dict()
     assert afg.memory_fivetup == dict()
-    assert afg.lst_timestamp == None
+    assert afg.lst_timestamp is None
 
 
 def test_anubisfg_onlytwo():
     afg = AnubisFG(only_twotuple=True)
     assert afg.memory_twotup == dict()
-    assert afg.memory_fivetup == None
+    assert afg.memory_fivetup is None
 
 
 def test_anubisfg_onlyfive():
     afg = AnubisFG(only_fivetuple=True)
-    assert afg.memory_twotup == None
+    assert afg.memory_twotup is None
     assert afg.memory_fivetup == dict()
+
 
 def test_anubisfg_ud():
     t2_1 = TwoTupleBidirectionalNode()
@@ -58,11 +59,11 @@ def test_anubisfg_ud():
     dst_port_1 = LayerFieldsContainer('80')
     protocol_1 = 'TCP'
     protocol_2 = 'UDP'
-    memory_fivetup_1 = {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, 
+    memory_fivetup_1 = {(ip_src_1, src_port_1, ip_dst_1, dst_port_1,
                          protocol_1): t5_1}
-    memory_fivetup_2 = {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, 
+    memory_fivetup_2 = {(ip_src_1, src_port_1, ip_dst_1, dst_port_1,
                          protocol_1): t5_1,
-                        (ip_src_1, src_port_1, ip_dst_1, dst_port_1, 
+                        (ip_src_1, src_port_1, ip_dst_1, dst_port_1,
                          protocol_2): t5_1}
     afg_1 = AnubisFG(bidirectional=True, memory_fivetup=memory_fivetup_1)
     afg_2 = AnubisFG(bidirectional=True, memory_fivetup=memory_fivetup_2)
@@ -99,16 +100,16 @@ def test_anubisfg_raises():
 
     memories = [[[ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1], t5_1],
                 {ip_src_1: t5_1},
-                {(ip_src_2, src_port_1, ip_dst_1, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_2, ip_dst_1, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_2, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_2, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_2) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1) : t5_2}]
+                {(ip_src_2, src_port_1, ip_dst_1, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_2, ip_dst_1, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_2, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_2, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_2): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1): t5_2}]
     for memory_fivetup in memories:
         with pytest.raises(AssertionError):
             _ = AnubisFG(memory_fivetup=memory_fivetup)
-    
+
     with pytest.raises(AssertionError):
         _ = AnubisFG(only_twotuple=True, only_fivetuple=True)
 
@@ -142,12 +143,12 @@ def test_anubisfg_uni_raises():
 
     memories = [[[ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1], t5_1],
                 {ip_src_1: t5_1},
-                {(ip_src_2, src_port_1, ip_dst_1, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_2, ip_dst_1, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_2, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_2, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_2) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1) : t5_2}]
+                {(ip_src_2, src_port_1, ip_dst_1, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_2, ip_dst_1, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_2, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_2, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_2): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1): t5_2}]
     for memory_fivetup in memories:
         with pytest.raises(AssertionError):
             _ = AnubisFG(bidirectional=False, memory_fivetup=memory_fivetup)
@@ -492,9 +493,9 @@ def test_update():
     for bidir in [True, False]:
         for onlytwo in [True, False]:
             for onlyfive in set([not onlytwo, False]):
-                afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo, 
+                afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
                                  only_fivetuple=onlyfive)
-                afg_2 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo, 
+                afg_2 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
                                  only_fivetuple=onlyfive)
                 for i in range(1, 4):
                     packet = capture[i]
@@ -516,21 +517,21 @@ def test_update():
                         else:
                             afg_2._update_twotupleuni(packet)
                             afg_2._update_fivetupleuni(packet)
-                    
+
                     if afg_1.memory_twotup is None:
                         assert afg_2.memory_twotup is None
                     else:
                         assert afg_1.memory_twotup.keys() == afg_2.memory_twotup.keys()
                         for key in afg_1.memory_twotup.keys():
                             assert afg_1.memory_twotup[key].__dict__ == afg_2.memory_twotup[key].__dict__
-                    
+
                     if afg_1.memory_fivetup is None:
                         assert afg_2.memory_fivetup is None
                     else:
                         assert afg_1.memory_fivetup.keys() == afg_2.memory_fivetup.keys()
                         for key in afg_1.memory_fivetup.keys():
                             assert afg_1.memory_fivetup[key].__dict__ == afg_2.memory_fivetup[key].__dict__
-                    
+
 
 def test__generate_features_twotupleuni():
     '''
@@ -668,11 +669,9 @@ def test__generate_features_twotupleuni():
     assert ftrs == [0] * n_features
 
 
-
-
 def test__generate_features_twotuplebi():
     '''
-     
+
     '''
     n_features = 39
     ip_src = LayerFieldsContainer('172.16.0.5')
@@ -689,10 +688,10 @@ def test__generate_features_twotuplebi():
     # Second packet is a SYN TCP packet.
     packet = capture[1]
     timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
-  
+
     afg._update_twotuplebi(packet)
     expected = [
-        #fwd
+        # fwd
         1,  # qt_pkt
         1,  # qt_pkt_tcp
         0,  # qt_pkt_udp
@@ -712,7 +711,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         1,  # frq_pkt
-        #bck
+        # bck
         0,  # qt_pkt
         0,  # qt_pkt_tcp
         0,  # qt_pkt_udp
@@ -732,7 +731,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         0,  # avg_pkt_len
         0,  # frq_pkt
-        #non-directional
+        # non-directional
         0,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotuplebi(key)
@@ -765,7 +764,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
-        #bck
+        # bck
         0,  # qt_pkt
         0,  # qt_pkt_tcp
         0,  # qt_pkt_udp
@@ -785,7 +784,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         0,  # avg_pkt_len
         0,  # frq_pkt
-        #non-directional
+        # non-directional
         dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotuplebi(key)
@@ -814,7 +813,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
-        #bck
+        # bck
         0,  # qt_pkt
         0,  # qt_pkt_tcp
         0,  # qt_pkt_udp
@@ -834,7 +833,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         0,  # avg_pkt_len
         0,  # frq_pkt
-        #non-directional
+        # non-directional
         dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotuplebi(key, now=True)
@@ -867,7 +866,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
-        #bck
+        # bck
         1,  # qt_pkt
         1,  # qt_pkt_tcp
         0,  # qt_pkt_udp
@@ -885,14 +884,14 @@ def test__generate_features_twotuplebi():
         0,  # qt_ecn_fl
         0,  # qt_cwr_fl
         0,  # avg_hdr_len
-        74,  # avg_pkt_len  
+        74,  # avg_pkt_len
         1 / dur,  # frq_pkt
-        #non-directional
+        # non-directional
         dur,  # tm_dur_s
     ]
-    
+
     ftrs = afg._generate_features_twotuplebi(key)
-    #breakpoint()
+    # breakpoint()
     assert np.isclose(ftrs, expected).all()
 
     # Zero forward packets on existing flow
@@ -961,7 +960,7 @@ def test__generate_features_fivetupleuni():
         74,  # min_pkt_len
         1,  # frq_pkt
         0,  # tm_dur_s
-        63, # avg_ttl
+        63,  # avg_ttl
     ]
     ftrs = afg._generate_features_fivetupleuni(key)
     assert ftrs == expected
@@ -989,7 +988,7 @@ def test__generate_features_fivetupleuni():
         74,  # min_pkt_len
         2 / dur,  # frq_pkt
         dur,  # tm_dur_s
-        63, # avg_ttl
+        63,  # avg_ttl
     ]
     ftrs = afg._generate_features_fivetupleuni(key)
     assert ftrs == expected
@@ -1013,7 +1012,7 @@ def test__generate_features_fivetupleuni():
         74,  # min_pkt_len
         2 / dur,  # frq_pkt
         dur,  # tm_dur_s
-        63, # avg_ttl
+        63,  # avg_ttl
     ]
     ftrs = afg._generate_features_fivetupleuni(key, now=True)
     assert np.isclose(ftrs, expected).all()
@@ -1030,6 +1029,7 @@ def test__generate_features_fivetupleuni():
     afg_1 = AnubisFG(memory_fivetup=memory_fivetup_1, bidirectional=False)
     ftrs = afg_1._generate_features_fivetupleuni(key_1)
     assert ftrs == [0] * n_features
+
 
 def test__generate_features_fivetuplebi():
     '''
@@ -1089,37 +1089,37 @@ def test__generate_features_fivetuplebi():
     timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
     afg._update_fivetuplebi(packet)
     expected = [
-        1, # fwd_qt_pkt
-        0, # fwd_qt_fin_fl
-        1, # fwd_qt_syn_fl
-        0, # fwd_qt_res_fl
-        0, # fwd_qt_psh_fl
-        0, # fwd_qt_ack_fl
-        0, # fwd_qt_urg_fl
-        0, # fwd_qt_ecn_fl
-        0, # fwd_qt_cwr_fl
-        0, # fwd_avg_hdr_len
-        74, # fwd_avg_pkt_len
-        74, # fwd_max_pkt_len
-        74, # fwd_min_pkt_len
-        1, # fwd_frq_pkt
-        63, # fwd_avg_ttl
-        0, # bck_qt_pkt
-        0, # bck_qt_fin_fl
-        0, # bck_qt_syn_fl
-        0, # bck_qt_res_fl
-        0, # bck_qt_psh_fl
-        0, # bck_qt_ack_fl
-        0, # bck_qt_urg_fl
-        0, # bck_qt_ecn_fl
-        0, # bck_qt_cwr_fl
-        0, # bck_avg_hdr_len
-        0, # bck_avg_pkt_len
-        0, # bck_max_pkt_len
-        0, # bck_min_pkt_len
-        0, # bck_frq_pkt
-        0, # bck_avg_ttl
-        0, # tm_dur_s
+        1,  # fwd_qt_pkt
+        0,  # fwd_qt_fin_fl
+        1,  # fwd_qt_syn_fl
+        0,  # fwd_qt_res_fl
+        0,  # fwd_qt_psh_fl
+        0,  # fwd_qt_ack_fl
+        0,  # fwd_qt_urg_fl
+        0,  # fwd_qt_ecn_fl
+        0,  # fwd_qt_cwr_fl
+        0,  # fwd_avg_hdr_len
+        74,  # fwd_avg_pkt_len
+        74,  # fwd_max_pkt_len
+        74,  # fwd_min_pkt_len
+        1,  # fwd_frq_pkt
+        63,  # fwd_avg_ttl
+        0,  # bck_qt_pkt
+        0,  # bck_qt_fin_fl
+        0,  # bck_qt_syn_fl
+        0,  # bck_qt_res_fl
+        0,  # bck_qt_psh_fl
+        0,  # bck_qt_ack_fl
+        0,  # bck_qt_urg_fl
+        0,  # bck_qt_ecn_fl
+        0,  # bck_qt_cwr_fl
+        0,  # bck_avg_hdr_len
+        0,  # bck_avg_pkt_len
+        0,  # bck_max_pkt_len
+        0,  # bck_min_pkt_len
+        0,  # bck_frq_pkt
+        0,  # bck_avg_ttl
+        0,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetuplebi(key)
     assert ftrs == expected
@@ -1132,37 +1132,37 @@ def test__generate_features_fivetuplebi():
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
     dur = (new_timestamp - timestamp).total_seconds()
     expected = [
-        2, # fwd_qt_pkt
-        0, # fwd_qt_fin_fl
-        2, # fwd_qt_syn_fl
-        0, # fwd_qt_res_fl
-        0, # fwd_qt_psh_fl
-        0, # fwd_qt_ack_fl
-        0, # fwd_qt_urg_fl
-        0, # fwd_qt_ecn_fl
-        0, # fwd_qt_cwr_fl
-        0, # fwd_avg_hdr_len
-        74, # fwd_avg_pkt_len
-        74, # fwd_max_pkt_len
-        74, # fwd_min_pkt_len
-        2 / dur, # fwd_frq_pkt
-        63, # fwd_avg_ttl
-        0, # bck_qt_pkt
-        0, # bck_qt_fin_fl
-        0, # bck_qt_syn_fl
-        0, # bck_qt_res_fl
-        0, # bck_qt_psh_fl
-        0, # bck_qt_ack_fl
-        0, # bck_qt_urg_fl
-        0, # bck_qt_ecn_fl
-        0, # bck_qt_cwr_fl
-        0, # bck_avg_hdr_len
-        0, # bck_avg_pkt_len
-        0, # bck_max_pkt_len
-        0, # bck_min_pkt_len
-        0 / dur, # bck_frq_pkt
-        0, # bck_avg_ttl
-        dur, # tm_dur_s
+        2,  # fwd_qt_pkt
+        0,  # fwd_qt_fin_fl
+        2,  # fwd_qt_syn_fl
+        0,  # fwd_qt_res_fl
+        0,  # fwd_qt_psh_fl
+        0,  # fwd_qt_ack_fl
+        0,  # fwd_qt_urg_fl
+        0,  # fwd_qt_ecn_fl
+        0,  # fwd_qt_cwr_fl
+        0,  # fwd_avg_hdr_len
+        74,  # fwd_avg_pkt_len
+        74,  # fwd_max_pkt_len
+        74,  # fwd_min_pkt_len
+        2 / dur,  # fwd_frq_pkt
+        63,  # fwd_avg_ttl
+        0,  # bck_qt_pkt
+        0,  # bck_qt_fin_fl
+        0,  # bck_qt_syn_fl
+        0,  # bck_qt_res_fl
+        0,  # bck_qt_psh_fl
+        0,  # bck_qt_ack_fl
+        0,  # bck_qt_urg_fl
+        0,  # bck_qt_ecn_fl
+        0,  # bck_qt_cwr_fl
+        0,  # bck_avg_hdr_len
+        0,  # bck_avg_pkt_len
+        0,  # bck_max_pkt_len
+        0,  # bck_min_pkt_len
+        0 / dur,  # bck_frq_pkt
+        0,  # bck_avg_ttl
+        dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetuplebi(key)
     assert ftrs == expected
@@ -1171,37 +1171,37 @@ def test__generate_features_fivetuplebi():
     new_timestamp = datetime.now()
     dur = (new_timestamp - timestamp).total_seconds()
     expected = [
-        2, # fwd_qt_pkt
-        0, # fwd_qt_fin_fl
-        2, # fwd_qt_syn_fl
-        0, # fwd_qt_res_fl
-        0, # fwd_qt_psh_fl
-        0, # fwd_qt_ack_fl
-        0, # fwd_qt_urg_fl
-        0, # fwd_qt_ecn_fl
-        0, # fwd_qt_cwr_fl
-        0, # fwd_avg_hdr_len
-        74, # fwd_avg_pkt_len
-        74, # fwd_max_pkt_len
-        74, # fwd_min_pkt_len
-        2 / dur, # fwd_frq_pkt
-        63, # fwd_avg_ttl
-        0, # bck_qt_pkt
-        0, # bck_qt_fin_fl
-        0, # bck_qt_syn_fl
-        0, # bck_qt_res_fl
-        0, # bck_qt_psh_fl
-        0, # bck_qt_ack_fl
-        0, # bck_qt_urg_fl
-        0, # bck_qt_ecn_fl
-        0, # bck_qt_cwr_fl
-        0, # bck_avg_hdr_len
-        0, # bck_avg_pkt_len
-        0, # bck_max_pkt_len
-        0, # bck_min_pkt_len
-        0 / dur, # bck_frq_pkt
-        0, # bck_avg_ttl
-        dur, # tm_dur_s
+        2,  # fwd_qt_pkt
+        0,  # fwd_qt_fin_fl
+        2,  # fwd_qt_syn_fl
+        0,  # fwd_qt_res_fl
+        0,  # fwd_qt_psh_fl
+        0,  # fwd_qt_ack_fl
+        0,  # fwd_qt_urg_fl
+        0,  # fwd_qt_ecn_fl
+        0,  # fwd_qt_cwr_fl
+        0,  # fwd_avg_hdr_len
+        74,  # fwd_avg_pkt_len
+        74,  # fwd_max_pkt_len
+        74,  # fwd_min_pkt_len
+        2 / dur,  # fwd_frq_pkt
+        63,  # fwd_avg_ttl
+        0,  # bck_qt_pkt
+        0,  # bck_qt_fin_fl
+        0,  # bck_qt_syn_fl
+        0,  # bck_qt_res_fl
+        0,  # bck_qt_psh_fl
+        0,  # bck_qt_ack_fl
+        0,  # bck_qt_urg_fl
+        0,  # bck_qt_ecn_fl
+        0,  # bck_qt_cwr_fl
+        0,  # bck_avg_hdr_len
+        0,  # bck_avg_pkt_len
+        0,  # bck_max_pkt_len
+        0,  # bck_min_pkt_len
+        0 / dur,  # bck_frq_pkt
+        0,  # bck_avg_ttl
+        dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetuplebi(key, now=True)
     assert np.isclose(ftrs, expected).all()
@@ -1214,37 +1214,37 @@ def test__generate_features_fivetuplebi():
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
     dur = (new_timestamp - timestamp).total_seconds()
     expected = [
-        2, # fwd_qt_pkt
-        0, # fwd_qt_fin_fl
-        2, # fwd_qt_syn_fl
-        0, # fwd_qt_res_fl
-        0, # fwd_qt_psh_fl
-        0, # fwd_qt_ack_fl
-        0, # fwd_qt_urg_fl
-        0, # fwd_qt_ecn_fl
-        0, # fwd_qt_cwr_fl
-        0, # fwd_avg_hdr_len
-        74, # fwd_avg_pkt_len
-        74, # fwd_max_pkt_len
-        74, # fwd_min_pkt_len
-        2 / dur, # fwd_frq_pkt
-        63, # fwd_avg_ttl
-        1, # bck_qt_pkt
-        0, # bck_qt_fin_fl
-        1, # bck_qt_syn_fl
-        0, # bck_qt_res_fl
-        0, # bck_qt_psh_fl
-        1, # bck_qt_ack_fl
-        0, # bck_qt_urg_fl
-        0, # bck_qt_ecn_fl
-        0, # bck_qt_cwr_fl
-        0, # bck_avg_hdr_len
-        74, # bck_avg_pkt_len
-        74, # bck_max_pkt_len
-        74, # bck_min_pkt_len
-        1 / dur, # bck_frq_pkt
-        64, # bck_avg_ttl
-        dur, # tm_dur_s
+        2,  # fwd_qt_pkt
+        0,  # fwd_qt_fin_fl
+        2,  # fwd_qt_syn_fl
+        0,  # fwd_qt_res_fl
+        0,  # fwd_qt_psh_fl
+        0,  # fwd_qt_ack_fl
+        0,  # fwd_qt_urg_fl
+        0,  # fwd_qt_ecn_fl
+        0,  # fwd_qt_cwr_fl
+        0,  # fwd_avg_hdr_len
+        74,  # fwd_avg_pkt_len
+        74,  # fwd_max_pkt_len
+        74,  # fwd_min_pkt_len
+        2 / dur,  # fwd_frq_pkt
+        63,  # fwd_avg_ttl
+        1,  # bck_qt_pkt
+        0,  # bck_qt_fin_fl
+        1,  # bck_qt_syn_fl
+        0,  # bck_qt_res_fl
+        0,  # bck_qt_psh_fl
+        1,  # bck_qt_ack_fl
+        0,  # bck_qt_urg_fl
+        0,  # bck_qt_ecn_fl
+        0,  # bck_qt_cwr_fl
+        0,  # bck_avg_hdr_len
+        74,  # bck_avg_pkt_len
+        74,  # bck_max_pkt_len
+        74,  # bck_min_pkt_len
+        1 / dur,  # bck_frq_pkt
+        64,  # bck_avg_ttl
+        dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetuplebi(key)
     assert np.isclose(ftrs, expected).all()
@@ -1274,7 +1274,7 @@ def test_generate_features():
     for bidir in [True, False]:
         for onlytwo in [True, False]:
             for onlyfive in set([not onlytwo, False]):
-                afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo, 
+                afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
                                  only_fivetuple=onlyfive)
                 for i in range(1, 4):
                     packet = capture[i]
@@ -1282,28 +1282,36 @@ def test_generate_features():
                     if bidir:
                         if onlytwo:
                             key = (ip_src, ip_dst)
-                            assert afg_1.generate_features(key) == afg_1._generate_features_twotuplebi(key)
+                            assert afg_1.generate_features(
+                                key) == afg_1._generate_features_twotuplebi(key)
                         elif onlyfive:
-                            key = (ip_src, src_port, ip_dst, dst_port, protocol)
-                            assert afg_1.generate_features(key) == afg_1._generate_features_fivetuplebi(key)
+                            key = (
+                                ip_src, src_port, ip_dst, dst_port, protocol)
+                            assert afg_1.generate_features(
+                                key) == afg_1._generate_features_fivetuplebi(key)
                         else:
                             key2 = (ip_src, ip_dst)
-                            key5 = (ip_src, src_port, ip_dst, dst_port, protocol)
+                            key5 = (
+                                ip_src, src_port, ip_dst, dst_port, protocol)
                             ftrs_1 = afg_1.generate_features(key5)
-                            ftrs_2 = afg_1._generate_features_twotuplebi(key2) + \
-                                     afg_1._generate_features_fivetuplebi(key5)
+                            ftrs_2 = afg_1._generate_features_twotuplebi(
+                                key2) + afg_1._generate_features_fivetuplebi(key5)
                             assert ftrs_1 == ftrs_2
                     else:
                         if onlytwo:
                             key = (ip_src, ip_dst)
-                            assert afg_1.generate_features(key) == afg_1._generate_features_twotupleuni(key)
+                            assert afg_1.generate_features(
+                                key) == afg_1._generate_features_twotupleuni(key)
                         elif onlyfive:
-                            key = (ip_src, src_port, ip_dst, dst_port, protocol)
-                            assert afg_1.generate_features(key) == afg_1._generate_features_fivetupleuni(key)
+                            key = (
+                                ip_src, src_port, ip_dst, dst_port, protocol)
+                            assert afg_1.generate_features(
+                                key) == afg_1._generate_features_fivetupleuni(key)
                         else:
                             key2 = (ip_src, ip_dst)
-                            key5 = (ip_src, src_port, ip_dst, dst_port, protocol)
+                            key5 = (
+                                ip_src, src_port, ip_dst, dst_port, protocol)
                             ftrs_1 = afg_1.generate_features(key5)
-                            ftrs_2 = afg_1._generate_features_twotupleuni(key2) + \
-                                     afg_1._generate_features_fivetupleuni(key5)
+                            ftrs_2 = afg_1._generate_features_twotupleuni(
+                                key2) + afg_1._generate_features_fivetupleuni(key5)
                             assert ftrs_1 == ftrs_2
