@@ -73,8 +73,8 @@ class AnubisFG:
 
     Updates the memories with a packet.
 
-    >>> afg.generate_features(five_tuple=(ip_src, port_src, ip_dst, port_dst,
-                                          protocol))
+    >>> afg.generate_features(flow_key=(ip_src, port_src, ip_dst, port_dst,
+                                        protocol))
     list_of_features
 
     Extract the features of both the two-tuple and the five-tuple flows with the
