@@ -60,6 +60,8 @@ class AnubisFG:
         pyshark.packet.fields.LayerFieldsContainer, str), and value a
         FiveTupleUnidirectionalNode or FiveTupleBidirectionalNode object,
         depeding on the choice of the bidirectional parameter.
+    lst_timestamp: `datetime.datetime`
+        The timestamp of the last updated packet.
 
     Examples
     --------
@@ -174,12 +176,14 @@ class AnubisFG:
             self.memory_fivetup = memory_fivetup
         else:
             self.memory_fivetup = None
+        self.lst_timestamp = None
     
     def generate_features(self, flow_key):
         return self._generate_features(flow_key)
 
     def update(self, packet: Packet):
         self._update(packet)
+        self.lst_timestamp = packet.sniff_time
 
     def _generate_features_bi_twofive(self, flow_key: Tuple[LayerFieldsContainer,
                                                         LayerFieldsContainer,
