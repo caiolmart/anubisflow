@@ -45,8 +45,8 @@ def test_anubisfg_ud():
     memory_twotup_1 = {(ip_src_1, ip_dst_1): t2_1}
     memory_twotup_2 = {(ip_src_1, ip_dst_1): t2_1,
                        (ip_src_2, ip_dst_2): t2_2}
-    afg_1 = AnubisFG(memory_twotup=memory_twotup_1)
-    afg_2 = AnubisFG(memory_twotup=memory_twotup_2)
+    afg_1 = AnubisFG(bidirectional=True, memory_twotup=memory_twotup_1)
+    afg_2 = AnubisFG(bidirectional=True, memory_twotup=memory_twotup_2)
     assert memory_twotup_1 == afg_1.memory_twotup
     assert memory_twotup_2 == afg_2.memory_twotup
 
@@ -63,8 +63,8 @@ def test_anubisfg_ud():
                          protocol_1): t5_1,
                         (ip_src_1, src_port_1, ip_dst_1, dst_port_1, 
                          protocol_2): t5_1}
-    afg_1 = AnubisFG(memory_fivetup=memory_fivetup_1)
-    afg_2 = AnubisFG(memory_fivetup=memory_fivetup_2)
+    afg_1 = AnubisFG(bidirectional=True, memory_fivetup=memory_fivetup_1)
+    afg_2 = AnubisFG(bidirectional=True, memory_fivetup=memory_fivetup_2)
     assert memory_fivetup_1 == afg_1.memory_fivetup
     assert memory_fivetup_2 == afg_2.memory_fivetup
 
@@ -85,7 +85,7 @@ def test_anubisfg_raises():
 
     for memory_twotup in memories:
         with pytest.raises(AssertionError):
-            _ = AnubisFG(memory_twotup=memory_twotup)
+            _ = AnubisFG(bidirectional=True, memory_twotup=memory_twotup)
 
     t5_1 = FiveTupleBidirectionalNode()
     src_port_1 = LayerFieldsContainer('80')
@@ -153,7 +153,7 @@ def test_anubisfg_uni_raises():
 
 
 def test__update_twotupleuni_noupdate():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=False)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # First packet is a STP packet that should not be read.
     packet = capture[0]
@@ -165,7 +165,7 @@ def test__update_twotupleuni_noupdate():
 
 
 def test__update_twotupleuni_update():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=False)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # Second packet is a SYN TCP packet.
     packet = capture[1]
@@ -214,7 +214,7 @@ def test__update_twotupleuni_update():
 
 
 def test__update_twotuplebi_noupdate():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # First packet is a STP packet that should not be read.
     packet = capture[0]
@@ -226,7 +226,7 @@ def test__update_twotuplebi_noupdate():
 
 
 def test__update_twotuplebi_update():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # Second packet is a SYN TCP packet.
     packet = capture[1]
@@ -314,7 +314,7 @@ def test__update_twotuplebi_update():
 
 
 def test__update_fivetupleuni_noupdate():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=False)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # First packet is a STP packet that should not be read.
     packet = capture[0]
@@ -326,7 +326,7 @@ def test__update_fivetupleuni_noupdate():
 
 
 def test__update_fivetupleuni_update():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=False)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # Second packet is a SYN TCP packet.
     packet = capture[1]
@@ -379,7 +379,7 @@ def test__update_fivetupleuni_update():
 
 
 def test__update_fivetuplebi_noupdate():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # First packet is a STP packet that should not be read.
     packet = capture[0]
@@ -391,7 +391,7 @@ def test__update_fivetuplebi_noupdate():
 
 
 def test__update_fivetuplebi_update():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # Second packet is a SYN TCP packet.
     packet = capture[1]
@@ -514,7 +514,7 @@ def test__generate_features_twotupleuni():
     ip_src = LayerFieldsContainer('172.16.0.5')
     ip_dst = LayerFieldsContainer('192.168.50.1')
     key = (ip_src, ip_dst)
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=False)
 
     # Tuple that is not on the memory.
     empty = afg._generate_features_twotupleuni(key)
@@ -632,7 +632,7 @@ def test__generate_features_twotuplebi():
     ip_src = LayerFieldsContainer('172.16.0.5')
     ip_dst = LayerFieldsContainer('192.168.50.1')
     key = (ip_src, ip_dst)
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
 
     # Tuple that is not on the memory.
     empty = afg._generate_features_twotuplebi(key)
@@ -855,7 +855,7 @@ def test__generate_features_twotuplebi():
     key_1 = (ip_src_1, ip_dst_1)
     t2_1 = TwoTupleBidirectionalNode()
     memory_twotup_1 = {key_1: t2_1}
-    afg_1 = AnubisFG(memory_twotup=memory_twotup_1)
+    afg_1 = AnubisFG(bidirectional=True, memory_twotup=memory_twotup_1)
     ftrs = afg_1._generate_features_twotuplebi(key_1)
     assert ftrs == [0] * n_features
 
@@ -1030,7 +1030,7 @@ def test__generate_features_fivetuplebi():
     dst_port = LayerFieldsContainer('80')
     protocol = 'TCP'
     key = (ip_src, src_port, ip_dst, dst_port, protocol)
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
 
     # Tuple that is not on the memory.
     empty = afg._generate_features_fivetuplebi(key)
