@@ -486,6 +486,50 @@ def test__update_fivetuplebi_update():
     assert afg.memory_fivetup[key].__dict__ == expected
 
 
+def test_update():
+    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    for bidir in [True, False]:
+        for onlytwo in [True, False]:
+            for onlyfive in set([not onlytwo, False]):
+                afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo, 
+                                 only_fivetuple=onlyfive)
+                afg_2 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo, 
+                                 only_fivetuple=onlyfive)
+                for i in range(1, 4):
+                    packet = capture[i]
+                    afg_1.update(packet)
+                    if bidir:
+                        if onlytwo:
+                            afg_2._update_twotuplebi(packet)
+                        elif onlyfive:
+                            afg_2._update_fivetuplebi(packet)
+                        else:
+                            afg_2._update_twotuplebi(packet)
+                            afg_2._update_fivetuplebi(packet)
+                    else:
+                        if onlytwo:
+                            afg_2._update_twotupleuni(packet)
+                        elif onlyfive:
+                            afg_2._update_fivetupleuni(packet)
+                        else:
+                            afg_2._update_twotupleuni(packet)
+                            afg_2._update_fivetupleuni(packet)
+                    
+                    if afg_1.memory_twotup is None:
+                        assert afg_2.memory_twotup is None
+                    else:
+                        assert afg_1.memory_twotup.keys() == afg_2.memory_twotup.keys()
+                        for key in afg_1.memory_twotup.keys():
+                            assert afg_1.memory_twotup[key].__dict__ == afg_2.memory_twotup[key].__dict__
+                    
+                    if afg_1.memory_fivetup is None:
+                        assert afg_2.memory_fivetup is None
+                    else:
+                        assert afg_1.memory_fivetup.keys() == afg_2.memory_fivetup.keys()
+                        for key in afg_1.memory_fivetup.keys():
+                            assert afg_1.memory_fivetup[key].__dict__ == afg_2.memory_fivetup[key].__dict__
+                    
+
 def test__generate_features_twotupleuni():
     '''
         Feature list:
@@ -1215,3 +1259,49 @@ def test__generate_features_fivetuplebi():
     afg_1 = AnubisFG(memory_fivetup=memory_fivetup_1)
     ftrs = afg_1._generate_features_fivetuplebi(key_1)
     assert ftrs == [0] * n_features
+
+
+def test_generate_features():
+    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    packet = capture[1]
+    ip_src = packet.ip.src
+    ip_dst = packet.ip.dst
+    src_port = int(packet[packet.transport_layer].srcport)
+    dst_port = int(packet[packet.transport_layer].dstport)
+    protocol = packet.transport_layer
+    for bidir in [True, False]:
+        for onlytwo in [True, False]:
+            for onlyfive in set([not onlytwo, False]):
+                afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo, 
+                                 only_fivetuple=onlyfive)
+                for i in range(1, 4):
+                    packet = capture[i]
+                    afg_1.update(packet)
+                    if bidir:
+                        if onlytwo:
+                            key = (ip_src, ip_dst)
+                            assert afg_1.generate_features(key) == afg_1._generate_features_twotuplebi(key)
+                        elif onlyfive:
+                            key = (ip_src, src_port, ip_dst, dst_port, protocol)
+                            assert afg_1.generate_features(key) == afg_1._generate_features_fivetuplebi(key)
+                        else:
+                            key2 = (ip_src, ip_dst)
+                            key5 = (ip_src, src_port, ip_dst, dst_port, protocol)
+                            ftrs_1 = afg_1.generate_features(key5)
+                            ftrs_2 = afg_1._generate_features_twotuplebi(key2) + \
+                                     afg_1._generate_features_fivetuplebi(key5)
+                            assert ftrs_1 == ftrs_2
+                    else:
+                        if onlytwo:
+                            key = (ip_src, ip_dst)
+                            assert afg_1.generate_features(key) == afg_1._generate_features_twotupleuni(key)
+                        elif onlyfive:
+                            key = (ip_src, src_port, ip_dst, dst_port, protocol)
+                            assert afg_1.generate_features(key) == afg_1._generate_features_fivetupleuni(key)
+                        else:
+                            key2 = (ip_src, ip_dst)
+                            key5 = (ip_src, src_port, ip_dst, dst_port, protocol)
+                            ftrs_1 = afg_1.generate_features(key5)
+                            ftrs_2 = afg_1._generate_features_twotupleuni(key2) + \
+                                     afg_1._generate_features_fivetupleuni(key5)
+                            assert ftrs_1 == ftrs_2
