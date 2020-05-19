@@ -22,18 +22,20 @@ def test_anubisfg_default():
     afg = AnubisFG()
     assert afg.memory_twotup == dict()
     assert afg.memory_fivetup == dict()
+    assert afg.lst_timestamp is None
 
 
 def test_anubisfg_onlytwo():
     afg = AnubisFG(only_twotuple=True)
     assert afg.memory_twotup == dict()
-    assert afg.memory_fivetup == None
+    assert afg.memory_fivetup is None
 
 
 def test_anubisfg_onlyfive():
     afg = AnubisFG(only_fivetuple=True)
-    assert afg.memory_twotup == None
+    assert afg.memory_twotup is None
     assert afg.memory_fivetup == dict()
+
 
 def test_anubisfg_ud():
     t2_1 = TwoTupleBidirectionalNode()
@@ -45,8 +47,8 @@ def test_anubisfg_ud():
     memory_twotup_1 = {(ip_src_1, ip_dst_1): t2_1}
     memory_twotup_2 = {(ip_src_1, ip_dst_1): t2_1,
                        (ip_src_2, ip_dst_2): t2_2}
-    afg_1 = AnubisFG(memory_twotup=memory_twotup_1)
-    afg_2 = AnubisFG(memory_twotup=memory_twotup_2)
+    afg_1 = AnubisFG(bidirectional=True, memory_twotup=memory_twotup_1)
+    afg_2 = AnubisFG(bidirectional=True, memory_twotup=memory_twotup_2)
     assert memory_twotup_1 == afg_1.memory_twotup
     assert memory_twotup_2 == afg_2.memory_twotup
 
@@ -57,14 +59,14 @@ def test_anubisfg_ud():
     dst_port_1 = LayerFieldsContainer('80')
     protocol_1 = 'TCP'
     protocol_2 = 'UDP'
-    memory_fivetup_1 = {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, 
+    memory_fivetup_1 = {(ip_src_1, src_port_1, ip_dst_1, dst_port_1,
                          protocol_1): t5_1}
-    memory_fivetup_2 = {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, 
+    memory_fivetup_2 = {(ip_src_1, src_port_1, ip_dst_1, dst_port_1,
                          protocol_1): t5_1,
-                        (ip_src_1, src_port_1, ip_dst_1, dst_port_1, 
+                        (ip_src_1, src_port_1, ip_dst_1, dst_port_1,
                          protocol_2): t5_1}
-    afg_1 = AnubisFG(memory_fivetup=memory_fivetup_1)
-    afg_2 = AnubisFG(memory_fivetup=memory_fivetup_2)
+    afg_1 = AnubisFG(bidirectional=True, memory_fivetup=memory_fivetup_1)
+    afg_2 = AnubisFG(bidirectional=True, memory_fivetup=memory_fivetup_2)
     assert memory_fivetup_1 == afg_1.memory_fivetup
     assert memory_fivetup_2 == afg_2.memory_fivetup
 
@@ -85,7 +87,7 @@ def test_anubisfg_raises():
 
     for memory_twotup in memories:
         with pytest.raises(AssertionError):
-            _ = AnubisFG(memory_twotup=memory_twotup)
+            _ = AnubisFG(bidirectional=True, memory_twotup=memory_twotup)
 
     t5_1 = FiveTupleBidirectionalNode()
     src_port_1 = LayerFieldsContainer('80')
@@ -98,16 +100,16 @@ def test_anubisfg_raises():
 
     memories = [[[ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1], t5_1],
                 {ip_src_1: t5_1},
-                {(ip_src_2, src_port_1, ip_dst_1, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_2, ip_dst_1, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_2, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_2, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_2) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1) : t5_2}]
+                {(ip_src_2, src_port_1, ip_dst_1, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_2, ip_dst_1, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_2, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_2, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_2): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1): t5_2}]
     for memory_fivetup in memories:
         with pytest.raises(AssertionError):
             _ = AnubisFG(memory_fivetup=memory_fivetup)
-    
+
     with pytest.raises(AssertionError):
         _ = AnubisFG(only_twotuple=True, only_fivetuple=True)
 
@@ -141,19 +143,19 @@ def test_anubisfg_uni_raises():
 
     memories = [[[ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1], t5_1],
                 {ip_src_1: t5_1},
-                {(ip_src_2, src_port_1, ip_dst_1, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_2, ip_dst_1, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_2, dst_port_1, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_2, protocol_1) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_2) : t5_1},
-                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1) : t5_2}]
+                {(ip_src_2, src_port_1, ip_dst_1, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_2, ip_dst_1, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_2, dst_port_1, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_2, protocol_1): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_2): t5_1},
+                {(ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1): t5_2}]
     for memory_fivetup in memories:
         with pytest.raises(AssertionError):
             _ = AnubisFG(bidirectional=False, memory_fivetup=memory_fivetup)
 
 
 def test__update_twotupleuni_noupdate():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=False)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # First packet is a STP packet that should not be read.
     packet = capture[0]
@@ -162,10 +164,12 @@ def test__update_twotupleuni_noupdate():
     assert afg.memory_twotup == dict()
     with pytest.raises(AttributeError, match='Attribute ip not in packet'):
         afg._update_twotupleuni(packet, ignore_errors=False)
+    
+    capture.close()
 
 
 def test__update_twotupleuni_update():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=False)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # Second packet is a SYN TCP packet.
     packet = capture[1]
@@ -211,10 +215,11 @@ def test__update_twotupleuni_update():
                 'tot_packet_len': length * 2}
     assert len(afg.memory_twotup) == 1
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
+    capture.close()
 
 
 def test__update_twotuplebi_noupdate():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # First packet is a STP packet that should not be read.
     packet = capture[0]
@@ -223,10 +228,12 @@ def test__update_twotuplebi_noupdate():
     assert afg.memory_twotup == dict()
     with pytest.raises(AttributeError, match='Attribute ip not in packet'):
         afg._update_twotuplebi(packet, ignore_errors=False)
+    
+    capture.close()
 
 
 def test__update_twotuplebi_update():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # Second packet is a SYN TCP packet.
     packet = capture[1]
@@ -312,9 +319,11 @@ def test__update_twotuplebi_update():
     assert len(afg.memory_twotup) == 1
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
 
+    capture.close()
+
 
 def test__update_fivetupleuni_noupdate():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=False)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # First packet is a STP packet that should not be read.
     packet = capture[0]
@@ -323,10 +332,12 @@ def test__update_fivetupleuni_noupdate():
     assert afg.memory_fivetup == dict()
     with pytest.raises(AttributeError, match='Attribute ip not in packet'):
         afg._update_fivetupleuni(packet, ignore_errors=False)
+    
+    capture.close()
 
 
 def test__update_fivetupleuni_update():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=False)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # Second packet is a SYN TCP packet.
     packet = capture[1]
@@ -377,9 +388,11 @@ def test__update_fivetupleuni_update():
     assert len(afg.memory_fivetup) == 1
     assert afg.memory_fivetup[key].__dict__ == expected
 
+    capture.close()
+
 
 def test__update_fivetuplebi_noupdate():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # First packet is a STP packet that should not be read.
     packet = capture[0]
@@ -389,9 +402,11 @@ def test__update_fivetuplebi_noupdate():
     with pytest.raises(AttributeError, match='Attribute ip not in packet'):
         afg._update_fivetuplebi(packet, ignore_errors=False)
 
+    capture.close()
+
 
 def test__update_fivetuplebi_update():
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
     capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
     # Second packet is a SYN TCP packet.
     packet = capture[1]
@@ -485,6 +500,58 @@ def test__update_fivetuplebi_update():
     assert len(afg.memory_fivetup) == 1
     assert afg.memory_fivetup[key].__dict__ == expected
 
+    capture.close()
+
+
+def test_update():
+    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    # Will be tested considering all possible sets of attributes.
+    for bidir in [True, False]:
+        for onlytwo in [True, False]:
+            for onlyfive in set([not onlytwo, False]):
+                # This will be updated by the method update.
+                afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
+                                 only_fivetuple=onlyfive)
+                # This will be updated by the specific method(s) tested above.
+                afg_2 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
+                                 only_fivetuple=onlyfive)
+                for i in range(1, 4):
+                    packet = capture[i]
+                    afg_1.update(packet)
+                    assert afg_1.lst_timestamp == packet.sniff_time
+                    if bidir:
+                        if onlytwo:
+                            afg_2._update_twotuplebi(packet)
+                        elif onlyfive:
+                            afg_2._update_fivetuplebi(packet)
+                        else:
+                            afg_2._update_twotuplebi(packet)
+                            afg_2._update_fivetuplebi(packet)
+                    else:
+                        if onlytwo:
+                            afg_2._update_twotupleuni(packet)
+                        elif onlyfive:
+                            afg_2._update_fivetupleuni(packet)
+                        else:
+                            afg_2._update_twotupleuni(packet)
+                            afg_2._update_fivetupleuni(packet)
+
+                    if afg_1.memory_twotup is None:
+                        assert afg_2.memory_twotup is None
+                    else:
+                        assert afg_1.memory_twotup.keys() == afg_2.memory_twotup.keys()
+                        for key in afg_1.memory_twotup.keys():
+                            assert afg_1.memory_twotup[key].__dict__ == afg_2.memory_twotup[key].__dict__
+
+                    if afg_1.memory_fivetup is None:
+                        assert afg_2.memory_fivetup is None
+                    else:
+                        assert afg_1.memory_fivetup.keys() == afg_2.memory_fivetup.keys()
+                        for key in afg_1.memory_fivetup.keys():
+                            assert afg_1.memory_fivetup[key].__dict__ == afg_2.memory_fivetup[key].__dict__
+    
+    capture.close()
+
 
 def test__generate_features_twotupleuni():
     '''
@@ -514,7 +581,7 @@ def test__generate_features_twotupleuni():
     ip_src = LayerFieldsContainer('172.16.0.5')
     ip_dst = LayerFieldsContainer('192.168.50.1')
     key = (ip_src, ip_dst)
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=False)
 
     # Tuple that is not on the memory.
     empty = afg._generate_features_twotupleuni(key)
@@ -620,19 +687,18 @@ def test__generate_features_twotupleuni():
     afg_1 = AnubisFG(memory_twotup=memory_twotup_1, bidirectional=False)
     ftrs = afg_1._generate_features_twotupleuni(key_1)
     assert ftrs == [0] * n_features
-
-
+    capture.close()
 
 
 def test__generate_features_twotuplebi():
     '''
-     
+
     '''
     n_features = 39
     ip_src = LayerFieldsContainer('172.16.0.5')
     ip_dst = LayerFieldsContainer('192.168.50.1')
     key = (ip_src, ip_dst)
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
 
     # Tuple that is not on the memory.
     empty = afg._generate_features_twotuplebi(key)
@@ -643,10 +709,10 @@ def test__generate_features_twotuplebi():
     # Second packet is a SYN TCP packet.
     packet = capture[1]
     timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
-  
+
     afg._update_twotuplebi(packet)
     expected = [
-        #fwd
+        # fwd
         1,  # qt_pkt
         1,  # qt_pkt_tcp
         0,  # qt_pkt_udp
@@ -666,7 +732,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         1,  # frq_pkt
-        #bck
+        # bck
         0,  # qt_pkt
         0,  # qt_pkt_tcp
         0,  # qt_pkt_udp
@@ -686,7 +752,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         0,  # avg_pkt_len
         0,  # frq_pkt
-        #non-directional
+        # non-directional
         0,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotuplebi(key)
@@ -719,7 +785,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
-        #bck
+        # bck
         0,  # qt_pkt
         0,  # qt_pkt_tcp
         0,  # qt_pkt_udp
@@ -739,7 +805,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         0,  # avg_pkt_len
         0,  # frq_pkt
-        #non-directional
+        # non-directional
         dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotuplebi(key)
@@ -768,7 +834,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
-        #bck
+        # bck
         0,  # qt_pkt
         0,  # qt_pkt_tcp
         0,  # qt_pkt_udp
@@ -788,7 +854,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         0,  # avg_pkt_len
         0,  # frq_pkt
-        #non-directional
+        # non-directional
         dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotuplebi(key, now=True)
@@ -821,7 +887,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
-        #bck
+        # bck
         1,  # qt_pkt
         1,  # qt_pkt_tcp
         0,  # qt_pkt_udp
@@ -839,14 +905,14 @@ def test__generate_features_twotuplebi():
         0,  # qt_ecn_fl
         0,  # qt_cwr_fl
         0,  # avg_hdr_len
-        74,  # avg_pkt_len  
+        74,  # avg_pkt_len
         1 / dur,  # frq_pkt
-        #non-directional
+        # non-directional
         dur,  # tm_dur_s
     ]
-    
+
     ftrs = afg._generate_features_twotuplebi(key)
-    #breakpoint()
+    # breakpoint()
     assert np.isclose(ftrs, expected).all()
 
     # Zero forward packets on existing flow
@@ -855,9 +921,11 @@ def test__generate_features_twotuplebi():
     key_1 = (ip_src_1, ip_dst_1)
     t2_1 = TwoTupleBidirectionalNode()
     memory_twotup_1 = {key_1: t2_1}
-    afg_1 = AnubisFG(memory_twotup=memory_twotup_1)
+    afg_1 = AnubisFG(bidirectional=True, memory_twotup=memory_twotup_1)
     ftrs = afg_1._generate_features_twotuplebi(key_1)
     assert ftrs == [0] * n_features
+
+    capture.close()
 
 
 def test__generate_features_fivetupleuni():
@@ -915,7 +983,7 @@ def test__generate_features_fivetupleuni():
         74,  # min_pkt_len
         1,  # frq_pkt
         0,  # tm_dur_s
-        63, # avg_ttl
+        63,  # avg_ttl
     ]
     ftrs = afg._generate_features_fivetupleuni(key)
     assert ftrs == expected
@@ -943,7 +1011,7 @@ def test__generate_features_fivetupleuni():
         74,  # min_pkt_len
         2 / dur,  # frq_pkt
         dur,  # tm_dur_s
-        63, # avg_ttl
+        63,  # avg_ttl
     ]
     ftrs = afg._generate_features_fivetupleuni(key)
     assert ftrs == expected
@@ -967,7 +1035,7 @@ def test__generate_features_fivetupleuni():
         74,  # min_pkt_len
         2 / dur,  # frq_pkt
         dur,  # tm_dur_s
-        63, # avg_ttl
+        63,  # avg_ttl
     ]
     ftrs = afg._generate_features_fivetupleuni(key, now=True)
     assert np.isclose(ftrs, expected).all()
@@ -984,6 +1052,9 @@ def test__generate_features_fivetupleuni():
     afg_1 = AnubisFG(memory_fivetup=memory_fivetup_1, bidirectional=False)
     ftrs = afg_1._generate_features_fivetupleuni(key_1)
     assert ftrs == [0] * n_features
+
+    capture.close()
+
 
 def test__generate_features_fivetuplebi():
     '''
@@ -1030,7 +1101,7 @@ def test__generate_features_fivetuplebi():
     dst_port = LayerFieldsContainer('80')
     protocol = 'TCP'
     key = (ip_src, src_port, ip_dst, dst_port, protocol)
-    afg = AnubisFG()
+    afg = AnubisFG(bidirectional=True)
 
     # Tuple that is not on the memory.
     empty = afg._generate_features_fivetuplebi(key)
@@ -1043,37 +1114,37 @@ def test__generate_features_fivetuplebi():
     timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
     afg._update_fivetuplebi(packet)
     expected = [
-        1, # fwd_qt_pkt
-        0, # fwd_qt_fin_fl
-        1, # fwd_qt_syn_fl
-        0, # fwd_qt_res_fl
-        0, # fwd_qt_psh_fl
-        0, # fwd_qt_ack_fl
-        0, # fwd_qt_urg_fl
-        0, # fwd_qt_ecn_fl
-        0, # fwd_qt_cwr_fl
-        0, # fwd_avg_hdr_len
-        74, # fwd_avg_pkt_len
-        74, # fwd_max_pkt_len
-        74, # fwd_min_pkt_len
-        1, # fwd_frq_pkt
-        63, # fwd_avg_ttl
-        0, # bck_qt_pkt
-        0, # bck_qt_fin_fl
-        0, # bck_qt_syn_fl
-        0, # bck_qt_res_fl
-        0, # bck_qt_psh_fl
-        0, # bck_qt_ack_fl
-        0, # bck_qt_urg_fl
-        0, # bck_qt_ecn_fl
-        0, # bck_qt_cwr_fl
-        0, # bck_avg_hdr_len
-        0, # bck_avg_pkt_len
-        0, # bck_max_pkt_len
-        0, # bck_min_pkt_len
-        0, # bck_frq_pkt
-        0, # bck_avg_ttl
-        0, # tm_dur_s
+        1,  # fwd_qt_pkt
+        0,  # fwd_qt_fin_fl
+        1,  # fwd_qt_syn_fl
+        0,  # fwd_qt_res_fl
+        0,  # fwd_qt_psh_fl
+        0,  # fwd_qt_ack_fl
+        0,  # fwd_qt_urg_fl
+        0,  # fwd_qt_ecn_fl
+        0,  # fwd_qt_cwr_fl
+        0,  # fwd_avg_hdr_len
+        74,  # fwd_avg_pkt_len
+        74,  # fwd_max_pkt_len
+        74,  # fwd_min_pkt_len
+        1,  # fwd_frq_pkt
+        63,  # fwd_avg_ttl
+        0,  # bck_qt_pkt
+        0,  # bck_qt_fin_fl
+        0,  # bck_qt_syn_fl
+        0,  # bck_qt_res_fl
+        0,  # bck_qt_psh_fl
+        0,  # bck_qt_ack_fl
+        0,  # bck_qt_urg_fl
+        0,  # bck_qt_ecn_fl
+        0,  # bck_qt_cwr_fl
+        0,  # bck_avg_hdr_len
+        0,  # bck_avg_pkt_len
+        0,  # bck_max_pkt_len
+        0,  # bck_min_pkt_len
+        0,  # bck_frq_pkt
+        0,  # bck_avg_ttl
+        0,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetuplebi(key)
     assert ftrs == expected
@@ -1086,37 +1157,37 @@ def test__generate_features_fivetuplebi():
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
     dur = (new_timestamp - timestamp).total_seconds()
     expected = [
-        2, # fwd_qt_pkt
-        0, # fwd_qt_fin_fl
-        2, # fwd_qt_syn_fl
-        0, # fwd_qt_res_fl
-        0, # fwd_qt_psh_fl
-        0, # fwd_qt_ack_fl
-        0, # fwd_qt_urg_fl
-        0, # fwd_qt_ecn_fl
-        0, # fwd_qt_cwr_fl
-        0, # fwd_avg_hdr_len
-        74, # fwd_avg_pkt_len
-        74, # fwd_max_pkt_len
-        74, # fwd_min_pkt_len
-        2 / dur, # fwd_frq_pkt
-        63, # fwd_avg_ttl
-        0, # bck_qt_pkt
-        0, # bck_qt_fin_fl
-        0, # bck_qt_syn_fl
-        0, # bck_qt_res_fl
-        0, # bck_qt_psh_fl
-        0, # bck_qt_ack_fl
-        0, # bck_qt_urg_fl
-        0, # bck_qt_ecn_fl
-        0, # bck_qt_cwr_fl
-        0, # bck_avg_hdr_len
-        0, # bck_avg_pkt_len
-        0, # bck_max_pkt_len
-        0, # bck_min_pkt_len
-        0 / dur, # bck_frq_pkt
-        0, # bck_avg_ttl
-        dur, # tm_dur_s
+        2,  # fwd_qt_pkt
+        0,  # fwd_qt_fin_fl
+        2,  # fwd_qt_syn_fl
+        0,  # fwd_qt_res_fl
+        0,  # fwd_qt_psh_fl
+        0,  # fwd_qt_ack_fl
+        0,  # fwd_qt_urg_fl
+        0,  # fwd_qt_ecn_fl
+        0,  # fwd_qt_cwr_fl
+        0,  # fwd_avg_hdr_len
+        74,  # fwd_avg_pkt_len
+        74,  # fwd_max_pkt_len
+        74,  # fwd_min_pkt_len
+        2 / dur,  # fwd_frq_pkt
+        63,  # fwd_avg_ttl
+        0,  # bck_qt_pkt
+        0,  # bck_qt_fin_fl
+        0,  # bck_qt_syn_fl
+        0,  # bck_qt_res_fl
+        0,  # bck_qt_psh_fl
+        0,  # bck_qt_ack_fl
+        0,  # bck_qt_urg_fl
+        0,  # bck_qt_ecn_fl
+        0,  # bck_qt_cwr_fl
+        0,  # bck_avg_hdr_len
+        0,  # bck_avg_pkt_len
+        0,  # bck_max_pkt_len
+        0,  # bck_min_pkt_len
+        0 / dur,  # bck_frq_pkt
+        0,  # bck_avg_ttl
+        dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetuplebi(key)
     assert ftrs == expected
@@ -1125,37 +1196,37 @@ def test__generate_features_fivetuplebi():
     new_timestamp = datetime.now()
     dur = (new_timestamp - timestamp).total_seconds()
     expected = [
-        2, # fwd_qt_pkt
-        0, # fwd_qt_fin_fl
-        2, # fwd_qt_syn_fl
-        0, # fwd_qt_res_fl
-        0, # fwd_qt_psh_fl
-        0, # fwd_qt_ack_fl
-        0, # fwd_qt_urg_fl
-        0, # fwd_qt_ecn_fl
-        0, # fwd_qt_cwr_fl
-        0, # fwd_avg_hdr_len
-        74, # fwd_avg_pkt_len
-        74, # fwd_max_pkt_len
-        74, # fwd_min_pkt_len
-        2 / dur, # fwd_frq_pkt
-        63, # fwd_avg_ttl
-        0, # bck_qt_pkt
-        0, # bck_qt_fin_fl
-        0, # bck_qt_syn_fl
-        0, # bck_qt_res_fl
-        0, # bck_qt_psh_fl
-        0, # bck_qt_ack_fl
-        0, # bck_qt_urg_fl
-        0, # bck_qt_ecn_fl
-        0, # bck_qt_cwr_fl
-        0, # bck_avg_hdr_len
-        0, # bck_avg_pkt_len
-        0, # bck_max_pkt_len
-        0, # bck_min_pkt_len
-        0 / dur, # bck_frq_pkt
-        0, # bck_avg_ttl
-        dur, # tm_dur_s
+        2,  # fwd_qt_pkt
+        0,  # fwd_qt_fin_fl
+        2,  # fwd_qt_syn_fl
+        0,  # fwd_qt_res_fl
+        0,  # fwd_qt_psh_fl
+        0,  # fwd_qt_ack_fl
+        0,  # fwd_qt_urg_fl
+        0,  # fwd_qt_ecn_fl
+        0,  # fwd_qt_cwr_fl
+        0,  # fwd_avg_hdr_len
+        74,  # fwd_avg_pkt_len
+        74,  # fwd_max_pkt_len
+        74,  # fwd_min_pkt_len
+        2 / dur,  # fwd_frq_pkt
+        63,  # fwd_avg_ttl
+        0,  # bck_qt_pkt
+        0,  # bck_qt_fin_fl
+        0,  # bck_qt_syn_fl
+        0,  # bck_qt_res_fl
+        0,  # bck_qt_psh_fl
+        0,  # bck_qt_ack_fl
+        0,  # bck_qt_urg_fl
+        0,  # bck_qt_ecn_fl
+        0,  # bck_qt_cwr_fl
+        0,  # bck_avg_hdr_len
+        0,  # bck_avg_pkt_len
+        0,  # bck_max_pkt_len
+        0,  # bck_min_pkt_len
+        0 / dur,  # bck_frq_pkt
+        0,  # bck_avg_ttl
+        dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetuplebi(key, now=True)
     assert np.isclose(ftrs, expected).all()
@@ -1168,37 +1239,37 @@ def test__generate_features_fivetuplebi():
     new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
     dur = (new_timestamp - timestamp).total_seconds()
     expected = [
-        2, # fwd_qt_pkt
-        0, # fwd_qt_fin_fl
-        2, # fwd_qt_syn_fl
-        0, # fwd_qt_res_fl
-        0, # fwd_qt_psh_fl
-        0, # fwd_qt_ack_fl
-        0, # fwd_qt_urg_fl
-        0, # fwd_qt_ecn_fl
-        0, # fwd_qt_cwr_fl
-        0, # fwd_avg_hdr_len
-        74, # fwd_avg_pkt_len
-        74, # fwd_max_pkt_len
-        74, # fwd_min_pkt_len
-        2 / dur, # fwd_frq_pkt
-        63, # fwd_avg_ttl
-        1, # bck_qt_pkt
-        0, # bck_qt_fin_fl
-        1, # bck_qt_syn_fl
-        0, # bck_qt_res_fl
-        0, # bck_qt_psh_fl
-        1, # bck_qt_ack_fl
-        0, # bck_qt_urg_fl
-        0, # bck_qt_ecn_fl
-        0, # bck_qt_cwr_fl
-        0, # bck_avg_hdr_len
-        74, # bck_avg_pkt_len
-        74, # bck_max_pkt_len
-        74, # bck_min_pkt_len
-        1 / dur, # bck_frq_pkt
-        64, # bck_avg_ttl
-        dur, # tm_dur_s
+        2,  # fwd_qt_pkt
+        0,  # fwd_qt_fin_fl
+        2,  # fwd_qt_syn_fl
+        0,  # fwd_qt_res_fl
+        0,  # fwd_qt_psh_fl
+        0,  # fwd_qt_ack_fl
+        0,  # fwd_qt_urg_fl
+        0,  # fwd_qt_ecn_fl
+        0,  # fwd_qt_cwr_fl
+        0,  # fwd_avg_hdr_len
+        74,  # fwd_avg_pkt_len
+        74,  # fwd_max_pkt_len
+        74,  # fwd_min_pkt_len
+        2 / dur,  # fwd_frq_pkt
+        63,  # fwd_avg_ttl
+        1,  # bck_qt_pkt
+        0,  # bck_qt_fin_fl
+        1,  # bck_qt_syn_fl
+        0,  # bck_qt_res_fl
+        0,  # bck_qt_psh_fl
+        1,  # bck_qt_ack_fl
+        0,  # bck_qt_urg_fl
+        0,  # bck_qt_ecn_fl
+        0,  # bck_qt_cwr_fl
+        0,  # bck_avg_hdr_len
+        74,  # bck_avg_pkt_len
+        74,  # bck_max_pkt_len
+        74,  # bck_min_pkt_len
+        1 / dur,  # bck_frq_pkt
+        64,  # bck_avg_ttl
+        dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetuplebi(key)
     assert np.isclose(ftrs, expected).all()
@@ -1215,3 +1286,64 @@ def test__generate_features_fivetuplebi():
     afg_1 = AnubisFG(memory_fivetup=memory_fivetup_1)
     ftrs = afg_1._generate_features_fivetuplebi(key_1)
     assert ftrs == [0] * n_features
+
+    capture.close()
+
+
+def test_generate_features():
+    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    # Flow to be tested.
+    packet = capture[1]
+    ip_src = packet.ip.src
+    ip_dst = packet.ip.dst
+    src_port = int(packet[packet.transport_layer].srcport)
+    dst_port = int(packet[packet.transport_layer].dstport)
+    protocol = packet.transport_layer
+    # Will be tested considering all possible sets of attributes.
+    for bidir in [True, False]:
+        for onlytwo in [True, False]:
+            for onlyfive in set([not onlytwo, False]):
+                afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
+                                 only_fivetuple=onlyfive)
+                # Will be tested along 3 updates.
+                for i in range(1, 4):
+                    packet = capture[i]
+                    afg_1.update(packet)
+                    if bidir:
+                        if onlytwo:
+                            key = (ip_src, ip_dst)
+                            assert afg_1.generate_features(
+                                key) == afg_1._generate_features_twotuplebi(key)
+                        elif onlyfive:
+                            key = (
+                                ip_src, src_port, ip_dst, dst_port, protocol)
+                            assert afg_1.generate_features(
+                                key) == afg_1._generate_features_fivetuplebi(key)
+                        else:
+                            key2 = (ip_src, ip_dst)
+                            key5 = (
+                                ip_src, src_port, ip_dst, dst_port, protocol)
+                            ftrs_1 = afg_1.generate_features(key5)
+                            ftrs_2 = afg_1._generate_features_twotuplebi(
+                                key2) + afg_1._generate_features_fivetuplebi(key5)
+                            assert ftrs_1 == ftrs_2
+                    else:
+                        if onlytwo:
+                            key = (ip_src, ip_dst)
+                            assert afg_1.generate_features(
+                                key) == afg_1._generate_features_twotupleuni(key)
+                        elif onlyfive:
+                            key = (
+                                ip_src, src_port, ip_dst, dst_port, protocol)
+                            assert afg_1.generate_features(
+                                key) == afg_1._generate_features_fivetupleuni(key)
+                        else:
+                            key2 = (ip_src, ip_dst)
+                            key5 = (
+                                ip_src, src_port, ip_dst, dst_port, protocol)
+                            ftrs_1 = afg_1.generate_features(key5)
+                            ftrs_2 = afg_1._generate_features_twotupleuni(
+                                key2) + afg_1._generate_features_fivetupleuni(key5)
+                            assert ftrs_1 == ftrs_2
+
+    capture.close()

@@ -60,6 +60,8 @@ class AnubisFG:
         pyshark.packet.fields.LayerFieldsContainer, str), and value a
         FiveTupleUnidirectionalNode or FiveTupleBidirectionalNode object,
         depeding on the choice of the bidirectional parameter.
+    lst_timestamp: `datetime.datetime`
+        The timestamp of the last updated packet.
 
     Examples
     --------
@@ -71,8 +73,8 @@ class AnubisFG:
 
     Updates the memories with a packet.
 
-    >>> afg.generate_features(five_tuple=(ip_src, port_src, ip_dst, port_dst,
-                                          protocol))
+    >>> afg.generate_features(flow_key=(ip_src, port_src, ip_dst, port_dst,
+                                        protocol))
     list_of_features
 
     Extract the features of both the two-tuple and the five-tuple flows with the
@@ -96,43 +98,39 @@ class AnubisFG:
                                       Union[FiveTupleUnidirectionalNode,
                                             FiveTupleUnidirectionalNode]] = None):
 
-
-        if bidirectional ==True:
-            if only_twotuple ==True and only_fivetuple == True:
-                self._update = self._update_bi_2_5
-                self._generate_features_twotuple = self._generate_features_twotuplebi
-                self._generate_features_fivetuple = self._generate_features_fivetuplebi
-                self._generate_features = self._generate_features_bi_2_5
-            elif only_twotuple ==True and only_fivetuple ==False:
-                self._update = self._update_bi_2
-                self._generate_features_twotuple = self._generate_features_twotuplebi
-
-            elif only_twotuple == False and only_fivetuple == True:
-                self._update = self._update_bi_5
-                self._generate_features_fivetuple = self._generate_features_fivetuplebi
-          #  else: Da pra puxar o assert la embaixo aqui pra dentro pra n checar 2 vezes essa condicao
-
-        else:
-            if only_twotuple ==True and only_fivetuple == True:
-                self._update = self._update_uni_2_5
-                self._generate_features_twotuple = self._generate_features_twotupleuni
-                self._generate_features_fivetuple = self._generate_features_fivetupleuni
-                self._generate_features = self._generate_features_uni_2_5
-            elif only_twotuple ==True and only_fivetuple ==False:
-                self._update = self._update_uni_2
-                self._generate_features_twotuple = self._generate_features_twotupleuni
-
-            elif only_twotuple == False and only_fivetuple == True:
-                self._update = self._update_uni_5
-                self._generate_features_fivetuple = self._generate_features_fivetupleuni
-          #  else: Da pra puxar o assert la embaixo aqui pra dentro pra n checar 2 vezes essa condicao
-
-
-
-
         msg = "Parameters only_twotuple and only_fivetuple can't be mutually " \
               "True"
         assert not (only_twotuple and only_fivetuple), msg
+
+        if bidirectional:
+            if not only_twotuple and not only_fivetuple:
+                self._update = self._update_bi_twofive
+                self._generate_features_twotuple = self._generate_features_twotuplebi
+                self._generate_features_fivetuple = self._generate_features_fivetuplebi
+                self._generate_features = self._generate_features_bi_twofive
+            elif only_twotuple:
+                self._update = self._update_bi_two
+                self._generate_features_twotuple = self._generate_features_twotuplebi
+                self._generate_features = self._generate_features_twotuplebi
+            else:
+                self._update = self._update_bi_five
+                self._generate_features_fivetuple = self._generate_features_fivetuplebi
+                self._generate_features = self._generate_features_fivetuplebi
+
+        else:
+            if not only_twotuple and not only_fivetuple:
+                self._update = self._update_uni_twofive
+                self._generate_features_twotuple = self._generate_features_twotupleuni
+                self._generate_features_fivetuple = self._generate_features_fivetupleuni
+                self._generate_features = self._generate_features_uni_twofive
+            elif only_twotuple:
+                self._update = self._update_uni_two
+                self._generate_features_twotuple = self._generate_features_twotupleuni
+                self._generate_features = self._generate_features_twotupleuni
+            else:
+                self._update = self._update_uni_five
+                self._generate_features_fivetuple = self._generate_features_fivetupleuni
+                self._generate_features = self._generate_features_fivetupleuni
 
         if memory_twotup is None and not only_fivetuple:
             self.memory_twotup = dict()
@@ -177,36 +175,69 @@ class AnubisFG:
             self.memory_fivetup = memory_fivetup
         else:
             self.memory_fivetup = None
+        self.lst_timestamp = None
 
-    def _generate_features_bi_2_5(self, flow_key: Tuple[LayerFieldsContainer,
-                                                        LayerFieldsContainer,
-                                                        LayerFieldsContainer,
-                                                        LayerFieldsContainer,
-                                                        str],
-                                        now=False) -> List:
+    def generate_features(self, flow_key: Tuple):
+        '''Method generates features of a flow.
+
+        Parameters
+        ----------
+        flow_key: `tuple`
+            The identifier of the flow. If the only_twotuple attribute is True,
+            it must be a tuple with two LayerFieldsContainer's (IP Source, IP
+            Destination) else must be a tuple with five elements: four
+            LayerFieldsContainer's and a string (IP Source, Source Port,
+            IP Destination, Destination Port, Protocol).
+
+        Returns
+        -------
+        features: `list`
+            A list of the features of the flow. The length and positions depends
+            on the attributes bidirectional, only_twotuple and only_fivetuple of
+            the class.
+        '''
+        return self._generate_features(flow_key)
+
+    def update(self, packet: Packet):
+        '''Method updates memories of AnubisFG with a pyshark.packet.Packet.
+
+        Updates memory_twotup if only_fivetuple is False.
+        Updates memory_fivetup if only_twotuple is False.
+        '''
+        self._update(packet)
+        self.lst_timestamp = packet.sniff_time
+
+    def _generate_features_bi_twofive(self,
+                                      flow_key: Tuple[LayerFieldsContainer,
+                                                      LayerFieldsContainer,
+                                                      LayerFieldsContainer,
+                                                      LayerFieldsContainer,
+                                                      str],
+                                      now=False) -> List:
         ''' Extract features from both flows with one single function. Bidirectional case
 
         '''
-        features_2 = self._generate_features_twotuplebi(Tuple(flow_key[0], flow_key[2]), now)
-        features_5 = self._generate_features_fivetuplebi(flow_key, now)
-        return features_2 , features_5
-    
-    def _generate_features_uni_2_5(self, flow_key: Tuple[LayerFieldsContainer,
-                                                        LayerFieldsContainer,
-                                                        LayerFieldsContainer,
-                                                        LayerFieldsContainer,
-                                                        str],
-                                        now=False) -> List:
+        features_two = self._generate_features_twotuplebi(
+            (flow_key[0], flow_key[2]), now)
+        features_five = self._generate_features_fivetuplebi(flow_key, now)
+        return features_two + features_five
+
+    def _generate_features_uni_twofive(self,
+                                       flow_key: Tuple[LayerFieldsContainer,
+                                                       LayerFieldsContainer,
+                                                       LayerFieldsContainer,
+                                                       LayerFieldsContainer,
+                                                       str],
+                                       now=False) -> List:
         ''' Extract features from both flows with one single function. Unidirectional case
 
         '''
-        features_2 = self._generate_features_twotupleuni(Tuple(flow_key[0], flow_key[2]), now)
-        features_5 = self._generate_features_fivetupleuni(flow_key, now)
-        return features_2 , features_5
+        features_two = self._generate_features_twotupleuni(
+            (flow_key[0], flow_key[2]), now)
+        features_five = self._generate_features_fivetupleuni(flow_key, now)
+        return features_two + features_five
 
-
-
-    def _update_bi_2_5(self, packet: Packet, ignore_errors=True):
+    def _update_bi_twofive(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -222,7 +253,7 @@ class AnubisFG:
         self._update_twotuplebi(packet, ignore_errors)
         self._update_fivetuplebi(packet, ignore_errors)
 
-    def _update_bi_2(self, packet: Packet, ignore_errors=True):
+    def _update_bi_two(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -237,7 +268,7 @@ class AnubisFG:
         '''
         self._update_twotuplebi(packet, ignore_errors)
 
-    def _update_bi_5(self, packet: Packet, ignore_errors=True):
+    def _update_bi_five(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -252,7 +283,7 @@ class AnubisFG:
         '''
         self._update_fivetuplebi(packet, ignore_errors)
 
-    def _update_uni_2_5(self, packet: Packet, ignore_errors=True):
+    def _update_uni_twofive(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -268,7 +299,7 @@ class AnubisFG:
         self._update_twotupleuni(packet, ignore_errors)
         self._update_fivetupleuni(packet, ignore_errors)
 
-    def _update_uni_2(self, packet: Packet, ignore_errors=True):
+    def _update_uni_two(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -283,7 +314,7 @@ class AnubisFG:
         '''
         self._update_twotupleuni(packet, ignore_errors)
 
-    def _update_uni_5(self, packet: Packet, ignore_errors=True):
+    def _update_uni_five(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -297,8 +328,6 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         self._update_fivetupleuni(packet, ignore_errors)
-
-
 
     def _update_twotupleuni(self, packet: Packet, ignore_errors=True):
         ''' Method updates the two tuple unidirectional memory with a pyshark

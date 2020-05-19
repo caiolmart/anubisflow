@@ -4,3 +4,6 @@ htmlcov
 .coverage
 assets
 .venv*
+build
+dist
+anubisflow.egg-info
