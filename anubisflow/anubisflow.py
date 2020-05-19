@@ -96,43 +96,40 @@ class AnubisFG:
                                       Union[FiveTupleUnidirectionalNode,
                                             FiveTupleUnidirectionalNode]] = None):
 
-
-        if bidirectional ==True:
-            if only_twotuple ==True and only_fivetuple == True:
-                self._update = self._update_bi_2_5
-                self._generate_features_twotuple = self._generate_features_twotuplebi
-                self._generate_features_fivetuple = self._generate_features_fivetuplebi
-                self._generate_features = self._generate_features_bi_2_5
-            elif only_twotuple ==True and only_fivetuple ==False:
-                self._update = self._update_bi_2
-                self._generate_features_twotuple = self._generate_features_twotuplebi
-
-            elif only_twotuple == False and only_fivetuple == True:
-                self._update = self._update_bi_5
-                self._generate_features_fivetuple = self._generate_features_fivetuplebi
-          #  else: Da pra puxar o assert la embaixo aqui pra dentro pra n checar 2 vezes essa condicao
-
-        else:
-            if only_twotuple ==True and only_fivetuple == True:
-                self._update = self._update_uni_2_5
-                self._generate_features_twotuple = self._generate_features_twotupleuni
-                self._generate_features_fivetuple = self._generate_features_fivetupleuni
-                self._generate_features = self._generate_features_uni_2_5
-            elif only_twotuple ==True and only_fivetuple ==False:
-                self._update = self._update_uni_2
-                self._generate_features_twotuple = self._generate_features_twotupleuni
-
-            elif only_twotuple == False and only_fivetuple == True:
-                self._update = self._update_uni_5
-                self._generate_features_fivetuple = self._generate_features_fivetupleuni
-          #  else: Da pra puxar o assert la embaixo aqui pra dentro pra n checar 2 vezes essa condicao
-
-
-
-
         msg = "Parameters only_twotuple and only_fivetuple can't be mutually " \
               "True"
         assert not (only_twotuple and only_fivetuple), msg
+
+        if bidirectional ==True:
+            if only_twotuple == False and only_fivetuple == False:
+                self._update = self._update_bi_twofive
+                self._generate_features_twotuple = self._generate_features_twotuplebi
+                self._generate_features_fivetuple = self._generate_features_fivetuplebi
+                self._generate_features = self._generate_features_bi_twofive
+            elif only_twotuple == True and only_fivetuple == False:
+                self._update = self._update_bi_two
+                self._generate_features_twotuple = self._generate_features_twotuplebi
+                self._generate_features = self._generate_features_twotuplebi
+            elif only_twotuple == False and only_fivetuple == True:
+                self._update = self._update_bi_five
+                self._generate_features_fivetuple = self._generate_features_fivetuplebi
+                self._generate_features = self._generate_features_fivetuplebi
+
+        else:
+            if only_twotuple == False and only_fivetuple == False:
+                self._update = self._update_uni_twofive
+                self._generate_features_twotuple = self._generate_features_twotupleuni
+                self._generate_features_fivetuple = self._generate_features_fivetupleuni
+                self._generate_features = self._generate_features_uni_twofive
+            elif only_twotuple ==True and only_fivetuple == False:
+                self._update = self._update_uni_two
+                self._generate_features_twotuple = self._generate_features_twotupleuni
+                self._generate_features = self._generate_features_twotupleuni
+
+            elif only_twotuple == False and only_fivetuple == True:
+                self._update = self._update_uni_five
+                self._generate_features_fivetuple = self._generate_features_fivetupleuni
+                self._generate_features = self._generate_features_fivetupleuni
 
         if memory_twotup is None and not only_fivetuple:
             self.memory_twotup = dict()
@@ -177,8 +174,14 @@ class AnubisFG:
             self.memory_fivetup = memory_fivetup
         else:
             self.memory_fivetup = None
+    
+    def generate_features(self, flow_key):
+        return self._generate_features(flow_key)
 
-    def _generate_features_bi_2_5(self, flow_key: Tuple[LayerFieldsContainer,
+    def update(self, packet: Packet):
+        self._update(packet)
+
+    def _generate_features_bi_twofive(self, flow_key: Tuple[LayerFieldsContainer,
                                                         LayerFieldsContainer,
                                                         LayerFieldsContainer,
                                                         LayerFieldsContainer,
@@ -187,11 +190,11 @@ class AnubisFG:
         ''' Extract features from both flows with one single function. Bidirectional case
 
         '''
-        features_2 = self._generate_features_twotuplebi(Tuple(flow_key[0], flow_key[2]), now)
-        features_5 = self._generate_features_fivetuplebi(flow_key, now)
-        return features_2 , features_5
+        features_two = self._generate_features_twotuplebi((flow_key[0], flow_key[2]), now)
+        features_five = self._generate_features_fivetuplebi(flow_key, now)
+        return features_two + features_five
     
-    def _generate_features_uni_2_5(self, flow_key: Tuple[LayerFieldsContainer,
+    def _generate_features_uni_twofive(self, flow_key: Tuple[LayerFieldsContainer,
                                                         LayerFieldsContainer,
                                                         LayerFieldsContainer,
                                                         LayerFieldsContainer,
@@ -200,13 +203,13 @@ class AnubisFG:
         ''' Extract features from both flows with one single function. Unidirectional case
 
         '''
-        features_2 = self._generate_features_twotupleuni(Tuple(flow_key[0], flow_key[2]), now)
-        features_5 = self._generate_features_fivetupleuni(flow_key, now)
-        return features_2 , features_5
+        features_two = self._generate_features_twotupleuni((flow_key[0], flow_key[2]), now)
+        features_five = self._generate_features_fivetupleuni(flow_key, now)
+        return features_two + features_five
 
 
 
-    def _update_bi_2_5(self, packet: Packet, ignore_errors=True):
+    def _update_bi_twofive(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -222,7 +225,7 @@ class AnubisFG:
         self._update_twotuplebi(packet, ignore_errors)
         self._update_fivetuplebi(packet, ignore_errors)
 
-    def _update_bi_2(self, packet: Packet, ignore_errors=True):
+    def _update_bi_two(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -237,7 +240,7 @@ class AnubisFG:
         '''
         self._update_twotuplebi(packet, ignore_errors)
 
-    def _update_bi_5(self, packet: Packet, ignore_errors=True):
+    def _update_bi_five(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -252,7 +255,7 @@ class AnubisFG:
         '''
         self._update_fivetuplebi(packet, ignore_errors)
 
-    def _update_uni_2_5(self, packet: Packet, ignore_errors=True):
+    def _update_uni_twofive(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -268,7 +271,7 @@ class AnubisFG:
         self._update_twotupleuni(packet, ignore_errors)
         self._update_fivetupleuni(packet, ignore_errors)
 
-    def _update_uni_2(self, packet: Packet, ignore_errors=True):
+    def _update_uni_two(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
@@ -283,7 +286,7 @@ class AnubisFG:
         '''
         self._update_twotupleuni(packet, ignore_errors)
 
-    def _update_uni_5(self, packet: Packet, ignore_errors=True):
+    def _update_uni_five(self, packet: Packet, ignore_errors=True):
         ''' Method updates all flows with their respective functions
 
         Parameters
