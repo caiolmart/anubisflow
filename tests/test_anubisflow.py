@@ -22,6 +22,7 @@ def test_anubisfg_default():
     afg = AnubisFG()
     assert afg.memory_twotup == dict()
     assert afg.memory_fivetup == dict()
+    assert afg.lst_timestamp == None
 
 
 def test_anubisfg_onlytwo():
@@ -498,6 +499,7 @@ def test_update():
                 for i in range(1, 4):
                     packet = capture[i]
                     afg_1.update(packet)
+                    assert afg_1.lst_timestamp == packet.sniff_time
                     if bidir:
                         if onlytwo:
                             afg_2._update_twotuplebi(packet)
