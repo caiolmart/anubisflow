@@ -33,6 +33,8 @@ class TwoTupleUnidirectionalNode:
         The sum of all the header lengths of packets of the flow.
     tot_packet_len: `int`
         The sum of all the packet lengths of packets of the flow.
+    tot_ttl: `int`
+        The sum of the TTL of all packets.
     '''
 
     def __init__(self, **kwargs):
@@ -44,6 +46,7 @@ class TwoTupleUnidirectionalNode:
         self.pkt_protocol_counter = dict()
         self.tot_header_len = 0
         self.tot_packet_len = 0
+        self.tot_ttl = 0
 
         for key, value in kwargs.items():
             msg1 = f'AssertionError: {key} is invalid argument'
@@ -91,6 +94,8 @@ class TwoTupleBidirectionalNode:
         The sum of all the header lengths of forward packets of the flow.
     fwd_tot_packet_len: `int`
         The sum of all the packet lengths of forward packets of the flow.
+    fwd_tot_ttl: `int`
+        The sum of the TTL of all forward packets.
     bck_set_src_ports: `set`
         A set of all source ports of backward packets of the flow.
     bck_set_dst_ports: `set`
@@ -112,6 +117,8 @@ class TwoTupleBidirectionalNode:
         The sum of all the header lengths of backward packets of the flow.
     bck_tot_packet_len: `int`
         The sum of all the packet lengths of backward packets of the flow.
+    bck_tot_ttl: `int`
+        The sum of the TTL of all backward packets.
     '''
 
     def __init__(self, **kwargs):
@@ -123,12 +130,14 @@ class TwoTupleBidirectionalNode:
         self.fwd_pkt_protocol_counter = dict()
         self.fwd_tot_header_len = 0
         self.fwd_tot_packet_len = 0
+        self.fwd_tot_ttl = 0
         self.bck_set_src_ports = set()
         self.bck_set_dst_ports = set()
         self.bck_pkt_flag_counter = [0] * 8
         self.bck_pkt_protocol_counter = dict()
         self.bck_tot_header_len = 0
         self.bck_tot_packet_len = 0
+        self.bck_tot_ttl = 0
 
         for key, value in kwargs.items():
             msg1 = f'AssertionError: {key} is invalid argument'
