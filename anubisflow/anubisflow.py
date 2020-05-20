@@ -351,6 +351,7 @@ class AnubisFG:
             dst_port = int(packet[packet.transport_layer].dstport)
             protocol = packet.transport_layer
             length = int(packet.length)
+            ttl = int(packet.ip.ttl)
         except AttributeError as err:
             if ignore_errors:
                 return
@@ -390,6 +391,7 @@ class AnubisFG:
                            protocol)
             self.memory_twotup[key].tot_packet_len += length
             self.memory_twotup[key].tot_header_len += hdr_length
+            self.memory_twotup[key].tot_ttl += ttl
             self.memory_twotup[key].pkt_flag_counter[0] += fin
             self.memory_twotup[key].pkt_flag_counter[1] += syn
             self.memory_twotup[key].pkt_flag_counter[2] += res
@@ -416,7 +418,8 @@ class AnubisFG:
                 'pkt_protocol_counter': {
                     protocol: 1},
                 'tot_header_len': hdr_length,
-                'tot_packet_len': length}
+                'tot_packet_len': length,
+                'tot_ttl': ttl}
             node = TwoTupleUnidirectionalNode(**node_dict)
             self.memory_twotup[key] = node
 
@@ -442,6 +445,7 @@ class AnubisFG:
             dst_port = int(packet[packet.transport_layer].dstport)
             protocol = packet.transport_layer
             length = int(packet.length)
+            ttl = int(packet.ip.ttl)
         except AttributeError as err:
             if ignore_errors:
                 return
@@ -496,7 +500,8 @@ class AnubisFG:
                 'fwd_pkt_protocol_counter': {
                     protocol: 1},
                 'fwd_tot_header_len': hdr_length,
-                'fwd_tot_packet_len': length}
+                'fwd_tot_packet_len': length,
+                'fwd_tot_ttl': ttl}
             node = TwoTupleBidirectionalNode(**node_dict)
             self.memory_twotup[(ip_src, ip_dst)] = node
             return
@@ -509,6 +514,7 @@ class AnubisFG:
         add_to_counter(self.memory_twotup[key].__dict__[
             f'{prefix}_pkt_protocol_counter'], protocol)
         self.memory_twotup[key].__dict__[f'{prefix}_tot_packet_len'] += length
+        self.memory_twotup[key].__dict__[f'{prefix}_tot_ttl'] += ttl
         self.memory_twotup[key].__dict__[
             f'{prefix}_tot_header_len'] += hdr_length
         self.memory_twotup[key].__dict__[
