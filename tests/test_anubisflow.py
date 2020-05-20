@@ -585,9 +585,10 @@ def test__generate_features_twotupleuni():
             avg_hdr_len
             avg_pkt_len
             frq_pkt
+            avg_ttl
             tm_dur_s
     '''
-    n_features = 20
+    n_features = 21
     ip_src = LayerFieldsContainer('172.16.0.5')
     ip_dst = LayerFieldsContainer('192.168.50.1')
     key = (ip_src, ip_dst)
@@ -623,6 +624,7 @@ def test__generate_features_twotupleuni():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         1,  # frq_pkt
+        63,  # avg_ttl
         0,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotupleuni(key)
@@ -655,6 +657,7 @@ def test__generate_features_twotupleuni():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
+        63,  # avg_ttl
         dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotupleuni(key)
@@ -683,6 +686,7 @@ def test__generate_features_twotupleuni():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
+        63,  # avg_ttl
         dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_twotupleuni(key, now=True)
@@ -704,7 +708,7 @@ def test__generate_features_twotuplebi():
     '''
 
     '''
-    n_features = 39
+    n_features = 41
     ip_src = LayerFieldsContainer('172.16.0.5')
     ip_dst = LayerFieldsContainer('192.168.50.1')
     key = (ip_src, ip_dst)
@@ -742,6 +746,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         1,  # frq_pkt
+        63, # avg_ttl
         # bck
         0,  # qt_pkt
         0,  # qt_pkt_tcp
@@ -762,6 +767,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         0,  # avg_pkt_len
         0,  # frq_pkt
+        0,  # avg_ttl
         # non-directional
         0,  # tm_dur_s
     ]
@@ -795,6 +801,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
+        63,  # avg_ttl
         # bck
         0,  # qt_pkt
         0,  # qt_pkt_tcp
@@ -815,6 +822,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         0,  # avg_pkt_len
         0,  # frq_pkt
+        0,  # avg_ttl
         # non-directional
         dur,  # tm_dur_s
     ]
@@ -844,6 +852,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
+        63,  # avg_ttl
         # bck
         0,  # qt_pkt
         0,  # qt_pkt_tcp
@@ -864,6 +873,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         0,  # avg_pkt_len
         0,  # frq_pkt
+        0,  # avg_ttl
         # non-directional
         dur,  # tm_dur_s
     ]
@@ -897,6 +907,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         2 / dur,  # frq_pkt
+        63,  # avg_ttl
         # bck
         1,  # qt_pkt
         1,  # qt_pkt_tcp
@@ -917,6 +928,7 @@ def test__generate_features_twotuplebi():
         0,  # avg_hdr_len
         74,  # avg_pkt_len
         1 / dur,  # frq_pkt
+        64,  # avg_ttl
         # non-directional
         dur,  # tm_dur_s
     ]
@@ -955,8 +967,8 @@ def test__generate_features_fivetupleuni():
             max_pkt_len
             min_pkt_len
             frq_pkt
-            tm_dur_s
             avg_ttl
+            tm_dur_s
     '''
     n_features = 16
     ip_src = LayerFieldsContainer('172.16.0.5')
@@ -992,8 +1004,8 @@ def test__generate_features_fivetupleuni():
         74,  # max_pkt_len
         74,  # min_pkt_len
         1,  # frq_pkt
-        0,  # tm_dur_s
         63,  # avg_ttl
+        0,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetupleuni(key)
     assert ftrs == expected
@@ -1020,8 +1032,8 @@ def test__generate_features_fivetupleuni():
         74,  # max_pkt_len
         74,  # min_pkt_len
         2 / dur,  # frq_pkt
-        dur,  # tm_dur_s
         63,  # avg_ttl
+        dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetupleuni(key)
     assert ftrs == expected
@@ -1044,8 +1056,8 @@ def test__generate_features_fivetupleuni():
         74,  # max_pkt_len
         74,  # min_pkt_len
         2 / dur,  # frq_pkt
-        dur,  # tm_dur_s
         63,  # avg_ttl
+        dur,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetupleuni(key, now=True)
     assert np.isclose(ftrs, expected).all()
