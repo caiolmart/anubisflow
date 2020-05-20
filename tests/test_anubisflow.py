@@ -181,6 +181,7 @@ def test__update_twotupleuni_update():
     dst_port = 80
     protocol = 'TCP'
     length = 74
+    ttl = 63
     pkt_flag_counter = [0] * 8
     # SYN flag
     pkt_flag_counter[1] = 1
@@ -194,7 +195,8 @@ def test__update_twotupleuni_update():
                 'pkt_flag_counter': pkt_flag_counter,
                 'pkt_protocol_counter': {protocol: 1},
                 'tot_header_len': 0,
-                'tot_packet_len': length}
+                'tot_packet_len': length,
+                'tot_ttl': ttl}
     assert len(afg.memory_twotup) == 1
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
 
@@ -212,7 +214,8 @@ def test__update_twotupleuni_update():
                 'pkt_flag_counter': pkt_flag_counter,
                 'pkt_protocol_counter': {protocol: 2},
                 'tot_header_len': 0,
-                'tot_packet_len': length * 2}
+                'tot_packet_len': length * 2,
+                'tot_ttl': ttl * 2}
     assert len(afg.memory_twotup) == 1
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
     capture.close()
@@ -245,6 +248,7 @@ def test__update_twotuplebi_update():
     dst_port = 80
     protocol = 'TCP'
     length = 74
+    ttl = 63
     fwd_pkt_flag_counter = [0] * 8
     # SYN flag
     fwd_pkt_flag_counter[1] = 1
@@ -260,12 +264,14 @@ def test__update_twotuplebi_update():
                 'fwd_pkt_protocol_counter': {protocol: 1},
                 'fwd_tot_header_len': 0,
                 'fwd_tot_packet_len': length,
+                'fwd_tot_ttl': ttl,
                 'bck_set_src_ports': set(),
                 'bck_set_dst_ports': set(),
                 'bck_pkt_flag_counter': bck_pkt_flag_counter,
                 'bck_pkt_protocol_counter': dict(),
                 'bck_tot_header_len': 0,
-                'bck_tot_packet_len': 0}
+                'bck_tot_packet_len': 0,
+                'bck_tot_ttl': 0}
     assert len(afg.memory_twotup) == 1
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
 
@@ -284,12 +290,14 @@ def test__update_twotuplebi_update():
                 'fwd_pkt_protocol_counter': {protocol: 2},
                 'fwd_tot_header_len': 0,
                 'fwd_tot_packet_len': length * 2,
+                'fwd_tot_ttl': ttl * 2,
                 'bck_set_src_ports': set(),
                 'bck_set_dst_ports': set(),
                 'bck_pkt_flag_counter': bck_pkt_flag_counter,
                 'bck_pkt_protocol_counter': dict(),
                 'bck_tot_header_len': 0,
-                'bck_tot_packet_len': 0}
+                'bck_tot_packet_len': 0,
+                'bck_tot_ttl': 0}
     assert len(afg.memory_twotup) == 1
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
 
@@ -310,12 +318,14 @@ def test__update_twotuplebi_update():
                 'fwd_pkt_protocol_counter': {protocol: 2},
                 'fwd_tot_header_len': 0,
                 'fwd_tot_packet_len': length * 2,
+                'fwd_tot_ttl': ttl * 2,
                 'bck_set_src_ports': {dst_port},
                 'bck_set_dst_ports': {src_port},
                 'bck_pkt_flag_counter': bck_pkt_flag_counter,
                 'bck_pkt_protocol_counter': {protocol: 1},
                 'bck_tot_header_len': 0,
-                'bck_tot_packet_len': length}
+                'bck_tot_packet_len': length,
+                'bck_tot_ttl': 64}
     assert len(afg.memory_twotup) == 1
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
 
