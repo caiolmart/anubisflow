@@ -34,8 +34,8 @@ Here is the list of features of the 2-tuple flows we want to generate, and the a
 | avg_hdr_len | Average Header Size | tot_header_len + pkt_protocol_counter |
 | avg_pkt_len | Average Packet Size | tot_packet_len + pkt_protocol_counter |
 | frq_pkt | Frequency of packets | fst_timestamp (+ lst_timestamp) + pkt_protocol_counter |
+| avg_ttl | Average TTL | tot_ttl + pkt_protocol_counter |
 | tm_dur_s | Time duration of the flow (s) | fst_timestamp (+ lst_timestamp)|
-| ttl_m | Average TTL | tot_ttl + pkt_protocol_counter |
 | qt_tos | Amount of IP Service Type | TODO |
 | qt_do_not_frag | Amount of “Do Not Frag” Flags | TODO |
 | qt_more_frag | Amount of “More Frag” Flags | TODO |
