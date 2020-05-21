@@ -774,6 +774,56 @@ def test__generate_features_twotuplebi():
     ftrs = afg._generate_features_twotuplebi(key)
     assert ftrs == expected
 
+    # Inverted
+    expected = [
+        # bck
+        0,  # qt_pkt
+        0,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        0,  # qt_prtcl
+        0,  # qt_src_prt
+        0,  # qt_dst_prt
+        0,  # qt_fin_fl
+        0,  # qt_syn_fl
+        0,  # qt_res_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_ecn_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        0,  # avg_pkt_len
+        0,  # frq_pkt
+        0,  # avg_ttl
+        # fwd
+        1,  # qt_pkt
+        1,  # qt_pkt_tcp
+        0,  # qt_pkt_udp
+        0,  # qt_pkt_icmp
+        0,  # qt_pkt_ip
+        1,  # qt_prtcl
+        1,  # qt_src_prt
+        1,  # qt_dst_prt
+        0,  # qt_fin_fl
+        1,  # qt_syn_fl
+        0,  # qt_res_fl
+        0,  # qt_psh_fl
+        0,  # qt_ack_fl
+        0,  # qt_urg_fl
+        0,  # qt_ecn_fl
+        0,  # qt_cwr_fl
+        0,  # avg_hdr_len
+        74,  # avg_pkt_len
+        1,  # frq_pkt
+        63, # avg_ttl
+        # non-directional
+        0,  # tm_dur_s
+    ]
+    ftrs = afg._generate_features_twotuplebi((key[1], key[0]))
+    assert ftrs == expected
+
     # Duration > 0
     # Updating
     # Third packet is another SYN TCP packet with same IPs and Ports
@@ -1169,6 +1219,44 @@ def test__generate_features_fivetuplebi():
         0,  # tm_dur_s
     ]
     ftrs = afg._generate_features_fivetuplebi(key)
+    assert ftrs == expected
+
+    # Inverted
+    expected = [
+        0,  # bck_qt_pkt
+        0,  # bck_qt_fin_fl
+        0,  # bck_qt_syn_fl
+        0,  # bck_qt_res_fl
+        0,  # bck_qt_psh_fl
+        0,  # bck_qt_ack_fl
+        0,  # bck_qt_urg_fl
+        0,  # bck_qt_ecn_fl
+        0,  # bck_qt_cwr_fl
+        0,  # bck_avg_hdr_len
+        0,  # bck_avg_pkt_len
+        0,  # bck_max_pkt_len
+        0,  # bck_min_pkt_len
+        0,  # bck_frq_pkt
+        0,  # bck_avg_ttl
+        1,  # fwd_qt_pkt
+        0,  # fwd_qt_fin_fl
+        1,  # fwd_qt_syn_fl
+        0,  # fwd_qt_res_fl
+        0,  # fwd_qt_psh_fl
+        0,  # fwd_qt_ack_fl
+        0,  # fwd_qt_urg_fl
+        0,  # fwd_qt_ecn_fl
+        0,  # fwd_qt_cwr_fl
+        0,  # fwd_avg_hdr_len
+        74,  # fwd_avg_pkt_len
+        74,  # fwd_max_pkt_len
+        74,  # fwd_min_pkt_len
+        1,  # fwd_frq_pkt
+        63,  # fwd_avg_ttl
+        0,  # tm_dur_s
+    ]
+    inv_key = (key[2], key[3], key[0], key[1], key[4])
+    ftrs = afg._generate_features_fivetuplebi(inv_key)
     assert ftrs == expected
 
     # Duration > 0
