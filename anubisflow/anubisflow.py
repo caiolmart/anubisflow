@@ -884,9 +884,16 @@ class AnubisFG:
         '''
 
         n_features = 41
-
-        if flow_key not in self.memory_twotup:
+        n_nondir = 1
+        
+        if flow_key in self.memory_twotup:
+            inverted = False
+        elif (flow_key[1], flow_key[0]) in self.memory_twotup:
+            inverted = True
+            flow_key = (flow_key[1], flow_key[0])
+        else:
             return [0] * n_features
+
         mem = self.memory_twotup[flow_key]
         if now:
             lst_time = datetime.now()
@@ -921,7 +928,8 @@ class AnubisFG:
             bck_avg_packet = mem.bck_tot_packet_len / bck_qt_pkt
             bck_avg_ttl = mem.bck_tot_ttl / bck_qt_pkt
 
-        return [  # fwd
+        features = [  
+            # fwd
             fwd_qt_pkt,
             zero_if_not_exists(mem.fwd_pkt_protocol_counter, 'TCP'),
             zero_if_not_exists(mem.fwd_pkt_protocol_counter, 'UDP'),
@@ -966,6 +974,11 @@ class AnubisFG:
             # non-directional
             duration_s,
         ]
+        if inverted:
+            return features[((n_features - n_nondir) // 2):(-n_nondir)] + \
+                   features[:((n_features - n_nondir) // 2)] + \
+                   features[-n_nondir:]         
+        return features
 
     def _generate_features_fivetupleuni(self,
                                         flow_key: Tuple[LayerFieldsContainer,
@@ -1080,8 +1093,17 @@ class AnubisFG:
             tm_dur_s
         '''
         n_features = 31
-        if flow_key not in self.memory_fivetup:
+        n_nondir = 1
+        inv_key = (flow_key[2], flow_key[3], flow_key[0], flow_key[1], 
+                   flow_key[4])
+        if flow_key in self.memory_fivetup:
+            inverted = False
+        elif inv_key in self.memory_fivetup:
+            inverted = True
+            flow_key = inv_key
+        else:
             return [0] * n_features
+
         mem = self.memory_fivetup[flow_key]
         if now:
             lst_time = datetime.now()
@@ -1111,7 +1133,7 @@ class AnubisFG:
             avg_bck_packet = mem.bck_tot_packet_len / mem.bck_tot_pkt
             avg_bck_ttl = mem.bck_tot_ttl / mem.bck_tot_pkt
 
-        return [
+        features = [
             # fwd
             mem.fwd_tot_pkt,
             mem.fwd_pkt_flag_counter[0],
@@ -1147,3 +1169,9 @@ class AnubisFG:
             # non-directional
             duration_s,
         ]
+
+        if inverted:
+            return features[((n_features - n_nondir) // 2):(-n_nondir)] + \
+                   features[:((n_features - n_nondir) // 2)] + \
+                   features[-n_nondir:]         
+        return features
