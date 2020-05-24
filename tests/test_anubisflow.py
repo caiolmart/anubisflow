@@ -401,118 +401,119 @@ def test__update_fivetupleuni_update():
 
 
 
-#def test__update_fivetuplebi_noupdate():
-#    afg = AnubisFG(bidirectional=True)
-#    capture = rdpcap('tests/data/test_100_rows.pcap')
-#    # First packet is a STP packet that should not be read.
-#    packet = capture[0]
-#
-#    afg._update_fivetuplebi(packet)
-#    assert afg.memory_fivetup == dict()
-#    with pytest.raises(IndexError, match='Packet does not have an IP layer'):
-#        afg._update_fivetuplebi(packet, ignore_errors=False)
-#
-#    
-#
-#
-#def test__update_fivetuplebi_update():
-#    afg = AnubisFG(bidirectional=True)
-#    capture = rdpcap('tests/data/test_100_rows.pcap')
-#    # Second packet is a SYN TCP packet.
-#    packet = capture[1]
-#
-#    ip_src = '172.16.0.5'
-#    ip_dst = '192.168.50.1'
-#    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
-#    src_port = 60675
-#    dst_port = 80
-#    protocol = 'TCP'
-#    key = (ip_src, src_port, ip_dst, dst_port, protocol)
-#    length = 74
-#    ttl = 63
-#    fwd_pkt_flag_counter = [0] * 8
-#    # SYN flag
-#    fwd_pkt_flag_counter[1] = 1
-#    bck_pkt_flag_counter = [0] * 8
-#
-#    # Creating
-#    afg._update_fivetuplebi(packet)
-#    expected = {'fst_timestamp': timestamp,
-#                'lst_timestamp': timestamp,
-#                'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
-#                'fwd_tot_pkt': 1,
-#                'fwd_tot_header_len': 0,
-#                'fwd_tot_packet_len': length,
-#                'fwd_max_pkt_len': length,
-#                'fwd_min_pkt_len': length,
-#                'fwd_tot_ttl': ttl,
-#                'bck_pkt_flag_counter': bck_pkt_flag_counter,
-#                'bck_tot_pkt': 0,
-#                'bck_tot_header_len': 0,
-#                'bck_tot_packet_len': 0,
-#                'bck_max_pkt_len': 0,
-#                'bck_min_pkt_len': 0,
-#                'bck_tot_ttl': 0}
-#    assert len(afg.memory_fivetup) == 1
-#    assert afg.memory_fivetup[key].__dict__ == expected
-#
-#    # Updating Forward
-#    # Third packet is another SYN TCP packet with same IPs and Ports
-#    packet = capture[2]
-#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183813)
-#    # SYN flag
-#    fwd_pkt_flag_counter[1] += 1
-#    afg._update_fivetuplebi(packet)
-#    expected = {'fst_timestamp': timestamp,
-#                'lst_timestamp': new_timestamp,
-#                'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
-#                'fwd_tot_pkt': 2,
-#                'fwd_tot_header_len': 0,
-#                'fwd_tot_packet_len': length * 2,
-#                'fwd_max_pkt_len': length,
-#                'fwd_min_pkt_len': length,
-#                'fwd_tot_ttl': ttl * 2,
-#                'bck_pkt_flag_counter': bck_pkt_flag_counter,
-#                'bck_tot_pkt': 0,
-#                'bck_tot_header_len': 0,
-#                'bck_tot_packet_len': 0,
-#                'bck_max_pkt_len': 0,
-#                'bck_min_pkt_len': 0,
-#                'bck_tot_ttl': 0}
-#    assert len(afg.memory_fivetup) == 1
-#    assert afg.memory_fivetup[key].__dict__ == expected
-#
-#    # Fourth packet is a SYN ACK response TCP packet with inverted IPs and
-#    # Ports
-#    packet = capture[3]
-#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183932)
-#    # SYN flag
-#    bck_pkt_flag_counter[1] += 1
-#    # ACK flag
-#    bck_pkt_flag_counter[4] += 1
-#    afg._update_fivetuplebi(packet)
-#    expected = {'fst_timestamp': timestamp,
-#                'lst_timestamp': new_timestamp,
-#                'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
-#                'fwd_tot_pkt': 2,
-#                'fwd_tot_header_len': 0,
-#                'fwd_tot_packet_len': length * 2,
-#                'fwd_max_pkt_len': length,
-#                'fwd_min_pkt_len': length,
-#                'fwd_tot_ttl': ttl * 2,
-#                'bck_pkt_flag_counter': bck_pkt_flag_counter,
-#                'bck_tot_pkt': 1,
-#                'bck_tot_header_len': 0,
-#                'bck_tot_packet_len': length,
-#                'bck_max_pkt_len': length,
-#                'bck_min_pkt_len': length,
-#                'bck_tot_ttl': 64}
-#    assert len(afg.memory_fivetup) == 1
-#    assert afg.memory_fivetup[key].__dict__ == expected
-#
-#    
-#
-#
+def test__update_fivetuplebi_noupdate():
+    afg = AnubisFG(bidirectional=True)
+    capture = rdpcap('tests/data/test_100_rows.pcap')
+    # First packet is a STP packet that should not be read.
+    packet = capture[0]
+
+    afg._update_fivetuplebi(packet)
+    assert afg.memory_fivetup == dict()
+    with pytest.raises(IndexError, match='Packet does not have an IP layer'):
+        afg._update_fivetuplebi(packet, ignore_errors=False)
+
+    
+
+
+def test__update_fivetuplebi_update():
+    afg = AnubisFG(bidirectional=True)
+    capture = rdpcap('tests/data/test_100_rows.pcap')
+    # Second packet is a SYN TCP packet.
+    packet = capture[1]
+
+    ip_src = '172.16.0.5'
+    ip_dst = '192.168.50.1'
+    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
+    src_port = 60675
+    dst_port = 80
+    protocol = 6
+    key = (ip_src, src_port, ip_dst, dst_port, protocol)
+    length = 74
+    hdr_len = 20
+    ttl = 63
+    fwd_pkt_flag_counter = [0] * 8
+    # SYN flag
+    fwd_pkt_flag_counter[1] = 1
+    bck_pkt_flag_counter = [0] * 8
+
+    # Creating
+    afg._update_fivetuplebi(packet)
+    expected = {'fst_timestamp': timestamp,
+                'lst_timestamp': timestamp,
+                'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
+                'fwd_tot_pkt': 1,
+                'fwd_tot_header_len': hdr_len,
+                'fwd_tot_packet_len': length,
+                'fwd_max_pkt_len': length,
+                'fwd_min_pkt_len': length,
+                'fwd_tot_ttl': ttl,
+                'bck_pkt_flag_counter': bck_pkt_flag_counter,
+                'bck_tot_pkt': 0,
+                'bck_tot_header_len': 0,
+                'bck_tot_packet_len': 0,
+                'bck_max_pkt_len': 0,
+                'bck_min_pkt_len': 0,
+                'bck_tot_ttl': 0}
+    assert len(afg.memory_fivetup) == 1
+    assert afg.memory_fivetup[key].__dict__ == expected
+
+    # Updating Forward
+    # Third packet is another SYN TCP packet with same IPs and Ports
+    packet = capture[2]
+    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183813)
+    # SYN flag
+    fwd_pkt_flag_counter[1] += 1
+    afg._update_fivetuplebi(packet)
+    expected = {'fst_timestamp': timestamp,
+                'lst_timestamp': new_timestamp,
+                'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
+                'fwd_tot_pkt': 2,
+                'fwd_tot_header_len': hdr_len * 2,
+                'fwd_tot_packet_len': length * 2,
+                'fwd_max_pkt_len': length,
+                'fwd_min_pkt_len': length,
+                'fwd_tot_ttl': ttl * 2,
+                'bck_pkt_flag_counter': bck_pkt_flag_counter,
+                'bck_tot_pkt': 0,
+                'bck_tot_header_len': 0,
+                'bck_tot_packet_len': 0,
+                'bck_max_pkt_len': 0,
+                'bck_min_pkt_len': 0,
+                'bck_tot_ttl': 0}
+    assert len(afg.memory_fivetup) == 1
+    assert afg.memory_fivetup[key].__dict__ == expected
+
+    # Fourth packet is a SYN ACK response TCP packet with inverted IPs and
+    # Ports
+    packet = capture[3]
+    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183932)
+    # SYN flag
+    bck_pkt_flag_counter[1] += 1
+    # ACK flag
+    bck_pkt_flag_counter[4] += 1
+    afg._update_fivetuplebi(packet)
+    expected = {'fst_timestamp': timestamp,
+                'lst_timestamp': new_timestamp,
+                'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
+                'fwd_tot_pkt': 2,
+                'fwd_tot_header_len': hdr_len * 2,
+                'fwd_tot_packet_len': length * 2,
+                'fwd_max_pkt_len': length,
+                'fwd_min_pkt_len': length,
+                'fwd_tot_ttl': ttl * 2,
+                'bck_pkt_flag_counter': bck_pkt_flag_counter,
+                'bck_tot_pkt': 1,
+                'bck_tot_header_len': hdr_len,
+                'bck_tot_packet_len': length,
+                'bck_max_pkt_len': length,
+                'bck_min_pkt_len': length,
+                'bck_tot_ttl': 64}
+    assert len(afg.memory_fivetup) == 1
+    assert afg.memory_fivetup[key].__dict__ == expected
+
+    
+
+
 #def test_update():
 #    capture = rdpcap('tests/data/test_100_rows.pcap')
 #    # Will be tested considering all possible sets of attributes.
@@ -1025,7 +1026,7 @@ def test__update_fivetupleuni_update():
 #    ip_dst = '192.168.50.1'
 #    src_port = 60675
 #    dst_port = 80
-#    protocol = 'TCP'
+#    protocol = 6
 #    key = (ip_src, src_port, ip_dst, dst_port, protocol)
 #    afg = AnubisFG(bidirectional=False)
 #
@@ -1171,7 +1172,7 @@ def test__update_fivetupleuni_update():
 #    ip_dst = '192.168.50.1'
 #    src_port = 60675
 #    dst_port = 80
-#    protocol = 'TCP'
+#    protocol = 6
 #    key = (ip_src, src_port, ip_dst, dst_port, protocol)
 #    afg = AnubisFG(bidirectional=True)
 #
