@@ -1,9 +1,8 @@
 from typing import Dict, List, Tuple, Union
 from datetime import datetime
-
-from pyshark.packet.fields import LayerFieldsContainer
-from pyshark.packet.packet import Packet
+from scapy.packet import Packet
 from scapy.layers.inet import IP, UDP, TCP
+
 from .nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode, \
     FiveTupleUnidirectionalNode, FiveTupleBidirectionalNode
 
@@ -58,21 +57,17 @@ class AnubisFG:
     ----------
     memory_twotup: `dict`
         The dictionary with the information of the flows. Has key (IP Source,
-        IP Destination), a tuple with two
-        pyshark.packet.fields.LayerFieldsContainer's, and value a
+        IP Destination), a tuple with two str's, and value a
         TwoTupleUnidirectionalNode of TwoTupleBidirectionalNode object,
         depeding on the choice of the bidirectional parameter.
     memory_fivetup: `dict`
         The dictionary with the information of the flows. Has key (IP Source,
         Source Port, IP Destination, Destination Port, Protocol), a tuple with
-        five elements (pyshark.packet.fields.LayerFieldsContainer,
-        pyshark.packet.fields.LayerFieldsContainer,
-        pyshark.packet.fields.LayerFieldsContainer,
-        pyshark.packet.fields.LayerFieldsContainer, str), and value a
+        five elements (str, int, str, int, int), and value a
         FiveTupleUnidirectionalNode or FiveTupleBidirectionalNode object,
         depeding on the choice of the bidirectional parameter.
     lst_timestamp: `datetime.datetime`
-        The timestamp of the last updated packet.
+        The UTC timestamp of the last updated packet.
 
     Examples
     --------
@@ -165,8 +160,7 @@ class AnubisFG:
             self.memory_fivetup = dict()
         elif not only_twotuple:
             msg = 'AssertionError: memory_fivetup must be of type ' \
-                  'Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer, ' \
-                  'LayerFieldsContainer, LayerFieldsContainer, str], ' \
+                  'Dict[Tuple[str, int, str, int, int], ' \
                   'Union[FiveTupleUnidirectionalNode, ' \
                   'FiveTupleBidirectionalNode]]'
             assert isinstance(memory_fivetup, dict), msg
@@ -194,10 +188,9 @@ class AnubisFG:
         ----------
         flow_key: `tuple`
             The identifier of the flow. If the only_twotuple attribute is True,
-            it must be a tuple with two LayerFieldsContainer's (IP Source, IP
-            Destination) else must be a tuple with five elements: four
-            LayerFieldsContainer's and a string (IP Source, Source Port,
-            IP Destination, Destination Port, Protocol).
+            it must be a tuple with two str's (IP Source, IP Destination) else
+            must be a tuple with five elements: (str, int, str, int, int - IP
+            Source, Source Port, IP Destination, Destination Port, Protocol).
 
         Returns
         -------
@@ -209,7 +202,7 @@ class AnubisFG:
         return self._generate_features(flow_key)
 
     def update(self, packet: Packet):
-        '''Method updates memories of AnubisFG with a pyshark.packet.Packet.
+        '''Method updates memories of AnubisFG with a scapy.packet.Packet.
 
         Updates memory_twotup if only_fivetuple is False.
         Updates memory_fivetup if only_twotuple is False.
@@ -218,11 +211,11 @@ class AnubisFG:
         self.lst_timestamp = datetime.utcfromtimestamp(packet.time)
 
     def _generate_features_bi_twofive(self,
-                                      flow_key: Tuple[LayerFieldsContainer,
-                                                      LayerFieldsContainer,
-                                                      LayerFieldsContainer,
-                                                      LayerFieldsContainer,
-                                                      str],
+                                      flow_key: Tuple[str,
+                                                      int,
+                                                      str,
+                                                      int,
+                                                      int],
                                       now=False) -> List:
         ''' Extract features from both flows with one single function. Bidirectional case
 
@@ -233,11 +226,11 @@ class AnubisFG:
         return features_two + features_five
 
     def _generate_features_uni_twofive(self,
-                                       flow_key: Tuple[LayerFieldsContainer,
-                                                       LayerFieldsContainer,
-                                                       LayerFieldsContainer,
-                                                       LayerFieldsContainer,
-                                                       str],
+                                       flow_key: Tuple[str,
+                                                       int,
+                                                       str,
+                                                       int,
+                                                       int],
                                        now=False) -> List:
         ''' Extract features from both flows with one single function. Unidirectional case
 
@@ -252,7 +245,7 @@ class AnubisFG:
 
         Parameters
         ----------
-        packet: `pyshark.packet.packet.Packet`
+        packet: `scapy.packet.Packet`
             The packet to be inserted in memory.
 
         ignore_errors: `bool`
@@ -268,7 +261,7 @@ class AnubisFG:
 
         Parameters
         ----------
-        packet: `pyshark.packet.packet.Packet`
+        packet: `scapy.packet.Packet`
             The packet to be inserted in memory.
 
         ignore_errors: `bool`
@@ -283,7 +276,7 @@ class AnubisFG:
 
         Parameters
         ----------
-        packet: `pyshark.packet.packet.Packet`
+        packet: `scapy.packet.Packet`
             The packet to be inserted in memory.
 
         ignore_errors: `bool`
@@ -298,7 +291,7 @@ class AnubisFG:
 
         Parameters
         ----------
-        packet: `pyshark.packet.packet.Packet`
+        packet: `scapy.packet.Packet`
             The packet to be inserted in memory.
 
         ignore_errors: `bool`
@@ -314,7 +307,7 @@ class AnubisFG:
 
         Parameters
         ----------
-        packet: `pyshark.packet.packet.Packet`
+        packet: `scapy.packet.Packet`
             The packet to be inserted in memory.
 
         ignore_errors: `bool`
@@ -329,7 +322,7 @@ class AnubisFG:
 
         Parameters
         ----------
-        packet: `pyshark.packet.packet.Packet`
+        packet: `scapy.packet.Packet`
             The packet to be inserted in memory.
 
         ignore_errors: `bool`
@@ -340,12 +333,12 @@ class AnubisFG:
         self._update_fivetupleuni(packet, ignore_errors)
 
     def _update_twotupleuni(self, packet: Packet, ignore_errors=True):
-        ''' Method updates the two tuple unidirectional memory with a pyshark
+        ''' Method updates the two tuple unidirectional memory with a scapy
         packet.
 
         Parameters
         ----------
-        packet: `pyshark.packet.packet.Packet`
+        packet: `scapy.packet.Packet`
             The packet to be inserted in memory.
 
         ignore_errors: `bool`
@@ -444,12 +437,12 @@ class AnubisFG:
             self.memory_twotup[key] = node
 
     def _update_twotuplebi(self, packet: Packet, ignore_errors=True):
-        ''' Method updates the two tuple unidirectional memory with a pyshark
+        ''' Method updates the two tuple unidirectional memory with a scapy
         packet.
 
         Parameters
         ----------
-        packet: `pyshark.packet.packet.Packet`
+        packet: `scapy.packet.Packet`
             The packet to be inserted in memory.
 
         ignore_errors: `bool`
@@ -574,12 +567,12 @@ class AnubisFG:
             f'{prefix}_pkt_flag_counter'][7] += cwr
 
     def _update_fivetupleuni(self, packet: Packet, ignore_errors=True):
-        ''' Method updates the two tuple unidirectional memory with a pyshark
+        ''' Method updates the two tuple unidirectional memory with a scapy
         packet.
 
         Parameters
         ----------
-        packet: `pyshark.packet.packet.Packet`
+        packet: `scapy.packet.Packet`
             The packet to be inserted in memory.
 
         ignore_errors: `bool`
@@ -678,12 +671,12 @@ class AnubisFG:
             self.memory_fivetup[key] = node
 
     def _update_fivetuplebi(self, packet: Packet, ignore_errors=True):
-        ''' Method updates the five tuple bidirectional memory with a pyshark
+        ''' Method updates the five tuple bidirectional memory with a scapy
         packet.
 
         Parameters
         ----------
-        packet: `pyshark.packet.packet.Packet`
+        packet: `scapy.packet.Packet`
             The packet to be inserted in memory.
 
         ignore_errors: `bool`
@@ -813,8 +806,8 @@ class AnubisFG:
             f'{prefix}_pkt_flag_counter'][7] += cwr
 
     def _generate_features_twotupleuni(self,
-                                       flow_key: Tuple[LayerFieldsContainer,
-                                                       LayerFieldsContainer],
+                                       flow_key: Tuple[str,
+                                                       str],
                                        now=False) -> List:
         ''' Extract features of the flow from the memory_twotup.
 
@@ -888,8 +881,8 @@ class AnubisFG:
         ]
 
     def _generate_features_twotuplebi(self,
-                                      flow_key: Tuple[LayerFieldsContainer,
-                                                      LayerFieldsContainer],
+                                      flow_key: Tuple[str,
+                                                      str],
                                       now=False) -> List:
         ''' Extract features of the flow from the memory_twotup.
 
@@ -1039,11 +1032,11 @@ class AnubisFG:
         return features
 
     def _generate_features_fivetupleuni(self,
-                                        flow_key: Tuple[LayerFieldsContainer,
-                                                        LayerFieldsContainer,
-                                                        LayerFieldsContainer,
-                                                        LayerFieldsContainer,
-                                                        str],
+                                        flow_key: Tuple[str,
+                                                        int,
+                                                        str,
+                                                        int,
+                                                        int],
                                         now=False) -> List:
         ''' Extract features of the flow from the memory_fivetup.
 
@@ -1106,11 +1099,11 @@ class AnubisFG:
         ]
 
     def _generate_features_fivetuplebi(self,
-                                       flow_key: Tuple[LayerFieldsContainer,
-                                                       LayerFieldsContainer,
-                                                       LayerFieldsContainer,
-                                                       LayerFieldsContainer,
-                                                       str],
+                                       flow_key: Tuple[str,
+                                                       int,
+                                                       str,
+                                                       int,
+                                                       int],
                                        now=False) -> List:
         ''' Extract features of the flow from the memory_fivetup.
 
