@@ -86,14 +86,14 @@ class AnubisFG:
                  bidirectional=True,
                  only_twotuple=False,
                  only_fivetuple=False,
-                 memory_twotup: Dict[Tuple[LayerFieldsContainer,
-                                           LayerFieldsContainer],
+                 memory_twotup: Dict[Tuple[str,
+                                           str],
                                      Union[TwoTupleUnidirectionalNode,
                                            TwoTupleBidirectionalNode]] = None,
-                 memory_fivetup: Dict[Tuple[LayerFieldsContainer,
-                                            LayerFieldsContainer,
-                                            LayerFieldsContainer,
-                                            LayerFieldsContainer,
+                 memory_fivetup: Dict[Tuple[str,
+                                            int,
+                                            str,
+                                            int,
                                             str],
                                       Union[FiveTupleUnidirectionalNode,
                                             FiveTupleUnidirectionalNode]] = None):
@@ -136,13 +136,12 @@ class AnubisFG:
             self.memory_twotup = dict()
         elif not only_fivetuple:
             msg = 'AssertionError: memory_twotup must be of type ' \
-                  'Dict[Tuple[LayerFieldsContainer, LayerFieldsContainer], ' \
-                  'TwoTupleUnidirectionalNode]'
+                  'Dict[Tuple[str, str], TwoTupleUnidirectionalNode]'
             assert isinstance(memory_twotup, dict), msg
             for item in memory_twotup.items():
                 assert isinstance(item[0], tuple), msg
-                assert isinstance(item[0][0], LayerFieldsContainer), msg
-                assert isinstance(item[0][1], LayerFieldsContainer), msg
+                assert isinstance(item[0][0], str), msg
+                assert isinstance(item[0][1], str), msg
                 if bidirectional:
                     assert isinstance(item[1], TwoTupleBidirectionalNode), msg
                 else:
@@ -162,10 +161,10 @@ class AnubisFG:
             assert isinstance(memory_fivetup, dict), msg
             for item in memory_fivetup.items():
                 assert isinstance(item[0], tuple), msg
-                assert isinstance(item[0][0], LayerFieldsContainer), msg
-                assert isinstance(item[0][1], LayerFieldsContainer), msg
-                assert isinstance(item[0][2], LayerFieldsContainer), msg
-                assert isinstance(item[0][3], LayerFieldsContainer), msg
+                assert isinstance(item[0][0], str), msg
+                assert isinstance(item[0][1], int), msg
+                assert isinstance(item[0][2], str), msg
+                assert isinstance(item[0][3], int), msg
                 assert isinstance(item[0][4], str), msg
                 if bidirectional:
                     assert isinstance(item[1], FiveTupleBidirectionalNode), msg
