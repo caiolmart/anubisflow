@@ -214,7 +214,7 @@ class AnubisFG:
         Updates memory_fivetup if only_twotuple is False.
         '''
         self._update(packet)
-        self.lst_timestamp = packet.sniff_time
+        self.lst_timestamp = datetime.utcfromtimestamp(packet.time)
 
     def _generate_features_bi_twofive(self,
                                       flow_key: Tuple[LayerFieldsContainer,
