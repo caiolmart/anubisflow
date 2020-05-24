@@ -3,9 +3,19 @@ from datetime import datetime
 
 from pyshark.packet.fields import LayerFieldsContainer
 from pyshark.packet.packet import Packet
+from scapy.layers.inet import IP, UDP, TCP, ICMP
 from .nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode, \
     FiveTupleUnidirectionalNode, FiveTupleBidirectionalNode
 
+
+FIN = 0x01
+SYN = 0x02
+RES = 0x04
+PSH = 0x08
+ACK = 0x10
+URG = 0x20
+ECN = 0x40
+CWR = 0x80
 
 def add_to_counter(counter, key, val=1):
     if key in counter:
@@ -94,7 +104,7 @@ class AnubisFG:
                                             int,
                                             str,
                                             int,
-                                            str],
+                                            int],
                                       Union[FiveTupleUnidirectionalNode,
                                             FiveTupleUnidirectionalNode]] = None):
 
@@ -165,7 +175,7 @@ class AnubisFG:
                 assert isinstance(item[0][1], int), msg
                 assert isinstance(item[0][2], str), msg
                 assert isinstance(item[0][3], int), msg
-                assert isinstance(item[0][4], str), msg
+                assert isinstance(item[0][4], int), msg
                 if bidirectional:
                     assert isinstance(item[1], FiveTupleBidirectionalNode), msg
                 else:
@@ -343,49 +353,59 @@ class AnubisFG:
             STP Packets are invalid for example). (default=True)
         '''
         try:
-            ip_src = packet.ip.src
-            ip_dst = packet.ip.dst
-            timestamp = packet.sniff_time
-            src_port = int(packet[packet.transport_layer].srcport)
-            dst_port = int(packet[packet.transport_layer].dstport)
-            protocol = packet.transport_layer
-            length = int(packet.length)
-            ttl = int(packet.ip.ttl)
-        except AttributeError as err:
+            ip_src = packet[IP].src
+            ip_dst = packet[IP].dst
+            timestamp = datetime.utcfromtimestamp(packet.time)
+            length = len(packet)
+            ttl = packet[IP].ttl
+            hdr_length = packet[IP].ihl * 4
+            protocol = packet[IP].proto
+        except IndexError as err:
             if ignore_errors:
                 return
-            err.args = ('Attribute ip not in packet', )
+            err.args = ('Packet does not have an IP layer', )
             raise
 
-        # Not all packets have IP headers
-        try:
-            hdr_length = int(packet.ip.hdr_length)
-        except AttributeError:
-            hdr_length = 0
-        # Only works for tcp packets
-        try:
-            ack = int(packet.tcp.flags_ack)
-            cwr = int(packet.tcp.flags_cwr)
-            ecn = int(packet.tcp.flags_ecn)
-            fin = int(packet.tcp.flags_fin)
-            res = int(packet.tcp.flags_res)
-            syn = int(packet.tcp.flags_syn)
-            urg = int(packet.tcp.flags_urg)
-            psh = int(packet.tcp.flags_push)
-        except AttributeError:
-            ack = 0
-            cwr = 0
-            ecn = 0
-            fin = 0
-            res = 0
-            syn = 0
-            urg = 0
-            psh = 0
+        src_port = None
+        dst_port = None
+        fin = 0
+        syn = 0
+        res = 0
+        psh = 0
+        ack = 0
+        urg = 0
+        ecn = 0
+        cwr = 0
+        if TCP in packet:
+            flags = packet[TCP].flags
+            if flags & FIN:
+                fin = 1
+            if flags & SYN:
+                syn = 1
+            if flags & RES:
+                res = 1
+            if flags & PSH:
+                psh = 1
+            if flags & ACK:
+                ack = 1
+            if flags & URG:
+                urg = 1
+            if flags & ECN:
+                ecn = 1
+            if flags & CWR:
+                cwr = 1
+            src_port = packet[TCP].sport
+            dst_port = packet[TCP].dport
+        elif UDP in packet:
+            src_port = packet[TCP].sport
+            dst_port = packet[TCP].dport
+
         key = (ip_src, ip_dst)
         if key in self.memory_twotup:
             self.memory_twotup[key].lst_timestamp = timestamp
-            self.memory_twotup[key].set_src_ports.add(src_port)
-            self.memory_twotup[key].set_dst_ports.add(dst_port)
+            if src_port and dst_port:
+                self.memory_twotup[key].set_src_ports.add(src_port)
+                self.memory_twotup[key].set_dst_ports.add(dst_port)
             add_to_counter(self.memory_twotup[key].pkt_protocol_counter,
                            protocol)
             self.memory_twotup[key].tot_packet_len += length
