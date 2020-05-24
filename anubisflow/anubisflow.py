@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pyshark.packet.fields import LayerFieldsContainer
 from pyshark.packet.packet import Packet
-from scapy.layers.inet import IP, UDP, TCP, ICMP
+from scapy.layers.inet import IP, UDP, TCP
 from .nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode, \
     FiveTupleUnidirectionalNode, FiveTupleBidirectionalNode
 
@@ -16,6 +16,7 @@ ACK = 0x10
 URG = 0x20
 ECN = 0x40
 CWR = 0x80
+
 
 def add_to_counter(counter, key, val=1):
     if key in counter:
@@ -542,7 +543,7 @@ class AnubisFG:
             self.memory_twotup[(ip_src, ip_dst)] = node
             return
 
-        self.memory_twotup[key].__dict__[f'lst_timestamp'] = timestamp
+        self.memory_twotup[key].__dict__['lst_timestamp'] = timestamp
         if src_port:
             self.memory_twotup[key].__dict__[
                 f'{prefix}_set_src_ports'].add(src_port)
@@ -740,12 +741,12 @@ class AnubisFG:
 
         # Forward packet
         if (ip_src, src_port, ip_dst, dst_port,
-            protocol) in self.memory_fivetup:
+                protocol) in self.memory_fivetup:
             prefix = 'fwd'
             key = (ip_src, src_port, ip_dst, dst_port, protocol)
         # Backward packet
-        elif (ip_dst, dst_port, ip_src, src_port, 
-            protocol) in self.memory_fivetup:
+        elif (ip_dst, dst_port, ip_src, src_port,
+              protocol) in self.memory_fivetup:
             prefix = 'bck'
             key = (ip_dst, dst_port, ip_src, src_port, protocol)
         # New (forward) packet
@@ -942,7 +943,7 @@ class AnubisFG:
 
         n_features = 41
         n_nondir = 1
-        
+
         if flow_key in self.memory_twotup:
             inverted = False
         elif (flow_key[1], flow_key[0]) in self.memory_twotup:
@@ -985,7 +986,7 @@ class AnubisFG:
             bck_avg_packet = mem.bck_tot_packet_len / bck_qt_pkt
             bck_avg_ttl = mem.bck_tot_ttl / bck_qt_pkt
 
-        features = [  
+        features = [
             # fwd
             fwd_qt_pkt,
             zero_if_not_exists(mem.fwd_pkt_protocol_counter, 6),
@@ -1033,8 +1034,8 @@ class AnubisFG:
         ]
         if inverted:
             return features[((n_features - n_nondir) // 2):(-n_nondir)] + \
-                   features[:((n_features - n_nondir) // 2)] + \
-                   features[-n_nondir:]         
+                features[:((n_features - n_nondir) // 2)] + \
+                features[-n_nondir:]
         return features
 
     def _generate_features_fivetupleuni(self,
@@ -1151,7 +1152,7 @@ class AnubisFG:
         '''
         n_features = 31
         n_nondir = 1
-        inv_key = (flow_key[2], flow_key[3], flow_key[0], flow_key[1], 
+        inv_key = (flow_key[2], flow_key[3], flow_key[0], flow_key[1],
                    flow_key[4])
         if flow_key in self.memory_fivetup:
             inverted = False
@@ -1229,6 +1230,6 @@ class AnubisFG:
 
         if inverted:
             return features[((n_features - n_nondir) // 2):(-n_nondir)] + \
-                   features[:((n_features - n_nondir) // 2)] + \
-                   features[-n_nondir:]         
+                features[:((n_features - n_nondir) // 2)] + \
+                features[-n_nondir:]
         return features

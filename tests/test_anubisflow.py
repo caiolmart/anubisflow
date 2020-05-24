@@ -232,8 +232,6 @@ def test__update_twotuplebi_noupdate():
     assert afg.memory_twotup == dict()
     with pytest.raises(IndexError, match='Packet does not have an IP layer'):
         afg._update_twotupleuni(packet, ignore_errors=False)
-    
-    
 
 
 def test__update_twotuplebi_update():
@@ -342,8 +340,6 @@ def test__update_fivetupleuni_noupdate():
     assert afg.memory_fivetup == dict()
     with pytest.raises(IndexError, match='Packet does not have an IP layer'):
         afg._update_fivetupleuni(packet, ignore_errors=False)
-    
-    
 
 
 def test__update_fivetupleuni_update():
@@ -400,7 +396,6 @@ def test__update_fivetupleuni_update():
     assert afg.memory_fivetup[key].__dict__ == expected
 
 
-
 def test__update_fivetuplebi_noupdate():
     afg = AnubisFG(bidirectional=True)
     capture = rdpcap('tests/data/test_100_rows.pcap')
@@ -411,8 +406,6 @@ def test__update_fivetuplebi_noupdate():
     assert afg.memory_fivetup == dict()
     with pytest.raises(IndexError, match='Packet does not have an IP layer'):
         afg._update_fivetuplebi(packet, ignore_errors=False)
-
-    
 
 
 def test__update_fivetuplebi_update():
@@ -527,7 +520,8 @@ def test_update():
                 for i in range(1, 4):
                     packet = capture[i]
                     afg_1.update(packet)
-                    assert afg_1.lst_timestamp == datetime.utcfromtimestamp(packet.time)
+                    assert afg_1.lst_timestamp == datetime.utcfromtimestamp(
+                        packet.time)
                     if bidir:
                         if onlytwo:
                             afg_2._update_twotuplebi(packet)
@@ -558,8 +552,6 @@ def test_update():
                         assert afg_1.memory_fivetup.keys() == afg_2.memory_fivetup.keys()
                         for key in afg_1.memory_fivetup.keys():
                             assert afg_1.memory_fivetup[key].__dict__ == afg_2.memory_fivetup[key].__dict__
-    
-    
 
 
 def test__generate_features_twotupleuni():
@@ -700,7 +692,6 @@ def test__generate_features_twotupleuni():
     afg_1 = AnubisFG(memory_twotup=memory_twotup_1, bidirectional=False)
     ftrs = afg_1._generate_features_twotupleuni(key_1)
     assert ftrs == [0] * n_features
-    
 
 
 def test__generate_features_twotuplebi():
@@ -745,7 +736,7 @@ def test__generate_features_twotuplebi():
         20,  # avg_hdr_len
         74,  # avg_pkt_len
         1,  # frq_pkt
-        63, # avg_ttl
+        63,  # avg_ttl
         # bck
         0,  # qt_pkt
         0,  # qt_pkt_tcp
@@ -816,7 +807,7 @@ def test__generate_features_twotuplebi():
         20,  # avg_hdr_len
         74,  # avg_pkt_len
         1,  # frq_pkt
-        63, # avg_ttl
+        63,  # avg_ttl
         # non-directional
         0,  # tm_dur_s
     ]
@@ -996,8 +987,6 @@ def test__generate_features_twotuplebi():
     ftrs = afg_1._generate_features_twotuplebi(key_1)
     assert ftrs == [0] * n_features
 
-    
-
 
 def test__generate_features_fivetupleuni():
     '''
@@ -1123,8 +1112,6 @@ def test__generate_features_fivetupleuni():
     afg_1 = AnubisFG(memory_fivetup=memory_fivetup_1, bidirectional=False)
     ftrs = afg_1._generate_features_fivetupleuni(key_1)
     assert ftrs == [0] * n_features
-
-    
 
 
 def test__generate_features_fivetuplebi():
@@ -1396,8 +1383,6 @@ def test__generate_features_fivetuplebi():
     ftrs = afg_1._generate_features_fivetuplebi(key_1)
     assert ftrs == [0] * n_features
 
-    
-
 
 def test_generate_features():
     capture = rdpcap('tests/data/test_100_rows.pcap')
@@ -1454,5 +1439,3 @@ def test_generate_features():
                             ftrs_2 = afg_1._generate_features_twotupleuni(
                                 key2) + afg_1._generate_features_fivetupleuni(key5)
                             assert ftrs_1 == ftrs_2
-
-    
