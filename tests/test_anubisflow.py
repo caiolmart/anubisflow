@@ -511,59 +511,57 @@ def test__update_fivetuplebi_update():
     assert len(afg.memory_fivetup) == 1
     assert afg.memory_fivetup[key].__dict__ == expected
 
+
+def test_update():
+    capture = rdpcap('tests/data/test_100_rows.pcap')
+    # Will be tested considering all possible sets of attributes.
+    for bidir in [True, False]:
+        for onlytwo in [True, False]:
+            for onlyfive in set([not onlytwo, False]):
+                # This will be updated by the method update.
+                afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
+                                 only_fivetuple=onlyfive)
+                # This will be updated by the specific method(s) tested above.
+                afg_2 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
+                                 only_fivetuple=onlyfive)
+                for i in range(1, 4):
+                    packet = capture[i]
+                    afg_1.update(packet)
+                    assert afg_1.lst_timestamp == datetime.utcfromtimestamp(packet.time)
+                    if bidir:
+                        if onlytwo:
+                            afg_2._update_twotuplebi(packet)
+                        elif onlyfive:
+                            afg_2._update_fivetuplebi(packet)
+                        else:
+                            afg_2._update_twotuplebi(packet)
+                            afg_2._update_fivetuplebi(packet)
+                    else:
+                        if onlytwo:
+                            afg_2._update_twotupleuni(packet)
+                        elif onlyfive:
+                            afg_2._update_fivetupleuni(packet)
+                        else:
+                            afg_2._update_twotupleuni(packet)
+                            afg_2._update_fivetupleuni(packet)
+
+                    if afg_1.memory_twotup is None:
+                        assert afg_2.memory_twotup is None
+                    else:
+                        assert afg_1.memory_twotup.keys() == afg_2.memory_twotup.keys()
+                        for key in afg_1.memory_twotup.keys():
+                            assert afg_1.memory_twotup[key].__dict__ == afg_2.memory_twotup[key].__dict__
+
+                    if afg_1.memory_fivetup is None:
+                        assert afg_2.memory_fivetup is None
+                    else:
+                        assert afg_1.memory_fivetup.keys() == afg_2.memory_fivetup.keys()
+                        for key in afg_1.memory_fivetup.keys():
+                            assert afg_1.memory_fivetup[key].__dict__ == afg_2.memory_fivetup[key].__dict__
+    
     
 
 
-#def test_update():
-#    capture = rdpcap('tests/data/test_100_rows.pcap')
-#    # Will be tested considering all possible sets of attributes.
-#    for bidir in [True, False]:
-#        for onlytwo in [True, False]:
-#            for onlyfive in set([not onlytwo, False]):
-#                # This will be updated by the method update.
-#                afg_1 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
-#                                 only_fivetuple=onlyfive)
-#                # This will be updated by the specific method(s) tested above.
-#                afg_2 = AnubisFG(bidirectional=bidir, only_twotuple=onlytwo,
-#                                 only_fivetuple=onlyfive)
-#                for i in range(1, 4):
-#                    packet = capture[i]
-#                    afg_1.update(packet)
-#                    assert afg_1.lst_timestamp == packet.sniff_time
-#                    if bidir:
-#                        if onlytwo:
-#                            afg_2._update_twotuplebi(packet)
-#                        elif onlyfive:
-#                            afg_2._update_fivetuplebi(packet)
-#                        else:
-#                            afg_2._update_twotuplebi(packet)
-#                            afg_2._update_fivetuplebi(packet)
-#                    else:
-#                        if onlytwo:
-#                            afg_2._update_twotupleuni(packet)
-#                        elif onlyfive:
-#                            afg_2._update_fivetupleuni(packet)
-#                        else:
-#                            afg_2._update_twotupleuni(packet)
-#                            afg_2._update_fivetupleuni(packet)
-#
-#                    if afg_1.memory_twotup is None:
-#                        assert afg_2.memory_twotup is None
-#                    else:
-#                        assert afg_1.memory_twotup.keys() == afg_2.memory_twotup.keys()
-#                        for key in afg_1.memory_twotup.keys():
-#                            assert afg_1.memory_twotup[key].__dict__ == afg_2.memory_twotup[key].__dict__
-#
-#                    if afg_1.memory_fivetup is None:
-#                        assert afg_2.memory_fivetup is None
-#                    else:
-#                        assert afg_1.memory_fivetup.keys() == afg_2.memory_fivetup.keys()
-#                        for key in afg_1.memory_fivetup.keys():
-#                            assert afg_1.memory_fivetup[key].__dict__ == afg_2.memory_fivetup[key].__dict__
-#    
-#    
-#
-#
 #def test__generate_features_twotupleuni():
 #    '''
 #        Feature list:
