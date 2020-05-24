@@ -332,75 +332,75 @@ def test__update_twotuplebi_update():
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
 
 
-#def test__update_fivetupleuni_noupdate():
-#    afg = AnubisFG(bidirectional=False)
-#    capture = rdpcap('tests/data/test_100_rows.pcap')
-#    # First packet is a STP packet that should not be read.
-#    packet = capture[0]
-#
-#    afg._update_fivetupleuni(packet)
-#    assert afg.memory_fivetup == dict()
-#    with pytest.raises(AttributeError, match='Attribute ip not in packet'):
-#        afg._update_fivetupleuni(packet, ignore_errors=False)
-#    
-#    
-#
-#
-#def test__update_fivetupleuni_update():
-#    afg = AnubisFG(bidirectional=False)
-#    capture = rdpcap('tests/data/test_100_rows.pcap')
-#    # Second packet is a SYN TCP packet.
-#    packet = capture[1]
-#
-#    ip_src = LayerFieldsContainer('172.16.0.5')
-#    ip_dst = LayerFieldsContainer('192.168.50.1')
-#    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
-#    src_port = LayerFieldsContainer('60675')
-#    dst_port = LayerFieldsContainer('80')
-#    protocol = 'TCP'
-#    key = (ip_src, src_port, ip_dst, dst_port, protocol)
-#    length = 74
-#    ttl = 63
-#    pkt_flag_counter = [0] * 8
-#    # SYN flag
-#    pkt_flag_counter[1] = 1
-#
-#    # Creating
-#    afg._update_fivetupleuni(packet)
-#    expected = {'fst_timestamp': timestamp,
-#                'lst_timestamp': timestamp,
-#                'pkt_flag_counter': pkt_flag_counter,
-#                'tot_pkt': 1,
-#                'tot_header_len': 0,
-#                'tot_packet_len': length,
-#                'max_pkt_len': length,
-#                'min_pkt_len': length,
-#                'tot_ttl': ttl}
-#    assert len(afg.memory_fivetup) == 1
-#    assert afg.memory_fivetup[key].__dict__ == expected
-#
-#    # Updating
-#    # Third packet is another SYN TCP packet with same IPs and Ports
-#    packet = capture[2]
-#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183813)
-#    # SYN flag
-#    pkt_flag_counter[1] += 1
-#    afg._update_fivetupleuni(packet)
-#    expected = {'fst_timestamp': timestamp,
-#                'lst_timestamp': new_timestamp,
-#                'pkt_flag_counter': pkt_flag_counter,
-#                'tot_pkt': 2,
-#                'tot_header_len': 0,
-#                'tot_packet_len': length * 2,
-#                'max_pkt_len': length,
-#                'min_pkt_len': length,
-#                'tot_ttl': ttl * 2}
-#    assert len(afg.memory_fivetup) == 1
-#    assert afg.memory_fivetup[key].__dict__ == expected
-#
-#    
-#
-#
+def test__update_fivetupleuni_noupdate():
+    afg = AnubisFG(bidirectional=False)
+    capture = rdpcap('tests/data/test_100_rows.pcap')
+    # First packet is a STP packet that should not be read.
+    packet = capture[0]
+
+    afg._update_fivetupleuni(packet)
+    assert afg.memory_fivetup == dict()
+    with pytest.raises(IndexError, match='Packet does not have an IP layer'):
+        afg._update_fivetupleuni(packet, ignore_errors=False)
+    
+    
+
+
+def test__update_fivetupleuni_update():
+    afg = AnubisFG(bidirectional=False)
+    capture = rdpcap('tests/data/test_100_rows.pcap')
+    # Second packet is a SYN TCP packet.
+    packet = capture[1]
+
+    ip_src = '172.16.0.5'
+    ip_dst = '192.168.50.1'
+    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
+    src_port = 60675
+    dst_port = 80
+    protocol = 6
+    key = (ip_src, src_port, ip_dst, dst_port, protocol)
+    length = 74
+    hdr_length = 20
+    ttl = 63
+    pkt_flag_counter = [0] * 8
+    # SYN flag
+    pkt_flag_counter[1] = 1
+
+    # Creating
+    afg._update_fivetupleuni(packet)
+    expected = {'fst_timestamp': timestamp,
+                'lst_timestamp': timestamp,
+                'pkt_flag_counter': pkt_flag_counter,
+                'tot_pkt': 1,
+                'tot_header_len': hdr_length,
+                'tot_packet_len': length,
+                'max_pkt_len': length,
+                'min_pkt_len': length,
+                'tot_ttl': ttl}
+    assert len(afg.memory_fivetup) == 1
+    assert afg.memory_fivetup[key].__dict__ == expected
+
+    # Updating
+    # Third packet is another SYN TCP packet with same IPs and Ports
+    packet = capture[2]
+    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183813)
+    # SYN flag
+    pkt_flag_counter[1] += 1
+    afg._update_fivetupleuni(packet)
+    expected = {'fst_timestamp': timestamp,
+                'lst_timestamp': new_timestamp,
+                'pkt_flag_counter': pkt_flag_counter,
+                'tot_pkt': 2,
+                'tot_header_len': hdr_length * 2,
+                'tot_packet_len': length * 2,
+                'max_pkt_len': length,
+                'min_pkt_len': length,
+                'tot_ttl': ttl * 2}
+    assert len(afg.memory_fivetup) == 1
+    assert afg.memory_fivetup[key].__dict__ == expected
+
+
+
 #def test__update_fivetuplebi_noupdate():
 #    afg = AnubisFG(bidirectional=True)
 #    capture = rdpcap('tests/data/test_100_rows.pcap')
@@ -409,7 +409,7 @@ def test__update_twotuplebi_update():
 #
 #    afg._update_fivetuplebi(packet)
 #    assert afg.memory_fivetup == dict()
-#    with pytest.raises(AttributeError, match='Attribute ip not in packet'):
+#    with pytest.raises(IndexError, match='Packet does not have an IP layer'):
 #        afg._update_fivetuplebi(packet, ignore_errors=False)
 #
 #    
@@ -421,11 +421,11 @@ def test__update_twotuplebi_update():
 #    # Second packet is a SYN TCP packet.
 #    packet = capture[1]
 #
-#    ip_src = LayerFieldsContainer('172.16.0.5')
-#    ip_dst = LayerFieldsContainer('192.168.50.1')
+#    ip_src = '172.16.0.5'
+#    ip_dst = '192.168.50.1'
 #    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
-#    src_port = LayerFieldsContainer('60675')
-#    dst_port = LayerFieldsContainer('80')
+#    src_port = 60675
+#    dst_port = 80
 #    protocol = 'TCP'
 #    key = (ip_src, src_port, ip_dst, dst_port, protocol)
 #    length = 74
@@ -589,8 +589,8 @@ def test__update_twotuplebi_update():
 #            tm_dur_s
 #    '''
 #    n_features = 21
-#    ip_src = LayerFieldsContainer('172.16.0.5')
-#    ip_dst = LayerFieldsContainer('192.168.50.1')
+#    ip_src = '172.16.0.5'
+#    ip_dst = '192.168.50.1'
 #    key = (ip_src, ip_dst)
 #    afg = AnubisFG(bidirectional=False)
 #
@@ -709,8 +709,8 @@ def test__update_twotuplebi_update():
 #
 #    '''
 #    n_features = 41
-#    ip_src = LayerFieldsContainer('172.16.0.5')
-#    ip_dst = LayerFieldsContainer('192.168.50.1')
+#    ip_src = '172.16.0.5'
+#    ip_dst = '192.168.50.1'
 #    key = (ip_src, ip_dst)
 #    afg = AnubisFG(bidirectional=True)
 #
@@ -1021,10 +1021,10 @@ def test__update_twotuplebi_update():
 #            tm_dur_s
 #    '''
 #    n_features = 16
-#    ip_src = LayerFieldsContainer('172.16.0.5')
-#    ip_dst = LayerFieldsContainer('192.168.50.1')
-#    src_port = LayerFieldsContainer('60675')
-#    dst_port = LayerFieldsContainer('80')
+#    ip_src = '172.16.0.5'
+#    ip_dst = '192.168.50.1'
+#    src_port = 60675
+#    dst_port = 80
 #    protocol = 'TCP'
 #    key = (ip_src, src_port, ip_dst, dst_port, protocol)
 #    afg = AnubisFG(bidirectional=False)
@@ -1115,8 +1115,8 @@ def test__update_twotuplebi_update():
 #    # Zero forward packets on existing flow
 #    ip_src_1 = LayerFieldsContainer('192.168.0.1')
 #    ip_dst_1 = LayerFieldsContainer('192.168.0.2')
-#    src_port_1 = LayerFieldsContainer('80')
-#    dst_port_1 = LayerFieldsContainer('80')
+#    src_port_1 = '80'
+#    dst_port_1 = '80'
 #    protocol_1 = 'TCP'
 #    key_1 = (ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1)
 #    t5_1 = FiveTupleUnidirectionalNode()
@@ -1167,10 +1167,10 @@ def test__update_twotuplebi_update():
 #            tm_dur_s
 #    '''
 #    n_features = 31
-#    ip_src = LayerFieldsContainer('172.16.0.5')
-#    ip_dst = LayerFieldsContainer('192.168.50.1')
-#    src_port = LayerFieldsContainer('60675')
-#    dst_port = LayerFieldsContainer('80')
+#    ip_src = '172.16.0.5'
+#    ip_dst = '192.168.50.1'
+#    src_port = 60675
+#    dst_port = 80
 #    protocol = 'TCP'
 #    key = (ip_src, src_port, ip_dst, dst_port, protocol)
 #    afg = AnubisFG(bidirectional=True)
@@ -1387,8 +1387,8 @@ def test__update_twotuplebi_update():
 #    # Zero forward packets on existing flow
 #    ip_src_1 = LayerFieldsContainer('192.168.0.1')
 #    ip_dst_1 = LayerFieldsContainer('192.168.0.2')
-#    src_port_1 = LayerFieldsContainer('80')
-#    dst_port_1 = LayerFieldsContainer('80')
+#    src_port_1 = '80'
+#    dst_port_1 = '80'
 #    protocol_1 = 'TCP'
 #    key_1 = (ip_src_1, src_port_1, ip_dst_1, dst_port_1, protocol_1)
 #    t5_1 = FiveTupleBidirectionalNode()
