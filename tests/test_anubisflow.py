@@ -39,11 +39,11 @@ def test_anubisfg_onlyfive():
 
 def test_anubisfg_ud():
     t2_1 = TwoTupleBidirectionalNode()
-    ip_src_1 = LayerFieldsContainer('192.168.0.1')
-    ip_dst_1 = LayerFieldsContainer('192.168.0.2')
+    ip_src_1 = '192.168.0.1'
+    ip_dst_1 = '192.168.0.2'
     t2_2 = TwoTupleBidirectionalNode()
-    ip_src_2 = LayerFieldsContainer('192.168.0.1')
-    ip_dst_2 = LayerFieldsContainer('192.168.0.2')
+    ip_src_2 = '192.168.0.1'
+    ip_dst_2 = '192.168.0.2'
     memory_twotup_1 = {(ip_src_1, ip_dst_1): t2_1}
     memory_twotup_2 = {(ip_src_1, ip_dst_1): t2_1,
                        (ip_src_2, ip_dst_2): t2_2}
@@ -53,10 +53,10 @@ def test_anubisfg_ud():
     assert memory_twotup_2 == afg_2.memory_twotup
 
     t5_1 = FiveTupleBidirectionalNode()
-    ip_src_1 = LayerFieldsContainer('192.168.0.1')
-    ip_dst_1 = LayerFieldsContainer('192.168.0.2')
-    src_port_1 = LayerFieldsContainer('80')
-    dst_port_1 = LayerFieldsContainer('80')
+    ip_src_1 = '192.168.0.1'
+    ip_dst_1 = '192.168.0.2'
+    src_port_1 = 80
+    dst_port_1 = 80
     protocol_1 = 'TCP'
     protocol_2 = 'UDP'
     memory_fivetup_1 = {(ip_src_1, src_port_1, ip_dst_1, dst_port_1,
@@ -73,11 +73,11 @@ def test_anubisfg_ud():
 
 def test_anubisfg_raises():
     t2_1 = TwoTupleBidirectionalNode()
-    ip_src_1 = LayerFieldsContainer('192.168.0.1')
-    ip_dst_1 = LayerFieldsContainer('192.168.0.2')
+    ip_src_1 = '192.168.0.1'
+    ip_dst_1 = '192.168.0.2'
     t2_2 = dict()
-    ip_src_2 = '192.168.0.1'
-    ip_dst_2 = '192.168.0.1'
+    ip_src_2 = 19216801
+    ip_dst_2 = 19216801
 
     memories = [[[ip_src_1, ip_dst_1], t2_1],
                 {ip_src_1: t2_1},
@@ -90,8 +90,8 @@ def test_anubisfg_raises():
             _ = AnubisFG(bidirectional=True, memory_twotup=memory_twotup)
 
     t5_1 = FiveTupleBidirectionalNode()
-    src_port_1 = LayerFieldsContainer('80')
-    dst_port_1 = LayerFieldsContainer('80')
+    src_port_1 = 80
+    dst_port_1 = 80
     protocol_1 = 'TCP'
     src_port_2 = '80'
     dst_port_2 = '80'
@@ -116,11 +116,11 @@ def test_anubisfg_raises():
 
 def test_anubisfg_uni_raises():
     t2_1 = TwoTupleUnidirectionalNode()
-    ip_src_1 = LayerFieldsContainer('192.168.0.1')
-    ip_dst_1 = LayerFieldsContainer('192.168.0.2')
+    ip_src_1 = '192.168.0.1'
+    ip_dst_1 = '192.168.0.2'
     t2_2 = dict()
-    ip_src_2 = '192.168.0.1'
-    ip_dst_2 = '192.168.0.1'
+    ip_src_2 = 19216801
+    ip_dst_2 = 19216801
 
     memories = [[[ip_src_1, ip_dst_1], t2_1],
                 {ip_src_1: t2_1},
@@ -133,8 +133,8 @@ def test_anubisfg_uni_raises():
             _ = AnubisFG(bidirectional=False, memory_twotup=memory_twotup)
 
     t5_1 = FiveTupleUnidirectionalNode()
-    src_port_1 = LayerFieldsContainer('80')
-    dst_port_1 = LayerFieldsContainer('80')
+    src_port_1 = 80
+    dst_port_1 = 80
     protocol_1 = 'TCP'
     src_port_2 = '80'
     dst_port_2 = '80'
