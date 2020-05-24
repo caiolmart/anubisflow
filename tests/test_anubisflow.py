@@ -224,30 +224,31 @@ def test__update_twotupleuni_update():
 
 def test__update_twotuplebi_noupdate():
     afg = AnubisFG(bidirectional=True)
-    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    capture = rdpcap('tests/data/test_100_rows.pcap')
     # First packet is a STP packet that should not be read.
     packet = capture[0]
 
     afg._update_twotuplebi(packet)
     assert afg.memory_twotup == dict()
-    with pytest.raises(AttributeError, match='Attribute ip not in packet'):
-        afg._update_twotuplebi(packet, ignore_errors=False)
+    with pytest.raises(IndexError, match='Packet does not have an IP layer'):
+        afg._update_twotupleuni(packet, ignore_errors=False)
     
-    capture.close()
+    
 
 
 def test__update_twotuplebi_update():
     afg = AnubisFG(bidirectional=True)
-    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+    capture = rdpcap('tests/data/test_100_rows.pcap')
     # Second packet is a SYN TCP packet.
     packet = capture[1]
 
-    ip_src = LayerFieldsContainer('172.16.0.5')
-    ip_dst = LayerFieldsContainer('192.168.50.1')
-    timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
+    ip_src = '172.16.0.5'
+    ip_dst = '192.168.50.1'
+    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
     src_port = 60675
     dst_port = 80
-    protocol = 'TCP'
+    protocol = 6
+    hdr_len = 20
     length = 74
     ttl = 63
     fwd_pkt_flag_counter = [0] * 8
@@ -263,7 +264,7 @@ def test__update_twotuplebi_update():
                 'fwd_set_dst_ports': {dst_port},
                 'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
                 'fwd_pkt_protocol_counter': {protocol: 1},
-                'fwd_tot_header_len': 0,
+                'fwd_tot_header_len': hdr_len,
                 'fwd_tot_packet_len': length,
                 'fwd_tot_ttl': ttl,
                 'bck_set_src_ports': set(),
@@ -279,7 +280,7 @@ def test__update_twotuplebi_update():
     # Updating Forward
     # Third packet is another SYN TCP packet with same IPs and Ports
     packet = capture[2]
-    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183813)
     # SYN flag
     fwd_pkt_flag_counter[1] += 1
     afg._update_twotuplebi(packet)
@@ -289,7 +290,7 @@ def test__update_twotuplebi_update():
                 'fwd_set_dst_ports': {dst_port},
                 'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
                 'fwd_pkt_protocol_counter': {protocol: 2},
-                'fwd_tot_header_len': 0,
+                'fwd_tot_header_len': hdr_len * 2,
                 'fwd_tot_packet_len': length * 2,
                 'fwd_tot_ttl': ttl * 2,
                 'bck_set_src_ports': set(),
@@ -305,7 +306,7 @@ def test__update_twotuplebi_update():
     # Fourth packet is a SYN ACK response TCP packet with inverted IPs and
     # Ports
     packet = capture[3]
-    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
+    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183932)
     # SYN flag
     bck_pkt_flag_counter[1] += 1
     # ACK flag
@@ -317,25 +318,23 @@ def test__update_twotuplebi_update():
                 'fwd_set_dst_ports': {dst_port},
                 'fwd_pkt_flag_counter': fwd_pkt_flag_counter,
                 'fwd_pkt_protocol_counter': {protocol: 2},
-                'fwd_tot_header_len': 0,
+                'fwd_tot_header_len': hdr_len * 2,
                 'fwd_tot_packet_len': length * 2,
                 'fwd_tot_ttl': ttl * 2,
                 'bck_set_src_ports': {dst_port},
                 'bck_set_dst_ports': {src_port},
                 'bck_pkt_flag_counter': bck_pkt_flag_counter,
                 'bck_pkt_protocol_counter': {protocol: 1},
-                'bck_tot_header_len': 0,
+                'bck_tot_header_len': hdr_len,
                 'bck_tot_packet_len': length,
                 'bck_tot_ttl': 64}
     assert len(afg.memory_twotup) == 1
     assert afg.memory_twotup[(ip_src, ip_dst)].__dict__ == expected
 
-    capture.close()
-
 
 #def test__update_fivetupleuni_noupdate():
 #    afg = AnubisFG(bidirectional=False)
-#    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+#    capture = rdpcap('tests/data/test_100_rows.pcap')
 #    # First packet is a STP packet that should not be read.
 #    packet = capture[0]
 #
@@ -344,18 +343,18 @@ def test__update_twotuplebi_update():
 #    with pytest.raises(AttributeError, match='Attribute ip not in packet'):
 #        afg._update_fivetupleuni(packet, ignore_errors=False)
 #    
-#    capture.close()
+#    
 #
 #
 #def test__update_fivetupleuni_update():
 #    afg = AnubisFG(bidirectional=False)
-#    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+#    capture = rdpcap('tests/data/test_100_rows.pcap')
 #    # Second packet is a SYN TCP packet.
 #    packet = capture[1]
 #
 #    ip_src = LayerFieldsContainer('172.16.0.5')
 #    ip_dst = LayerFieldsContainer('192.168.50.1')
-#    timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
+#    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
 #    src_port = LayerFieldsContainer('60675')
 #    dst_port = LayerFieldsContainer('80')
 #    protocol = 'TCP'
@@ -383,7 +382,7 @@ def test__update_twotuplebi_update():
 #    # Updating
 #    # Third packet is another SYN TCP packet with same IPs and Ports
 #    packet = capture[2]
-#    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183813)
 #    # SYN flag
 #    pkt_flag_counter[1] += 1
 #    afg._update_fivetupleuni(packet)
@@ -399,12 +398,12 @@ def test__update_twotuplebi_update():
 #    assert len(afg.memory_fivetup) == 1
 #    assert afg.memory_fivetup[key].__dict__ == expected
 #
-#    capture.close()
+#    
 #
 #
 #def test__update_fivetuplebi_noupdate():
 #    afg = AnubisFG(bidirectional=True)
-#    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+#    capture = rdpcap('tests/data/test_100_rows.pcap')
 #    # First packet is a STP packet that should not be read.
 #    packet = capture[0]
 #
@@ -413,18 +412,18 @@ def test__update_twotuplebi_update():
 #    with pytest.raises(AttributeError, match='Attribute ip not in packet'):
 #        afg._update_fivetuplebi(packet, ignore_errors=False)
 #
-#    capture.close()
+#    
 #
 #
 #def test__update_fivetuplebi_update():
 #    afg = AnubisFG(bidirectional=True)
-#    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+#    capture = rdpcap('tests/data/test_100_rows.pcap')
 #    # Second packet is a SYN TCP packet.
 #    packet = capture[1]
 #
 #    ip_src = LayerFieldsContainer('172.16.0.5')
 #    ip_dst = LayerFieldsContainer('192.168.50.1')
-#    timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
+#    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
 #    src_port = LayerFieldsContainer('60675')
 #    dst_port = LayerFieldsContainer('80')
 #    protocol = 'TCP'
@@ -460,7 +459,7 @@ def test__update_twotuplebi_update():
 #    # Updating Forward
 #    # Third packet is another SYN TCP packet with same IPs and Ports
 #    packet = capture[2]
-#    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183813)
 #    # SYN flag
 #    fwd_pkt_flag_counter[1] += 1
 #    afg._update_fivetuplebi(packet)
@@ -486,7 +485,7 @@ def test__update_twotuplebi_update():
 #    # Fourth packet is a SYN ACK response TCP packet with inverted IPs and
 #    # Ports
 #    packet = capture[3]
-#    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
+#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183932)
 #    # SYN flag
 #    bck_pkt_flag_counter[1] += 1
 #    # ACK flag
@@ -511,11 +510,11 @@ def test__update_twotuplebi_update():
 #    assert len(afg.memory_fivetup) == 1
 #    assert afg.memory_fivetup[key].__dict__ == expected
 #
-#    capture.close()
+#    
 #
 #
 #def test_update():
-#    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+#    capture = rdpcap('tests/data/test_100_rows.pcap')
 #    # Will be tested considering all possible sets of attributes.
 #    for bidir in [True, False]:
 #        for onlytwo in [True, False]:
@@ -561,7 +560,7 @@ def test__update_twotuplebi_update():
 #                        for key in afg_1.memory_fivetup.keys():
 #                            assert afg_1.memory_fivetup[key].__dict__ == afg_2.memory_fivetup[key].__dict__
 #    
-#    capture.close()
+#    
 #
 #
 #def test__generate_features_twotupleuni():
@@ -600,10 +599,10 @@ def test__update_twotuplebi_update():
 #    assert empty == [0] * n_features
 #
 #    # Duration 0
-#    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+#    capture = rdpcap('tests/data/test_100_rows.pcap')
 #    # Second packet is a SYN TCP packet.
 #    packet = capture[1]
-#    timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
+#    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
 #    afg._update_twotupleuni(packet)
 #    expected = [
 #        1,  # qt_pkt
@@ -636,7 +635,7 @@ def test__update_twotuplebi_update():
 #    # Third packet is another SYN TCP packet with same IPs and Ports
 #    packet = capture[2]
 #    afg._update_twotupleuni(packet)
-#    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183813)
 #    dur = (new_timestamp - timestamp).total_seconds()
 #    expected = [
 #        2,  # qt_pkt
@@ -702,7 +701,7 @@ def test__update_twotuplebi_update():
 #    afg_1 = AnubisFG(memory_twotup=memory_twotup_1, bidirectional=False)
 #    ftrs = afg_1._generate_features_twotupleuni(key_1)
 #    assert ftrs == [0] * n_features
-#    capture.close()
+#    
 #
 #
 #def test__generate_features_twotuplebi():
@@ -720,10 +719,10 @@ def test__update_twotuplebi_update():
 #    assert empty == [0] * n_features
 #
 #    # Duration 0
-#    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+#    capture = rdpcap('tests/data/test_100_rows.pcap')
 #    # Second packet is a SYN TCP packet.
 #    packet = capture[1]
-#    timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
+#    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
 #
 #    afg._update_twotuplebi(packet)
 #    expected = [
@@ -830,7 +829,7 @@ def test__update_twotuplebi_update():
 #    # Third packet is another SYN TCP packet with same IPs and Ports
 #    packet = capture[2]
 #    afg._update_twotuplebi(packet)
-#    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183813)
 #    dur = (new_timestamp - timestamp).total_seconds()
 #    expected = [
 #        2,  # qt_pkt
@@ -936,7 +935,7 @@ def test__update_twotuplebi_update():
 #    # Fourth packet is a SYN ACK response TCP packet with inverted IPs and
 #    packet = capture[3]
 #    afg._update_twotuplebi(packet)
-#    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
+#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183932)
 #    dur = (new_timestamp - timestamp).total_seconds()
 #    expected = [
 #        2,  # qt_pkt
@@ -998,7 +997,7 @@ def test__update_twotuplebi_update():
 #    ftrs = afg_1._generate_features_twotuplebi(key_1)
 #    assert ftrs == [0] * n_features
 #
-#    capture.close()
+#    
 #
 #
 #def test__generate_features_fivetupleuni():
@@ -1035,10 +1034,10 @@ def test__update_twotuplebi_update():
 #    assert empty == [0] * n_features
 #
 #    # Duration 0
-#    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+#    capture = rdpcap('tests/data/test_100_rows.pcap')
 #    # Second packet is a SYN TCP packet.
 #    packet = capture[1]
-#    timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
+#    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
 #    afg._update_fivetupleuni(packet)
 #    expected = [
 #        1,  # qt_pkt
@@ -1066,7 +1065,7 @@ def test__update_twotuplebi_update():
 #    # Third packet is another SYN TCP packet with same IPs and Ports
 #    packet = capture[2]
 #    afg._update_fivetupleuni(packet)
-#    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183813)
 #    dur = (new_timestamp - timestamp).total_seconds()
 #    expected = [
 #        2,  # qt_pkt
@@ -1126,7 +1125,7 @@ def test__update_twotuplebi_update():
 #    ftrs = afg_1._generate_features_fivetupleuni(key_1)
 #    assert ftrs == [0] * n_features
 #
-#    capture.close()
+#    
 #
 #
 #def test__generate_features_fivetuplebi():
@@ -1181,10 +1180,10 @@ def test__update_twotuplebi_update():
 #    assert empty == [0] * n_features
 #
 #    # Duration 0
-#    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+#    capture = rdpcap('tests/data/test_100_rows.pcap')
 #    # Second packet is a SYN TCP packet.
 #    packet = capture[1]
-#    timestamp = datetime(2018, 12, 1, 11, 17, 11, 183810)
+#    timestamp = datetime(2018, 12, 1, 13, 17, 11, 183810)
 #    afg._update_fivetuplebi(packet)
 #    expected = [
 #        1,  # fwd_qt_pkt
@@ -1265,7 +1264,7 @@ def test__update_twotuplebi_update():
 #    # Third packet is another SYN TCP packet with same IPs and Ports
 #    packet = capture[2]
 #    afg._update_fivetuplebi(packet)
-#    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183813)
+#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183813)
 #    dur = (new_timestamp - timestamp).total_seconds()
 #    expected = [
 #        2,  # fwd_qt_pkt
@@ -1347,7 +1346,7 @@ def test__update_twotuplebi_update():
 #    # Fourth packet is a SYN ACK response TCP packet with inverted IPs and
 #    packet = capture[3]
 #    afg._update_fivetuplebi(packet)
-#    new_timestamp = datetime(2018, 12, 1, 11, 17, 11, 183932)
+#    new_timestamp = datetime(2018, 12, 1, 13, 17, 11, 183932)
 #    dur = (new_timestamp - timestamp).total_seconds()
 #    expected = [
 #        2,  # fwd_qt_pkt
@@ -1398,11 +1397,11 @@ def test__update_twotuplebi_update():
 #    ftrs = afg_1._generate_features_fivetuplebi(key_1)
 #    assert ftrs == [0] * n_features
 #
-#    capture.close()
+#    
 #
 #
 #def test_generate_features():
-#    capture = pyshark.FileCapture('tests/data/test_100_rows.pcap')
+#    capture = rdpcap('tests/data/test_100_rows.pcap')
 #    # Flow to be tested.
 #    packet = capture[1]
 #    ip_src = packet.ip.src
@@ -1457,5 +1456,5 @@ def test__update_twotuplebi_update():
 #                                key2) + afg_1._generate_features_fivetupleuni(key5)
 #                            assert ftrs_1 == ftrs_2
 #
-#    capture.close()
+#    
 #
