@@ -391,8 +391,8 @@ class AnubisFG:
             src_port = packet[TCP].sport
             dst_port = packet[TCP].dport
         elif UDP in packet:
-            src_port = packet[TCP].sport
-            dst_port = packet[TCP].dport
+            src_port = packet[UDP].sport
+            dst_port = packet[UDP].dport
 
         key = (ip_src, ip_dst)
         if key in self.memory_twotup:
@@ -495,8 +495,8 @@ class AnubisFG:
             src_port = packet[TCP].sport
             dst_port = packet[TCP].dport
         elif UDP in packet:
-            src_port = packet[TCP].sport
-            dst_port = packet[TCP].dport
+            src_port = packet[UDP].sport
+            dst_port = packet[UDP].dport
 
         if (ip_src, ip_dst) in self.memory_twotup:
             prefix = 'fwd'
@@ -625,8 +625,8 @@ class AnubisFG:
             src_port = packet[TCP].sport
             dst_port = packet[TCP].dport
         elif UDP in packet:
-            src_port = packet[TCP].sport
-            dst_port = packet[TCP].dport
+            src_port = packet[UDP].sport
+            dst_port = packet[UDP].dport
 
         key = (ip_src, src_port, ip_dst, dst_port, protocol)
         if key in self.memory_fivetup:
@@ -729,8 +729,8 @@ class AnubisFG:
             src_port = packet[TCP].sport
             dst_port = packet[TCP].dport
         elif UDP in packet:
-            src_port = packet[TCP].sport
-            dst_port = packet[TCP].dport
+            src_port = packet[UDP].sport
+            dst_port = packet[UDP].dport
 
         # Forward packet
         if (ip_src, src_port, ip_dst, dst_port,
