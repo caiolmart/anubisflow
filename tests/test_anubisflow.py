@@ -228,7 +228,7 @@ def test__update_twotuplebi_noupdate():
     afg._update_twotuplebi(packet)
     assert afg.memory_twotup == dict()
     with pytest.raises(IndexError, match='Packet does not have an IP layer'):
-        afg._update_twotupleuni(packet, ignore_errors=False)
+        afg._update_twotuplebi(packet, ignore_errors=False)
 
 
 def test__update_twotuplebi_update():
