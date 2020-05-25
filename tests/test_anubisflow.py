@@ -2,12 +2,9 @@ import pytest
 from datetime import datetime
 import os
 import pathlib
-import pyshark
 import numpy as np
-
-from pyshark.packet.fields import LayerFieldsContainer
 from scapy.utils import rdpcap
-from scapy.layers.inet import IP, UDP, TCP, ICMP
+from scapy.layers.inet import IP, UDP, TCP
 
 from anubisflow.anubisflow import AnubisFG, add_to_counter
 from anubisflow.nodes import TwoTupleUnidirectionalNode, TwoTupleBidirectionalNode, FiveTupleUnidirectionalNode, FiveTupleBidirectionalNode
